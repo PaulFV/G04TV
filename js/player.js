@@ -330,10 +330,24 @@
     playingUrl = url;
 
     if (!viaProxy && mixedContent(source)) {
-      fail('Dieser Sender läuft über http, die App über https. Der Browser blockiert das. ' +
-           'Mit „Extern öffnen“ an einen richtigen Abspieler weitergeben — oder in den ' +
-           'Einstellungen einen Vermittler auch für Streams einschalten.');
-      return;
+      // Bevor aufgegeben wird: viele Anbieter geben denselben Sender auch
+      // über https heraus. Dann braucht es weder Vermittler noch einen
+      // fremden Abspieler.
+      set('loading', 'Wird über https versucht …');
+      var lifted = await G.library.httpsVariant(source, false);
+
+      if (current !== channel) return;      // inzwischen umgeschaltet
+
+      if (!lifted) {
+        fail('Dieser Sender läuft über http, die App über https. Der Browser blockiert das, ' +
+             'und der Anbieter antwortet auch nicht über https. Mit „Extern öffnen“ an einen ' +
+             'richtigen Abspieler weitergeben — oder in den Einstellungen einen Vermittler ' +
+             'auch für Streams einschalten.');
+        return;
+      }
+
+      url = lifted;
+      playingUrl = url;
     }
 
     var kind = kindOf(source);

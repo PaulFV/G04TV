@@ -16,6 +16,120 @@
      Playlisten holen
      ------------------------------------------------------------ */
 
+  /* ------------------------------------------------------------
+     Von http auf https heben
+
+     Laeuft GoTV ueber https und die Quelle ueber http, blockiert der
+     Browser - dagegen half bisher nur der Vermittler. Vorher lohnt aber
+     ein Versuch: viele Anbieter antworten unter demselben Namen auch
+     ueber https, nur auf dem Standardanschluss statt auf 8080. Wo das
+     gelingt, wird gar kein Vermittler gebraucht.
+     ------------------------------------------------------------ */
+
+  /** Die Adressen, unter denen die https-Fassung stehen koennte. */
+  function httpsCandidates(source) {
+    try {
+      var u = new URL(String(source || '').trim());
+      if (u.protocol !== 'http:') return [];
+
+      var out = [];
+
+      // Zuerst ohne Anschlussnummer: 8080 ist die des Klartextanschlusses,
+      // https liegt fast immer auf 443.
+      var plain = new URL(u.toString());
+      plain.protocol = 'https:';
+      plain.port = '';
+      out.push(plain.toString());
+
+      // Dann derselbe Anschluss - manche Anbieter koennen beides.
+      if (u.port) {
+        var kept = new URL(u.toString());
+        kept.protocol = 'https:';
+        out.push(kept.toString());
+      }
+
+      return out;
+    } catch (e) {
+      return [];
+    }
+  }
+
+  /**
+   * Antwortet die Adresse brauchbar? Gelesen wird nur der Anfang, danach
+   * wird abgebrochen - eine Senderliste hat schnell zehn Megabyte, und ein
+   * Stream hoert nie von selbst auf.
+   */
+  async function responds(url, wantM3u) {
+    try {
+      var res = await fetch(url, { cache: 'no-store', redirect: 'follow' });
+      if (!res.ok) return false;
+      if (!wantM3u) { try { res.body.cancel(); } catch (e) { } return true; }
+      if (!res.body) return false;
+
+      var reader = res.body.getReader();
+      var first = await reader.read();
+      try { await reader.cancel(); } catch (e) { /* Rest verwerfen */ }
+
+      var head = new TextDecoder().decode(first.value || new Uint8Array()).toUpperCase();
+      return head.indexOf('#EXTM3U') >= 0 || head.indexOf('#EXTINF') >= 0;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /**
+   * Was beim Anbieter herauskam: sein https-Ursprung - oder false, wenn er
+   * keinen hat. Ohne dieses Gedaechtnis wuerde jeder Sender eines Anbieters
+   * denselben Versuch neu machen, und der dauert ein paar Sekunden.
+   */
+  var lifted = {};
+
+  function originOf(url) {
+    try { return new URL(url).origin; } catch (e) { return ''; }
+  }
+
+  /** Dieselbe Adresse unter einem anderen Ursprung. */
+  function withOrigin(source, origin) {
+    try {
+      var from = new URL(source);
+      var to = new URL(origin);
+      to.pathname = from.pathname;
+      to.search = from.search;
+      to.hash = from.hash;
+      return to.toString();
+    } catch (e) {
+      return '';
+    }
+  }
+
+  /**
+   * Sucht die https-Fassung einer http-Adresse. Gibt die gefundene Adresse
+   * zurueck - oder einen leeren Text, wenn der Anbieter kein https kann.
+   *
+   * @param {string} source  die http-Adresse
+   * @param {boolean} wantM3u  true bei einer Playlist, false bei einem Stream
+   */
+  async function httpsVariant(source, wantM3u) {
+    var key = originOf(source);
+
+    // Beim selben Anbieter ist die Antwort schon bekannt.
+    if (key && key in lifted) {
+      return lifted[key] ? withOrigin(source, lifted[key]) : '';
+    }
+
+    var candidates = httpsCandidates(source);
+
+    for (var i = 0; i < candidates.length; i++) {
+      if (await responds(candidates[i], wantM3u !== false)) {
+        if (key) lifted[key] = originOf(candidates[i]);
+        return candidates[i];
+      }
+    }
+
+    if (key) lifted[key] = false;
+    return '';
+  }
+
   /**
    * Laedt die Sender einer Playlist neu von ihrer Quelle.
    * Playlisten aus Datei oder eingefuegtem Text haben keine Quelle im
@@ -29,6 +143,19 @@
 
     if (p.kind === 'file' || p.kind === 'text') {
       return { ok: false, count: p.count, error: 'Diese Playlist stammt nicht aus dem Netz. Datei erneut einlesen, um sie zu ersetzen.' };
+    }
+
+    // Bevor der Browser die http-Adresse blockiert: sieht nach, ob der
+    // Anbieter dieselbe Liste auch ueber https herausgibt. Gelingt das,
+    // wird die Quelle dauerhaft darauf umgestellt.
+    if (G.player.mixedContent(p.source)) {
+      var better = await httpsVariant(p.source, true);
+      if (better) {
+        p.source = better;
+        G.store.commit('playlists');
+        G.u.toast('Auf https gehoben',
+          'Der Anbieter antwortet auch über https — es wird kein Vermittler gebraucht.', 'ok', 6000);
+      }
     }
 
     try {
@@ -206,6 +333,7 @@
   }
 
   G.library = {
+    httpsVariant: httpsVariant,
     refresh: refresh,
     channelsOf: channelsOf,
     forget: forget,

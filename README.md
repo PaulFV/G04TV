@@ -107,7 +107,14 @@ Der häufigste Fall — und kein Fehler der App:
    Inhalt unter **Einfügen** hineinkopieren.
 2. **Gemischter Inhalt.** Läuft GoTV über `https` (GitHub Pages) und die Playlist über `http`,
    blockiert der Browser das.
-   → Datei/Einfügen verwenden, oder die App lokal über `http` betreiben.
+   → **GoTV versucht das von selbst zu lösen:** viele Anbieter geben dieselbe Liste auch über
+   `https` heraus, nur auf dem Standardanschluss statt auf `:8080`. Gelingt das, wird die Quelle
+   dauerhaft darauf umgestellt (Meldung *„Auf https gehoben"*) — und es braucht **keinen
+   Vermittler**. Panels, die den Aufruf über `https` beantworten, schreiben meist auch die Sender
+   als `https` in die Liste, dann läuft alles direkt. Beim Abspielen wird dasselbe für einen
+   einzelnen Sender versucht; das Ergebnis wird je Anbieter gemerkt.
+   → Klappt es nicht: Datei/Einfügen verwenden, die App lokal über `http` betreiben, oder den
+   Vermittler.
 3. **Vermittler.** Unter **Einstellungen › Playlisten aus dem Netz** lässt sich ein eigener Proxy
    eintragen (`https://…/?url={url}`). Er sieht dabei die vollständige Adresse **samt
    Zugangsdaten** — deshalb nur einen eintragen, dem man selbst vertraut. Voreingestellt ist keiner.
