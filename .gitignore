@@ -1,0 +1,19 @@
+# Betriebssystem
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Editor
+.vs/
+.idea/
+*.user
+*.suo
+
+# Werkzeuge
+node_modules/
+
+# Eigene Playlists / Zugangsdaten gehoeren nicht ins Repository
+*.m3u
+*.m3u8
+!beispiel/*.m3u
+zugang.txt

@@ -1,0 +1,192 @@
+/* ============================================================
+   IPTV+ — Bereich Sender: Buehne, Bedienleiste, Senderliste
+
+   Aufbau wie im IPTV-Fenster von Connect+: links die Sender,
+   rechts das Bild. Auf dem Handy liegt das Bild oben und die
+   Liste darunter.
+   ============================================================ */
+
+.live{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 360px;
+  gap:var(--sp);
+  align-items:start;
+}
+
+/* ---------- Buehne ---------- */
+.stage-wrap{display:flex;flex-direction:column;gap:12px;min-width:0}
+
+.stage{
+  position:relative;
+  aspect-ratio:16/9;
+  width:100%;
+  border-radius:var(--r-lg);
+  overflow:hidden;
+  background:#000;
+  border:1px solid var(--glass-br);
+  box-shadow:var(--sh-1);
+}
+.stage video{
+  width:100%;height:100%;object-fit:contain;background:#000;display:block;
+}
+.stage video.is-off{visibility:hidden}
+
+/* Ruhezustand: kein Rauschen, sondern ein ruhiger Schirm im Gewand
+   der Anwendung - das Zeichen als Kachel, darum ein weicher Schein. */
+.stage__idle{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:14px;padding:24px;text-align:center;
+  background:radial-gradient(circle at 50% 42%,var(--bg-2) 0%,#000 72%);
+}
+.stage__mark{
+  width:66px;height:66px;border-radius:20px;display:grid;place-items:center;
+  color:var(--acc);border:1px solid var(--acc-line);background:var(--acc-dim);
+  box-shadow:0 0 34px rgba(49,216,255,.22);
+}
+.stage__idle b{font-size:16px;font-weight:640}
+.stage__idle p{font-size:13px;color:var(--tx-2);max-width:340px}
+
+/* Ladeanzeige */
+.stage__busy{
+  position:absolute;inset:0;display:none;place-items:center;background:rgba(0,0,0,.42);
+}
+.stage__busy.is-on{display:grid}
+.stage__ring{
+  width:52px;height:52px;border-radius:50%;
+  border:3px solid rgba(255,255,255,.14);border-top-color:var(--acc);
+  animation:ringSpin .9s linear infinite;
+}
+@keyframes ringSpin{to{transform:rotate(360deg)}}
+
+/* Fehlerflaeche */
+.stage__err{
+  position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;padding:24px;text-align:center;background:rgba(6,8,12,.9);
+}
+.stage__err.is-on{display:flex}
+.stage__err b{font-size:15px;color:var(--danger)}
+.stage__err p{font-size:12.5px;color:var(--tx-1);max-width:460px;line-height:1.6;word-break:break-word}
+
+/* Vollbild: die Buehne loest sich aus dem Raster und deckt alles zu */
+.stage.is-full{
+  position:fixed;inset:0;z-index:120;
+  width:100vw;height:100vh;height:100dvh;
+  aspect-ratio:auto;border-radius:0;border:0;
+}
+.stage.is-full .stage__bar{opacity:0}
+.stage.is-full:hover .stage__bar,
+.stage.is-full.is-hint .stage__bar{opacity:1}
+
+/* Schwebende Leiste im Bild (Vollbild verlassen, Ton) */
+.stage__bar{
+  position:absolute;right:10px;top:10px;display:flex;gap:8px;
+  transition:opacity .3s var(--ease);
+}
+.stage__bar .icon-btn{background:rgba(6,8,12,.72);border-color:rgba(255,255,255,.14)}
+
+/* ---------- Die Buehne wandert mit ----------
+
+   Damit ein Sender weiterlaeuft, waehrend man in den Favoriten oder
+   in den Playlisten blaettert, lebt die Buehne nicht in der Ansicht,
+   sondern in einem eigenen Behaelter. Im Bereich Sender haengt er im
+   Bild, sonst als kleines Fenster unten rechts.
+   ------------------------------------------------- */
+.pdock{
+  position:fixed;z-index:55;right:16px;bottom:16px;width:min(320px,calc(100vw - 32px));
+  border-radius:var(--r-md);overflow:hidden;
+  border:1px solid var(--glass-br);background:rgba(8,12,19,.96);
+  box-shadow:0 18px 46px rgba(0,0,0,.6);
+  animation:dockIn .3s var(--ease) both;
+}
+@keyframes dockIn{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+.pdock .stage{border-radius:0;border:0}
+.pdock__bar{display:flex;align-items:center;gap:8px;padding:8px 10px;border-top:1px solid var(--glass-br)}
+.pdock__bar b{flex:1;min-width:0;font-size:12.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pdock__bar .icon-btn{width:30px;height:30px;border-radius:9px}
+
+/* Im Bereich Sender sitzt derselbe Behaelter fest im Raster. */
+.pdock.is-inline{
+  position:static;width:auto;border:0;background:none;box-shadow:none;border-radius:0;
+  animation:none;overflow:visible;
+}
+.pdock.is-inline .stage{border-radius:var(--r-lg);border:1px solid var(--glass-br)}
+.pdock.is-inline .pdock__bar{display:none}
+
+@media (max-width:980px){
+  .pdock{bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 12px);right:12px;left:auto;width:min(280px,calc(100vw - 24px))}
+  .pdock.is-inline{bottom:auto;right:auto;width:auto}
+}
+
+/* Der Platzhalter im Bereich Sender, in den der Behaelter einzieht */
+.stage-slot{min-width:0}
+.stage-slot:empty{
+  aspect-ratio:16/9;border-radius:var(--r-lg);
+  border:1px dashed var(--glass-br);background:rgba(0,0,0,.25);
+}
+
+/* ---------- Bedienleiste unter dem Bild ---------- */
+.transport{
+  border-radius:var(--r-lg);border:1px solid var(--glass-br);background:var(--glass-bg);
+  -webkit-backdrop-filter:blur(var(--blur));backdrop-filter:blur(var(--blur));
+  padding:14px 16px;display:flex;flex-direction:column;gap:12px;
+}
+.transport__now{display:flex;align-items:center;gap:12px;min-width:0}
+.transport__logo{
+  width:46px;height:36px;border-radius:9px;flex:none;display:grid;place-items:center;overflow:hidden;
+  background:rgba(0,0,0,.35);border:1px solid var(--glass-br);position:relative;
+}
+.transport__logo img{position:absolute;inset:3px;margin:auto;max-width:calc(100% - 6px);max-height:calc(100% - 6px);object-fit:contain;background:rgba(0,0,0,.35)}
+.transport__logo b{font-size:13px;font-weight:800;color:var(--tx-2)}
+.transport__meta{flex:1;min-width:0}
+.transport__meta b{display:block;font-size:15.5px;font-weight:640;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.transport__meta span{display:block;font-size:12px;color:var(--tx-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.transport__btns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* Lautstaerke */
+.vol{display:flex;align-items:center;gap:9px;min-width:150px;flex:1;max-width:230px}
+.vol input[type=range]{
+  -webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:99px;
+  background:rgba(255,255,255,.12);outline:none;cursor:pointer;
+}
+.vol input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:15px;height:15px;border-radius:50%;
+  background:var(--acc);box-shadow:0 0 10px rgba(49,216,255,.6);cursor:pointer;
+}
+.vol input[type=range]::-moz-range-thumb{
+  width:15px;height:15px;border:0;border-radius:50%;
+  background:var(--acc);box-shadow:0 0 10px rgba(49,216,255,.6);cursor:pointer;
+}
+
+/* Zustandszeile */
+.transport__state{font-size:12px;color:var(--tx-2);display:flex;align-items:center;gap:7px;min-height:17px}
+.transport__state.is-err{color:var(--danger)}
+.transport__state.is-ok{color:var(--acc)}
+
+/* ---------- Senderliste ---------- */
+.chlist{
+  border-radius:var(--r-lg);border:1px solid var(--glass-br);background:var(--glass-bg);
+  -webkit-backdrop-filter:blur(var(--blur));backdrop-filter:blur(var(--blur));
+  display:flex;flex-direction:column;overflow:hidden;
+  max-height:calc(100vh - 130px);
+}
+.chlist__head{padding:14px 14px 10px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid var(--glass-br)}
+.chlist__body{overflow-y:auto;padding:6px;flex:1;min-height:180px;overscroll-behavior:contain}
+.chlist__foot{padding:9px 14px;border-top:1px solid var(--glass-br);font-size:11.5px;color:var(--tx-2);display:flex;gap:8px;align-items:center}
+.chlist__more{width:100%;margin:8px 0 4px}
+
+@media (max-width:1180px){
+  .live{grid-template-columns:1fr}
+  .chlist{max-height:none}
+  .chlist__body{max-height:60vh}
+}
+@media (max-width:560px){
+  .stage{border-radius:var(--r-md)}
+  .transport{padding:12px 13px}
+  .vol{max-width:none}
+}
+
+/* Auf dem Handy liegt das Bild fest oben, waehrend die Liste laeuft. */
+@media (max-width:1180px){
+  .stage-wrap.is-sticky{position:sticky;top:calc(env(safe-area-inset-top) + 4px);z-index:20}
+  .stage-wrap.is-sticky .stage{box-shadow:0 12px 34px rgba(0,0,0,.6)}
+}

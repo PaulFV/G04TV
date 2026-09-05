@@ -1,0 +1,139 @@
+/* ============================================================
+   IPTV+ v1.0.0 — Design Tokens
+   Dunkle Oberflaeche · Glas · Signalblau mit Violett-Akzent
+   ============================================================ */
+
+:root{
+  /* --- Farbwelt --- */
+  --bg-0:#05070B;
+  --bg-1:#080C13;
+  --bg-2:#0C121B;
+
+  --acc:#31D8FF;
+  --acc-2:#0BA5EC;
+  --acc-dim:rgba(49,216,255,.14);
+  --acc-line:rgba(49,216,255,.32);
+
+  --violet:#A78BFA;
+  --violet-dim:rgba(167,139,250,.14);
+
+  --gold:#FFC857;
+  --danger:#FF5C7A;
+  --warn:#FFB020;
+  --live:#FF4D6D;
+
+  /* --- Text --- */
+  --tx-0:#E9F1F7;
+  --tx-1:#9DB0BE;
+  --tx-2:#6B7E8C;
+
+  /* --- Glas --- */
+  --glass-bg:rgba(255,255,255,.035);
+  --glass-bg-2:rgba(255,255,255,.055);
+  --glass-br:rgba(255,255,255,.085);
+  --glass-hi:rgba(255,255,255,.14);
+  --blur:18px;
+
+  /* --- Masse --- */
+  --r-xs:8px; --r-sm:12px; --r-md:16px; --r-lg:22px; --r-xl:30px;
+  --sp:16px;
+  --sidebar-w:246px;
+  --tabbar-h:66px;
+
+  --sh-1:0 1px 0 var(--glass-hi) inset, 0 12px 34px rgba(0,0,0,.5);
+  --sh-acc:0 0 0 1px var(--acc-line), 0 0 26px rgba(49,216,255,.18);
+
+  --ease:cubic-bezier(.22,.9,.25,1);
+  --dur:.34s;
+
+  --font:"Segoe UI Variable Display","Segoe UI",system-ui,-apple-system,"Inter",Roboto,sans-serif;
+  --mono:"Cascadia Mono",ui-monospace,"SF Mono",Consolas,monospace;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{
+  margin:0;
+  font-family:var(--font);
+  color:var(--tx-0);
+  background:var(--bg-0);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  font-size:15px;
+  line-height:1.5;
+  /* iOS: kein Gummiband-Effekt und kein grauer Tipp-Schleier */
+  overscroll-behavior-y:none;
+  -webkit-tap-highlight-color:transparent;
+}
+h1,h2,h3,h4{margin:0;font-weight:640;letter-spacing:-.015em;line-height:1.2}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--acc);text-decoration:none}
+
+/* --- Hintergrund --- */
+.bg-grid{
+  position:fixed;inset:0;z-index:-2;pointer-events:none;
+  background:
+    linear-gradient(rgba(49,216,255,.026) 1px,transparent 1px) 0 0/64px 64px,
+    linear-gradient(90deg,rgba(49,216,255,.026) 1px,transparent 1px) 0 0/64px 64px,
+    var(--bg-0);
+  mask-image:radial-gradient(ellipse 90% 70% at 50% 0%,#000 20%,transparent 80%);
+}
+.bg-glow{
+  position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(700px 460px at 12% -8%,rgba(49,216,255,.15),transparent 62%),
+    radial-gradient(620px 420px at 92% 4%,rgba(167,139,250,.11),transparent 62%),
+    radial-gradient(900px 620px at 50% 108%,rgba(49,216,255,.06),transparent 66%);
+  animation:auraDrift 22s var(--ease) infinite alternate;
+}
+@keyframes auraDrift{to{transform:translate3d(0,-14px,0) scale(1.04)}}
+
+/* --- Glas-Basisklasse --- */
+.glass{
+  background:var(--glass-bg);
+  border:1px solid var(--glass-br);
+  -webkit-backdrop-filter:blur(var(--blur)) saturate(150%);
+  backdrop-filter:blur(var(--blur)) saturate(150%);
+  box-shadow:var(--sh-1);
+}
+
+/* --- Scrollbar --- */
+*::-webkit-scrollbar{width:10px;height:10px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:99px;border:3px solid transparent;background-clip:content-box}
+*::-webkit-scrollbar-thumb:hover{background:var(--acc-line);background-clip:content-box}
+
+/* --- Auswahl / Fokus --- */
+::selection{background:var(--acc-dim);color:var(--acc)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:6px}
+
+/* --- Reduzierte Bewegung --- */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+body.no-motion *,body.no-motion *::before,body.no-motion *::after{
+  animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important
+}
+
+/* --- Hilfsklassen --- */
+.stack{display:flex;flex-direction:column;gap:var(--sp)}
+.stack--sm{gap:10px}
+.row{display:flex;align-items:center;gap:10px}
+.row--wrap{flex-wrap:wrap}
+.spacer{flex:1}
+.muted{color:var(--tx-1)}
+.dim{color:var(--tx-2)}
+.tiny{font-size:12px}
+.small{font-size:13px}
+.big{font-size:clamp(26px,4vw,38px);font-weight:700;letter-spacing:-.03em}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.acc{color:var(--acc)}
+.violet{color:var(--violet)}
+.gold{color:var(--gold)}
+.center{text-align:center}
+.hidden,[hidden]{display:none!important}
+.nowrap{white-space:nowrap}
+.ellips{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.break{word-break:break-all}
