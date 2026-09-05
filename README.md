@@ -81,13 +81,10 @@ Danach am Handy `http://<IP-des-Rechners>:8080` aufrufen — Rechner und Handy i
 
 ### 3. GitHub Pages
 
-Im Repository unter **Settings › Pages › Source: GitHub Actions** einschalten. Der mitgelieferte
-Ablauf [`.github/workflows/pages.yml`](.github/workflows/pages.yml) veröffentlicht den Stand von
-`main` unter
+Läuft bereits: **https://paulfv.github.io/GoTV/**
 
-```
-https://<benutzer>.github.io/GoTV/
-```
+Eingeschaltet unter **Settings › Pages › Source: Deploy from a branch › `main` / (root)**. Jeder
+Push auf `main` wird von GitHub selbst veröffentlicht — es braucht keinen eigenen Actions-Ablauf.
 
 ---
 
