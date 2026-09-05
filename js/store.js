@@ -68,6 +68,7 @@
         confirmExternal: true,   // vor dem Oeffnen in einer anderen App fragen
         proxyOn: false,
         proxy: '',               // eigener Vermittler, z. B. https://…/?url={url}
+        proxyStreams: false,     // auch die Streams über den Vermittler holen
         autoRefreshDays: 0       // 0 = nie von selbst neu laden
       }
     };
@@ -328,6 +329,31 @@
     return state.settings.proxyOn ? String(state.settings.proxy || '').trim() : '';
   }
 
+  /**
+   * Baut die Adresse, unter der eine Quelle ueber den Vermittler laeuft.
+   * Der Platzhalter <c>{url}</c> wird ersetzt; fehlt er, wird die Adresse
+   * hinten angehaengt. Ohne Vermittler kommt die Adresse unveraendert zurueck.
+   */
+  function viaProxy(url) {
+    var p = proxy();
+    var text = String(url || '').trim();
+    if (!p || !text) return text;
+
+    return p.indexOf('{url}') >= 0
+      ? p.replace('{url}', encodeURIComponent(text))
+      : p + encodeURIComponent(text);
+  }
+
+  /**
+   * Dasselbe fuer einen Stream - aber nur, wenn das ausdruecklich
+   * eingeschaltet ist. Die Playlist einmal zu holen ist harmlos; jeden
+   * Sender ueber den Vermittler zu spielen, schickt die gesamte Bandbreite
+   * ueber ihn.
+   */
+  function streamViaProxy(url) {
+    return state.settings.proxyStreams ? viaProxy(url) : String(url || '').trim();
+  }
+
   /* ---------- Sicherung ---------- */
   function exportAll(withSecrets) {
     var lists = state.playlists.map(function (p) {
@@ -451,6 +477,8 @@
 
     setSetting: setSetting,
     proxy: proxy,
+    viaProxy: viaProxy,
+    streamViaProxy: streamViaProxy,
 
     exportAll: exportAll,
     importAll: importAll,

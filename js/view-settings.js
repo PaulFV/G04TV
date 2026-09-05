@@ -61,13 +61,24 @@
         'samt Zugangsdaten. Trage deshalb nur einen ein, dem du selbst vertraust.</div></div>' +
         sw('proxyOn', 'Vermittler verwenden',
            'Erst wird direkt versucht; erst wenn das misslingt, geht die Anfrage über den Vermittler.') +
-        '<div class="field" style="padding:0 13px">' +
+        '<div class="field" style="padding:0 13px 8px">' +
           '<label for="setProxy">Adresse des Vermittlers</label>' +
           '<input class="input" id="setProxy" spellcheck="false" autocomplete="off" ' +
-          'placeholder="https://mein-proxy.example/?url={url}" value="' + u.esc(G.store.state.settings.proxy) + '">' +
-          '<span class="field__hint">Der Platzhalter <b>{url}</b> wird durch die Adresse der Playlist ersetzt. ' +
-          'Fehlt er, wird sie hinten angehängt.</span>' +
+          'placeholder="https://gotv-proxy.dein-name.workers.dev/?url={url}&amp;key=…" value="' +
+          u.esc(G.store.state.settings.proxy) + '">' +
+          '<span class="field__hint">Der Platzhalter <b>{url}</b> wird durch die abzurufende Adresse ersetzt. ' +
+          'Fehlt er, wird sie hinten angehängt. Im Ordner <b>proxy/</b> des Projekts liegt ein fertiger ' +
+          'Cloudflare Worker dafür.</span>' +
         '</div>' +
+        sw('proxyStreams', 'Auch Streams über den Vermittler',
+           'Nicht nur die Playlist, sondern auch das Bild läuft über ihn. Damit spielen ' +
+           '<b>http</b>-Sender trotz https und Anbieter, die CORS sperren. ' +
+           'Der Preis: die <b>gesamte Bandbreite</b> geht durch den Vermittler — rund 2 GB je Stunde ' +
+           'und Sender. Der mitgelieferte Worker schreibt die HLS-Segmente passend um.') +
+        (G.store.state.settings.proxyStreams && !G.store.proxy()
+          ? '<div class="note note--warn" style="margin:4px 13px 0">' + u.icon('warn', 16) +
+            '<div>Es ist kein Vermittler eingeschaltet — der Schalter bleibt wirkungslos.</div></div>'
+          : '') +
       '</div>' +
 
       /* ---- Daten ---- */
@@ -121,6 +132,11 @@
       if (key === 'resume' && t.checked) {
         u.toast('Gemerkt', 'Beim nächsten Start wird der letzte Sender vorbereitet.', 'ok', 2600);
       }
+      if (key === 'proxyStreams' && t.checked && !G.store.proxy()) {
+        u.toast('Noch ohne Wirkung', 'Trage erst einen Vermittler ein und schalte ihn ein.', 'warn', 5000);
+      }
+      // Der Hinweis unter den Schaltern haengt an beiden - neu zeichnen.
+      if (key === 'proxyOn' || key === 'proxyStreams') G.app.rerender();
     });
 
     /* Lautstaerke */

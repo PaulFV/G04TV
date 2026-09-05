@@ -30,6 +30,8 @@
   var ts = null;
 
   var current = null;        // laufender Sender
+  var playingUrl = '';       // die Adresse, die tatsaechlich abgerufen wird
+                             // (bei eingeschaltetem Vermittler dessen Adresse)
   var status = 'idle';       // idle | loading | playing | error
   var message = '';
   var tries = 0;
@@ -175,7 +177,7 @@
         set('loading', 'Zweiter Versuch mit MPEG-TS …');
         video.removeAttribute('src');
         video.load();
-        startTs(current.url, 'ts');
+        startTs(playingUrl || current.url, 'ts');
         return;
       }
       var e = video.error;
@@ -212,6 +214,7 @@
     }
     if (!silent) {
       current = null;
+      playingUrl = '';
       set('idle');
     }
   }
@@ -265,7 +268,10 @@
   function hlsErrorText(data) {
     var d = (data && data.details) || '';
     if (d === 'manifestLoadError' || d === 'manifestLoadTimeOut') {
-      return 'Die Senderliste des Streams war nicht erreichbar. Häufig blockiert der Anbieter den Abruf aus dem Browser (CORS) — dann hilft „Extern öffnen“.';
+      return 'Die Senderliste des Streams war nicht erreichbar. Häufig blockiert der Anbieter den Abruf aus dem Browser (CORS) — ' +
+        (G.store.state.settings.proxyStreams
+          ? 'hier auch über den Vermittler nicht. Dann hilft „Extern öffnen“.'
+          : 'dann hilft „Extern öffnen“ oder ein Vermittler für Streams (Einstellungen).');
     }
     if (d === 'manifestParsingError') return 'Der Anbieter hat kein gültiges HLS-Manifest geliefert.';
     return d || (data && data.type) || 'HLS-Fehler';
@@ -313,15 +319,24 @@
     nativeTried = false;
     set('loading', 'Verbindung wird aufgebaut …');
 
-    var url = String(channel.url).trim();
+    var source = String(channel.url).trim();
 
-    if (mixedContent(url)) {
+    // Ist der Vermittler auch für Streams eingeschaltet, läuft der Abruf
+    // über ihn - damit fallen CORS und gemischter Inhalt weg. Die Art des
+    // Streams wird trotzdem an der Originaladresse abgelesen: die
+    // Vermittleradresse trägt keine Endung.
+    var url = G.store.streamViaProxy(source);
+    var viaProxy = url !== source;
+    playingUrl = url;
+
+    if (!viaProxy && mixedContent(source)) {
       fail('Dieser Sender läuft über http, die App über https. Der Browser blockiert das. ' +
-           'Mit „Extern öffnen“ an einen richtigen Abspieler weitergeben.');
+           'Mit „Extern öffnen“ an einen richtigen Abspieler weitergeben — oder in den ' +
+           'Einstellungen einen Vermittler auch für Streams einschalten.');
       return;
     }
 
-    var kind = kindOf(url);
+    var kind = kindOf(source);
 
     if (kind === 'extern') {
       fail('Dieses Format kennt keine Browser-Engine (mkv, avi, wmv …). Mit „Extern öffnen“ an VLC weitergeben.');

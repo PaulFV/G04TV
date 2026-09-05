@@ -33,6 +33,11 @@ GoTV baut nur die Verbindungen auf, die für die Wiedergabe nötig sind:
 * **Vermittler (Proxy).** Nur wenn du unter *Einstellungen › Playlisten aus dem Netz* selbst einen
   einträgst und einschaltest. Er sieht dann die vollständige Adresse der Playlist einschließlich
   etwaiger Zugangsdaten. Voreingestellt ist keiner.
+  Ist zusätzlich *Auch Streams über den Vermittler* eingeschaltet, läuft **der gesamte
+  Videoverkehr** über ihn — er sieht dann auch, welchen Sender du wie lange schaust. Betreibst du
+  den Vermittler selbst (siehe `proxy/`), bleibt das in deiner Hand; bei einem fremden nicht.
+  Gegenüber deinem Anbieter tritt in diesem Fall der Vermittler an deine Stelle: dessen
+  IP-Adresse wird sichtbar, nicht mehr deine.
 
 Wird GoTV über GitHub Pages aufgerufen, gelten für das Ausliefern der Programmdateien die
 Bedingungen von GitHub; dabei fällt serverseitig die IP-Adresse an. Über `file://` oder einen

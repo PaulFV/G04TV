@@ -111,9 +111,38 @@ Der häufigste Fall — und kein Fehler der App:
 3. **Vermittler.** Unter **Einstellungen › Playlisten aus dem Netz** lässt sich ein eigener Proxy
    eintragen (`https://…/?url={url}`). Er sieht dabei die vollständige Adresse **samt
    Zugangsdaten** — deshalb nur einen eintragen, dem man selbst vertraut. Voreingestellt ist keiner.
+   Einen fertigen gibt es im Ordner [`proxy/`](proxy/) — siehe unten.
 
 Streams verhalten sich genauso: `hls.js` braucht CORS, der eingebaute Weg von Safari nicht. Was der
 Browser nicht öffnet, geht über **Extern öffnen** an VLC.
+
+---
+
+## Der eigene Vermittler (optional)
+
+Im Ordner [`proxy/`](proxy/) liegt ein **Cloudflare Worker**, der Playlisten *und* Streams
+stellvertretend holt und über HTTPS mit CORS-Kopfzeilen ausliefert. Damit fallen CORS, gemischter
+Inhalt und User-Agent-Sperren weg — er gibt sich, wie Connect+, als VLC aus.
+
+Bei HLS reicht Durchreichen nicht: der Worker **schreibt die Manifeste um**, damit auch Segmente,
+Varianten, Schlüssel (`#EXT-X-KEY`) und Tonspuren (`#EXT-X-MEDIA`) über ihn laufen.
+
+```bash
+cd proxy
+npx wrangler login
+npx wrangler secret put KEY
+npx wrangler deploy
+```
+
+Die ausgegebene Adresse in GoTV unter **Einstellungen › Playlisten aus dem Netz** eintragen:
+
+```
+https://gotv-proxy.dein-name.workers.dev/?url={url}&key=DEIN_SCHLUESSEL
+```
+
+**Vermittler verwenden** einschalten — und für das Bild zusätzlich **Auch Streams über den
+Vermittler**. Letzteres schickt die **gesamte Bandbreite** über den Worker (rund 2 GB je Stunde und
+Sender), deshalb ist es getrennt schaltbar. Einzelheiten in [`proxy/README.md`](proxy/README.md).
 
 ---
 
@@ -146,6 +175,9 @@ GoTV/
     view-info.js            Bereich Info
     onboarding.js           Ersteinrichtung (drei Schritte, einmalig)
     app.js                  Navigation, Tastatur, Start
+  proxy/
+    worker.js               Vermittler: holt Playlisten und Streams, schreibt HLS um
+    wrangler.toml           Einstellungen für Cloudflare
   icons/                    Sinnbilder für die Installation
   docs/                     Datenschutzerklärung
 ```

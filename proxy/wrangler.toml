@@ -1,0 +1,27 @@
+# GoTV — Vermittler als Cloudflare Worker
+#
+# Veroeffentlichen:
+#   cd proxy
+#   npx wrangler login
+#   npx wrangler secret put KEY      # ein selbst gewaehltes Wort
+#   npx wrangler deploy
+#
+# Danach steht die Adresse in der Ausgabe, etwa
+#   https://gotv-proxy.<dein-name>.workers.dev
+
+name = "gotv-proxy"
+main = "worker.js"
+compatibility_date = "2025-09-01"
+
+# Nur Zahlen, keine Inhalte: Cloudflare zeichnet ohnehin auf, wie oft der
+# Worker lief. Ausgeschaltet, damit nichts darueber hinaus anfaellt.
+[observability]
+enabled = false
+
+[vars]
+# Auf bestimmte Anbieter einschraenken (Komma-getrennt, Subdomains inbegriffen).
+# Leer = alle. Beispiel: ALLOW = "anbieter.tv,iptv-org.github.io"
+ALLOW = ""
+
+# KEY wird NICHT hier eingetragen, sondern als Secret:
+#   npx wrangler secret put KEY

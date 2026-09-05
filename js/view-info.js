@@ -118,7 +118,8 @@
           [['Dein Anbieter', 'Playlist und Streams werden direkt von deiner Quelle geholt — sie sieht deine IP-Adresse, wie bei jedem Abruf'],
            ['Senderlogos', 'Die Bilder stehen in der Playlist und werden von dort geladen'],
            ['hls.js / mpegts.js', 'Nur wenn sie gebraucht und nicht lokal hinterlegt sind: von cdnjs bzw. jsDelivr'],
-           ['Vermittler', 'Nur wenn du selbst einen einträgst und einschaltest']].map(function (r) {
+           ['Vermittler', 'Nur wenn du selbst einen einträgst und einschaltest — dann sieht er die ' +
+            'vollständige Adresse samt Zugangsdaten, und bei „auch Streams“ läuft das ganze Bild über ihn']].map(function (r) {
             return '<div class="list__row"><span class="list__main"><b>' + r[0] + '</b><span>' + r[1] + '</span></span></div>';
           }).join('') +
         '</div>' +
