@@ -105,7 +105,11 @@
       if (!G.m3u.isUrl(url)) { state.textContent = 'Das sieht nicht nach einer http- oder https-Adresse aus.'; return; }
 
       state.textContent = 'Playlist wird geholt …';
-      var res = await G.library.addAndLoad({ name: G.m3u.nameFromSource(url), source: url, kind: 'url' });
+      var res = await G.library.addAndLoad({
+        name: G.m3u.nameFromSource(url),
+        source: url,
+        kind: G.xtream.isXtream(url) ? 'xtream' : 'url'
+      });
 
       if (res.ok) { finish(); u.toast('Playlist gespeichert', u.fmtInt(res.count) + ' Sender', 'ok'); return; }
       state.textContent = res.error;

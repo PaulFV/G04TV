@@ -63,13 +63,21 @@
   function errorText(e, source) {
     var raw = String((e && e.message) || e || '');
 
+    var mitVermittler = !!G.store.proxy();
+
     if (/failed to fetch|networkerror|load failed/i.test(raw)) {
       if (G.player.mixedContent(source)) {
         return 'Die Adresse beginnt mit http, die App läuft über https — der Browser blockiert das. ' +
-               'Playlist per Datei oder Einfügen übernehmen, oder die App über http aufrufen.';
+          (mitVermittler
+            ? 'Auch der Vermittler kam nicht durch: Adresse und Schlüssel prüfen.'
+            : 'Dagegen hilft ein Vermittler (Einstellungen › Playlisten aus dem Netz; ein fertiger ' +
+              'liegt im Ordner proxy/). Sonst: Playlist per Datei oder Einfügen übernehmen.');
       }
       return 'Der Anbieter erlaubt den Abruf aus dem Browser nicht (CORS) oder ist nicht erreichbar. ' +
-             'Playlist als Datei speichern und hier einlesen, den Text einfügen — oder in den Einstellungen einen Vermittler eintragen.';
+        (mitVermittler
+          ? 'Auch über den Vermittler kam nichts an: Adresse und Schlüssel prüfen.'
+          : 'Playlist als Datei speichern und hier einlesen, den Text einfügen — oder in den ' +
+            'Einstellungen einen Vermittler eintragen.');
     }
     return raw || 'Unbekannter Fehler.';
   }

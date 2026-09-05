@@ -60,7 +60,15 @@
 
   /** Ist das eine Xtream-Abrufadresse? */
   function isXtream(url) {
-    return /get\.php\?/i.test(String(url || ''));
+    return /(get|player_api|panel_api)\.php\?/i.test(String(url || ''));
+  }
+
+  /**
+   * Traegt die Adresse ein Kennwort? Das gilt fuer jede Adresse mit einem
+   * solchen Parameter - nicht nur fuer die der Xtream-Anbieter.
+   */
+  function hasSecret(url) {
+    return /[?&](password|pass|pwd)=[^&]+/i.test(String(url || ''));
   }
 
   /**
@@ -68,7 +76,7 @@
    * und in der Sicherung, ohne dass das Kennwort mitliest, wer daneben sitzt.
    */
   function masked(url) {
-    return String(url || '').replace(/([?&]password=)[^&]*/i, '$1••••••');
+    return String(url || '').replace(/([?&](?:password|pass|pwd)=)[^&]*/gi, '$1••••••');
   }
 
   G.xtream = {
@@ -76,6 +84,7 @@
     playlistUrl: playlistUrl,
     fromUrl: fromUrl,
     isXtream: isXtream,
+    hasSecret: hasSecret,
     masked: masked
   };
 })(GoTV);

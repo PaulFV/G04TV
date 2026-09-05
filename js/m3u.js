@@ -141,23 +141,37 @@
   async function fetchText(url, options) {
     options = options || {};
     var direct = String(url).trim();
+    var proxy = options.proxy && String(options.proxy).trim();
+
+    // Laeuft die App ueber https und die Quelle ueber http, laesst der
+    // Browser den Abruf gar nicht erst zu. Der direkte Versuch waere sicher
+    // vergeblich - steht ein Vermittler bereit, geht es gleich ueber ihn.
+    if (proxy && blocked(direct)) return await viaProxy(proxy, direct);
 
     try {
       var res = await fetch(direct, { redirect: 'follow', cache: 'no-store' });
       if (!res.ok) throw new Error('HTTP ' + res.status + ' ' + res.statusText);
       return await res.text();
     } catch (e) {
-      var proxy = options.proxy && String(options.proxy).trim();
       if (!proxy) throw e;
-
-      var viaUrl = proxy.indexOf('{url}') >= 0
-        ? proxy.replace('{url}', encodeURIComponent(direct))
-        : proxy + encodeURIComponent(direct);
-
-      var via = await fetch(viaUrl, { redirect: 'follow', cache: 'no-store' });
-      if (!via.ok) throw new Error('HTTP ' + via.status + ' ' + via.statusText + ' (über den Vermittler)');
-      return await via.text();
+      return await viaProxy(proxy, direct);
     }
+  }
+
+  /** Der Browser blockiert eine http-Quelle, sobald die App ueber https laeuft. */
+  function blocked(url) {
+    return location.protocol === 'https:' && /^http:\/\//i.test(String(url || ''));
+  }
+
+  /** Holt eine Adresse ueber den Vermittler. */
+  async function viaProxy(proxy, url) {
+    var viaUrl = proxy.indexOf('{url}') >= 0
+      ? proxy.replace('{url}', encodeURIComponent(url))
+      : proxy + encodeURIComponent(url);
+
+    var via = await fetch(viaUrl, { redirect: 'follow', cache: 'no-store' });
+    if (!via.ok) throw new Error('HTTP ' + via.status + ' ' + via.statusText + ' (über den Vermittler)');
+    return await via.text();
   }
 
   /**
@@ -185,8 +199,14 @@
     try {
       if (isUrl(text)) {
         var u = new URL(text);
-        var last = u.pathname.split('/').filter(Boolean).pop() || u.hostname;
-        return last.replace(/\.(m3u8?|php)$/i, '') || u.hostname;
+        var last = (u.pathname.split('/').filter(Boolean).pop() || '').replace(/\.(m3u8?|php)$/i, '');
+
+        // Die Abrufadressen der Anbieter heissen alle gleich (get.php,
+        // player_api.php). "get" waere als Name der Playlist nutzlos -
+        // der Rechnername sagt, um wen es geht.
+        if (!last || /^(get|player_api|panel_api|playlist|index|live)$/i.test(last)) return u.hostname;
+
+        return last;
       }
     } catch (e) { /* faellt unten durch */ }
     var file = text.split(/[\\/]/).pop() || text;

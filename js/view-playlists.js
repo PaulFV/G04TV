@@ -34,7 +34,8 @@
 
   function card(p) {
     var active = p.id === G.store.state.activeId;
-    var source = G.xtream.isXtream(p.source) ? G.xtream.masked(p.source) : p.source;
+    // Immer maskieren: ein Kennwort steht nicht nur in Xtream-Adressen.
+    var source = G.xtream.masked(p.source);
 
     return '<article class="pl-card' + (active ? ' is-active' : '') + '" data-pl="' + u.esc(p.id) + '">' +
       '<div class="pl-card__head">' +
@@ -245,7 +246,11 @@
         var url = host.querySelector('#plUrl').value.trim();
         if (!url) throw new Error('Bitte eine Adresse eintragen.');
         if (!G.m3u.isUrl(url)) throw new Error('Das sieht nicht nach einer http- oder https-Adresse aus.');
-        await addUrl(url, host.querySelector('#plName').value.trim(), 'url');
+        // Wer den get.php-Aufruf seines Anbieters hier einträgt, hat einen
+        // Xtream-Zugang - dann auch als solcher führen, damit das Kennwort
+        // in der Anzeige unkenntlich bleibt.
+        await addUrl(url, host.querySelector('#plName').value.trim(),
+                     G.xtream.isXtream(url) ? 'xtream' : 'url');
         return;
       }
 
@@ -422,7 +427,7 @@
           '<div class="field"><label for="rnName">Name</label>' +
           '<input class="input" id="rnName" value="' + u.esc(p.name) + '" autocomplete="off"></div>' +
           '<div class="field"><label>Quelle</label>' +
-          '<div class="code">' + u.esc(G.xtream.isXtream(p.source) ? G.xtream.masked(p.source) : p.source) + '</div></div>' +
+          '<div class="code">' + u.esc(G.xtream.masked(p.source)) + '</div></div>' +
           '<div class="btn-row">' +
             '<button class="btn" id="rnCopy">' + u.icon('link', 15) + ' Adresse kopieren</button>' +
             '<button class="btn btn--primary" id="rnSave">Speichern</button>' +

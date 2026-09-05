@@ -178,7 +178,7 @@
      Sicherung
      ------------------------------------------------------------ */
   function exportSheet() {
-    var hasXtream = G.store.state.playlists.some(function (p) { return G.xtream.isXtream(p.source); });
+    var hasXtream = G.store.state.playlists.some(function (p) { return G.xtream.hasSecret(p.source); });
 
     u.openSheet('Sicherung speichern',
       '<div class="stack">' +

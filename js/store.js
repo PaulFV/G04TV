@@ -360,7 +360,7 @@
       var copy = Object.assign({}, p);
       // Ein Xtream-Zugang traegt das Kennwort in der Adresse. Wer die
       // Sicherung weitergibt, gibt sonst seinen Zugang mit.
-      if (!withSecrets && G.xtream.isXtream(copy.source)) copy.source = G.xtream.masked(copy.source);
+      if (!withSecrets && G.xtream.hasSecret(copy.source)) copy.source = G.xtream.masked(copy.source);
       return copy;
     });
 

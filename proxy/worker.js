@@ -82,26 +82,12 @@ export default {
       return fail(502, 'Der Anbieter war nicht erreichbar: ' + (e && e.message));
     }
 
-    /* ---- Playlist oder Strom? ---- */
+    /* ---- Umschreiben oder durchreichen? ---- */
     // Der Ursprung nach etwaigen Umleitungen ist die Grundlage für
     // relative Adressen im Manifest.
     const base = res.url || upstream.toString();
 
-    if (looksLikeManifest(res, upstream)) {
-      const text = await res.text();
-
-      // *.m3u8 ist doppeldeutig: Senderliste oder Manifest eines einzelnen
-      // Streams. Umgeschrieben wird beides gleich — die Zeilen sind Adressen.
-      const out = rewrite(text, base, here, env);
-
-      return new Response(out, {
-        status: res.status,
-        headers: cors({
-          'Content-Type': 'application/vnd.apple.mpegurl; charset=utf-8',
-          'Cache-Control': 'no-store'
-        })
-      });
-    }
+    if (maybeManifest(res, upstream)) return await manifestOrPass(res, base, here, env);
 
     // Alles Übrige — Segmente, rohe Ströme, Schlüssel, Logos — wird
     // durchgereicht, ohne den Inhalt anzufassen.
@@ -112,6 +98,77 @@ export default {
     });
   }
 };
+
+/* ------------------------------------------------------------------
+   Manifest oder Senderliste?
+
+   *.m3u8 ist doppeldeutig: es kann die Senderliste eines Anbieters sein
+   oder das Manifest eines einzelnen HLS-Streams. Umgeschrieben wird nur
+   das Manifest — dort muss der Browser die Segmente über den Vermittler
+   holen.
+
+   Eine Senderliste bleibt unangetastet und wird weitergestreamt, ohne
+   sie überhaupt in den Speicher zu holen: sie hat schnell zehntausende
+   Zeilen (bei Xtream über 10 MB). Sie umzuschreiben würde die Rechenzeit
+   eines Workers sprengen — und wäre unnötig, weil GoTV die Adresse eines
+   Senders von sich aus über den Vermittler schickt.
+   ------------------------------------------------------------------ */
+async function manifestOrPass(res, base, here, env) {
+  if (!res.body) return new Response(null, { status: res.status, headers: cors(passthroughHeaders(res)) });
+
+  const headers = cors({
+    'Content-Type': 'application/vnd.apple.mpegurl; charset=utf-8',
+    'Cache-Control': 'no-store'
+  });
+
+  const reader = res.body.getReader();
+  const head = [];
+  let size = 0;
+  let ended = false;
+
+  // Der Anfang genügt für die Entscheidung. Gelesen wird aus demselben
+  // Leser, aus dem danach weitergelesen wird - kein tee(), das den Strom
+  // doppelt puffern müsste.
+  while (size < 4096) {
+    const { done, value } = await reader.read();
+    if (done) { ended = true; break; }
+    head.push(value);
+    size += value.length;
+  }
+
+  const decoder = new TextDecoder();
+  const start = head.map((c) => decoder.decode(c, { stream: true })).join('');
+
+  // Die #EXT-X--Zeilen kommen nur im Manifest vor. #EXTINF steht in beiden
+  // Formen und taugt deshalb nicht als Merkmal.
+  if (!start.toUpperCase().includes('#EXT-X-')) {
+    // Senderliste: das Gelesene voran, der Rest fließt weiter durch.
+    const stream = new ReadableStream({
+      start(controller) {
+        for (const chunk of head) controller.enqueue(chunk);
+        if (ended) controller.close();
+      },
+      async pull(controller) {
+        const { done, value } = await reader.read();
+        if (done) controller.close(); else controller.enqueue(value);
+      },
+      cancel(reason) { return reader.cancel(reason); }
+    });
+
+    return new Response(stream, { status: res.status, headers });
+  }
+
+  // Manifest: klein genug, um es ganz zu lesen und umzuschreiben.
+  let text = start;
+  while (!ended) {
+    const { done, value } = await reader.read();
+    if (done) { ended = true; break; }
+    text += decoder.decode(value, { stream: true });
+  }
+  text += decoder.decode();
+
+  return new Response(rewrite(text, base, here, env), { status: res.status, headers });
+}
 
 /* ------------------------------------------------------------------
    Umschreiben
@@ -169,22 +226,23 @@ function proxied(absolute, here, env) {
    ------------------------------------------------------------------ */
 
 /**
- * Ist die Antwort eine M3U? Entschieden wird nach Inhaltstyp und Endung —
- * beides ist bei IPTV-Anbietern unzuverlässig, deshalb beide zusammen.
+ * Kommt hier überhaupt Text im M3U-Format? Entschieden wird nach Inhaltstyp
+ * und Endung — beides ist bei IPTV-Anbietern unzuverlässig, deshalb beide
+ * zusammen. Was durchkommt, wird gelesen; erst der Inhalt entscheidet, ob
+ * umgeschrieben wird.
  */
-function looksLikeManifest(res, upstream) {
+function maybeManifest(res, upstream) {
+  const path = upstream.pathname.toLowerCase();
+  const query = upstream.search.toLowerCase();
   const type = (res.headers.get('content-type') || '').toLowerCase();
 
-  if (type.includes('mpegurl') || type.includes('m3u')) return true;
+  const looksTexty =
+    type.includes('mpegurl') || type.includes('m3u') ||
+    path.endsWith('.m3u8') || path.endsWith('.m3u') ||
+    // Xtream liefert die Senderliste über get.php, oft als octet-stream.
+    path.endsWith('get.php') || query.includes('type=m3u');
 
-  const path = upstream.pathname.toLowerCase();
-  if (path.endsWith('.m3u8') || path.endsWith('.m3u')) return true;
-
-  // Xtream liefert die Senderliste über get.php, oft als text/plain.
-  const query = upstream.search.toLowerCase();
-  if (path.endsWith('get.php') || query.includes('type=m3u')) return true;
-
-  return false;
+  return looksTexty;
 }
 
 /** Steht der Anbieter auf der Liste? Ohne ALLOW ist jeder erlaubt. */
