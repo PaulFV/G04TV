@@ -18,7 +18,12 @@
 
   var KEY = 'g04tv.v1';
 
-  /** Unter diesem Schluessel lag alles, bevor die App umbenannt wurde. */
+  /**
+   * Unter diesem Schluessel lag alles, bevor die App umbenannt wurde. Er
+   * wird beim ersten Start einmal uebernommen und dann entfernt; die
+   * Stelle darf verschwinden, sobald die App auf allen Geraeten einmal
+   * gelaufen ist.
+   */
   var KEY_ALT = 'gotv.v1';
 
   var listeners = [];
@@ -398,8 +403,7 @@
    */
   function importAll(json) {
     var d = JSON.parse(json);
-    // 'GoTV' hiess die App vor der Umbenennung - solche Sicherungen gelten weiter.
-    if (!d || (d.app !== 'G04TV' && d.app !== 'GoTV')) throw new Error('Keine G04TV-Sicherung.');
+    if (!d || d.app !== 'G04TV') throw new Error('Keine G04TV-Sicherung.');
 
     if (Array.isArray(d.playlists)) {
       d.playlists.forEach(function (p) {
