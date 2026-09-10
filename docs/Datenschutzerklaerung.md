@@ -1,11 +1,11 @@
-# Datenschutzerklärung — GoTV
+# Datenschutzerklärung — G04TV
 
 Stand: Version 1.0.0
 
 ## Kurz
 
-GoTV ist eine reine Web-App ohne Backend. Es gibt **kein Benutzerkonto**, **keine Anmeldung** und
-**keinen Server**, an den Daten übermittelt würden. Alles, was du in GoTV einträgst, bleibt in dem
+G04TV ist eine reine Web-App ohne Backend. Es gibt **kein Benutzerkonto**, **keine Anmeldung** und
+**keinen Server**, an den Daten übermittelt würden. Alles, was du in G04TV einträgst, bleibt in dem
 Browser, in dem du es eingetragen hast.
 
 ## Welche Daten wo liegen
@@ -22,7 +22,7 @@ Es werden **keine Cookies** gesetzt, es findet **keine Analyse** und **kein Trac
 
 ## Verbindungen nach außen
 
-GoTV baut nur die Verbindungen auf, die für die Wiedergabe nötig sind:
+G04TV baut nur die Verbindungen auf, die für die Wiedergabe nötig sind:
 
 * **Dein Anbieter.** Playlist und Streams werden direkt von der Quelle geholt, die du eingetragen
   hast. Der Anbieter sieht dabei — wie bei jedem Abruf im Netz — deine IP-Adresse, den Zeitpunkt und
@@ -39,7 +39,7 @@ GoTV baut nur die Verbindungen auf, die für die Wiedergabe nötig sind:
   Gegenüber deinem Anbieter tritt in diesem Fall der Vermittler an deine Stelle: dessen
   IP-Adresse wird sichtbar, nicht mehr deine.
 
-Wird GoTV über GitHub Pages aufgerufen, gelten für das Ausliefern der Programmdateien die
+Wird G04TV über GitHub Pages aufgerufen, gelten für das Ausliefern der Programmdateien die
 Bedingungen von GitHub; dabei fällt serverseitig die IP-Adresse an. Über `file://` oder einen
 eigenen Webserver entfällt auch das.
 

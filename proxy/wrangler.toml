@@ -1,4 +1,4 @@
-# GoTV — Vermittler als Cloudflare Worker
+# G04TV — Vermittler als Cloudflare Worker
 #
 # Veroeffentlichen:
 #   cd proxy
@@ -7,9 +7,9 @@
 #   npx wrangler deploy
 #
 # Danach steht die Adresse in der Ausgabe, etwa
-#   https://gotv-proxy.<dein-name>.workers.dev
+#   https://g04tv-proxy.<dein-name>.workers.dev
 
-name = "gotv-proxy"
+name = "g04tv-proxy"
 main = "worker.js"
 compatibility_date = "2025-09-01"
 

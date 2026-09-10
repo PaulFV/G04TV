@@ -1,5 +1,5 @@
 /* ============================================================
-   GoTV — Ablage der Senderlisten
+   G04TV — Ablage der Senderlisten
 
    Eine Playlist hat schnell zehntausend Sender; das sprengt den
    localStorage, in dem alles Uebrige liegt. Die Senderlisten
@@ -15,6 +15,10 @@
 (function (G) {
   'use strict';
 
+  // Der Name bleibt, obwohl die App inzwischen G04TV heisst: eine
+  // IndexedDB laesst sich nicht umbenennen. Ein neuer Name waere eine neue,
+  // leere Datenbank - alle abgelegten Senderlisten waeren fort und muessten
+  // erst wieder geholt werden. Der Name ist nach aussen ohnehin unsichtbar.
   var DB_NAME = 'gotv';
   var DB_VERSION = 1;
   var STORE = 'channels';
@@ -134,4 +138,4 @@
     /** Prueft einmal, ob die Datenbank ueberhaupt aufgeht. */
     probe: function () { return open().then(function () { return true; }, function () { return false; }); }
   };
-})(GoTV);
+})(G04TV);

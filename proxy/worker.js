@@ -1,5 +1,5 @@
 /* ============================================================
-   GoTV — Vermittler (Cloudflare Worker)
+   G04TV — Vermittler (Cloudflare Worker)
 
    Holt Playlisten und Streams stellvertretend und gibt sie über
    HTTPS mit CORS-Kopfzeilen zurück. Damit fallen die beiden
@@ -110,7 +110,7 @@ export default {
    Eine Senderliste bleibt unangetastet und wird weitergestreamt, ohne
    sie überhaupt in den Speicher zu holen: sie hat schnell zehntausende
    Zeilen (bei Xtream über 10 MB). Sie umzuschreiben würde die Rechenzeit
-   eines Workers sprengen — und wäre unnötig, weil GoTV die Adresse eines
+   eines Workers sprengen — und wäre unnötig, weil G04TV die Adresse eines
    Senders von sich aus über den Vermittler schickt.
    ------------------------------------------------------------------ */
 async function manifestOrPass(res, base, here, env) {
@@ -312,11 +312,11 @@ function info(here, env) {
   const example = here.origin + here.pathname + '?url={url}' + (env.KEY ? '&key=DEIN_SCHLUESSEL' : '');
 
   const body = [
-    'GoTV — Vermittler',
+    'G04TV — Vermittler',
     '',
     'Aufruf:  ?url=<adresse>' + (env.KEY ? '&key=<schluessel>' : ''),
     '',
-    'In GoTV unter Einstellungen > Playlisten aus dem Netz eintragen:',
+    'In G04TV unter Einstellungen > Playlisten aus dem Netz eintragen:',
     '  ' + example,
     '',
     'Schlüssel gesetzt:      ' + (env.KEY ? 'ja' : 'NEIN — der Vermittler steht jedem offen!'),

@@ -1,5 +1,5 @@
 /* ============================================================
-   GoTV — Bereich Sender
+   G04TV — Bereich Sender
 
    Aufbau wie das IPTV-Fenster von Connect+: die Senderliste an der
    einen Seite, das Bild an der anderen. Ein Antippen spielt den
@@ -55,7 +55,7 @@
     return '<div class="view"><div class="card">' +
       '<div class="empty">' + u.icon('live', 42) +
       '<b>Noch keine Playlist</b>' +
-      '<p>GoTV bringt keine Sender mit. Trage deine eigene Playlist ein — als Adresse, ' +
+      '<p>G04TV bringt keine Sender mit. Trage deine eigene Playlist ein — als Adresse, ' +
       'als Datei vom Gerät, als eingefügten Text oder als Xtream-Zugang.</p>' +
       '<div class="btn-row"><button class="btn btn--primary" data-go="playlists">' +
       u.icon('plus', 17) + ' Playlist hinzufügen</button></div>' +
@@ -352,8 +352,8 @@
 
     // Meldungen des Abspielers
     var onPlayer = function () { paintTransport(); paintRows(); };
-    document.addEventListener('gotv:player', onPlayer);
-    off.push(function () { document.removeEventListener('gotv:player', onPlayer); });
+    document.addEventListener('g04tv:player', onPlayer);
+    off.push(function () { document.removeEventListener('g04tv:player', onPlayer); });
 
     fill();
   }
@@ -394,4 +394,4 @@
       G.player.play(channel);
     }
   };
-})(GoTV);
+})(G04TV);

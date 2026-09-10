@@ -1,5 +1,5 @@
 /* ============================================================
-   GoTV — Bereich Start
+   G04TV — Bereich Start
 
    Was zuletzt lief, die Favoriten und der Stand der Playlisten -
    alles, womit man ohne Umweg weitermacht.
@@ -155,7 +155,7 @@
     if (!G.store.storageOk) {
       return '<div class="note note--warn">' + u.icon('warn', 18) +
         '<div><b>Kein lokaler Speicher.</b> Der Browser blockiert Website-Daten. ' +
-        'GoTV vergisst Playlisten und Favoriten beim Schließen.</div></div>';
+        'G04TV vergisst Playlisten und Favoriten beim Schließen.</div></div>';
     }
     if (!s.playlists.length) return '';
 
@@ -211,4 +211,4 @@
     render: render,
     mount: mount
   };
-})(GoTV);
+})(G04TV);

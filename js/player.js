@@ -1,5 +1,5 @@
 /* ============================================================
-   GoTV — Wiedergabe
+   G04TV — Wiedergabe
 
    Uebernommen aus Connect+ (Forms/IptvPlayerPage.cs). Dort lief
    dieselbe Logik in einer WebView2-Flaeche; hier ist der Browser
@@ -13,7 +13,7 @@
 
    Die beiden Bibliotheken werden erst geholt, wenn sie gebraucht
    werden - und zuerst aus dem Ordner vendor/ neben der App, damit
-   sich GoTV auch ohne Weg nach draussen betreiben laesst.
+   sich G04TV auch ohne Weg nach draussen betreiben laesst.
    ============================================================ */
 (function (G) {
   'use strict';
@@ -453,4 +453,4 @@
     get status() { return status; },
     get message() { return message; }
   };
-})(GoTV);
+})(G04TV);

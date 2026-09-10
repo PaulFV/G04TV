@@ -1,13 +1,13 @@
 /* ============================================================
-   GoTV v1.0.0 — Hilfsfunktionen
+   G04TV v1.0.0 — Hilfsfunktionen
 
    Klassisches Script (kein Modul), damit die App auch per
    Doppelklick ueber file:// laeuft.
    ============================================================ */
-var GoTV = window.GoTV || {};
-window.GoTV = GoTV;
-GoTV.VERSION = '1.0.0';
-GoTV.NAME = 'GoTV';
+var G04TV = window.G04TV || {};
+window.G04TV = G04TV;
+G04TV.VERSION = '1.0.0';
+G04TV.NAME = 'G04TV';
 
 (function (G) {
   'use strict';
@@ -307,4 +307,4 @@ GoTV.NAME = 'GoTV';
     icon: icon, ICONS: ICONS, logoHtml: logoHtml,
     toast: toast, openSheet: openSheet, closeSheet: closeSheet, confirmSheet: confirmSheet
   };
-})(GoTV);
+})(G04TV);

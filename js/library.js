@@ -1,5 +1,5 @@
 /* ============================================================
-   GoTV — Senderbestand
+   G04TV — Senderbestand
 
    Setzt zusammen, was zur Auswahl steht, und holt die Playlisten
    nach. Der Aufbau ist derselbe wie in Connect+ (BuildPool):
@@ -19,7 +19,7 @@
   /* ------------------------------------------------------------
      Von http auf https heben
 
-     Laeuft GoTV ueber https und die Quelle ueber http, blockiert der
+     Laeuft G04TV ueber https und die Quelle ueber http, blockiert der
      Browser - dagegen half bisher nur der Vermittler. Vorher lohnt aber
      ein Versuch: viele Anbieter antworten unter demselben Namen auch
      ueber https, nur auf dem Standardanschluss statt auf 8080. Wo das
@@ -345,4 +345,4 @@
     groupsOf: groupsOf,
     filter: filter
   };
-})(GoTV);
+})(G04TV);

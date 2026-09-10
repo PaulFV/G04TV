@@ -1,5 +1,5 @@
 /* ============================================================
-   GoTV v1.0.0 — Anwendung, Navigation, Start
+   G04TV v1.0.0 — Anwendung, Navigation, Start
    ============================================================ */
 (function (G) {
   'use strict';
@@ -171,7 +171,7 @@
     });
 
     // Die Kopfzeile und die Seitenleiste haengen am Abspieler.
-    document.addEventListener('gotv:player', function () { markActive(); });
+    document.addEventListener('g04tv:player', function () { markActive(); });
 
     if (!s.onboarded) { G.onboarding.start(); return; }
 
@@ -185,7 +185,7 @@
 
     if (!G.store.storageOk) {
       u.toast('Kein lokaler Speicher',
-        'Der Browser blockiert Website-Daten. GoTV vergisst Playlisten und Favoriten beim Schließen.', 'warn', 7000);
+        'Der Browser blockiert Website-Daten. G04TV vergisst Playlisten und Favoriten beim Schließen.', 'warn', 7000);
     }
 
     G.db.probe().then(function (ok) {
@@ -235,4 +235,4 @@
   } else {
     boot(); registerSW();
   }
-})(GoTV);
+})(G04TV);

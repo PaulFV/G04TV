@@ -1,7 +1,7 @@
 {
-  "id": "gotv-v1",
-  "name": "GoTV — IPTV-Playlisten",
-  "short_name": "GoTV",
+  "id": "g04tv-v1",
+  "name": "G04TV — IPTV-Playlisten",
+  "short_name": "G04TV",
   "description": "Abspieler für eigene IPTV-Playlisten. Playlisten, Favoriten und Zugänge bleiben auf dem Gerät — ohne Konto, ohne Server.",
   "lang": "de",
   "dir": "ltr",

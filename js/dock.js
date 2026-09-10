@@ -1,5 +1,5 @@
 /* ============================================================
-   GoTV — Die wandernde Buehne
+   G04TV — Die wandernde Buehne
 
    Das Bild lebt nicht in der Ansicht, sondern in einem eigenen
    Behaelter (#pdock). Im Bereich Sender zieht er in die Ansicht
@@ -114,7 +114,7 @@
     paintVisibility();
 
     // Die Ansichten haengen sich hier ebenfalls ein (Bedienleiste, Liste).
-    document.dispatchEvent(new CustomEvent('gotv:player', {
+    document.dispatchEvent(new CustomEvent('g04tv:player', {
       detail: { status: status, message: message, channel: channel }
     }));
   }
@@ -195,4 +195,4 @@
     external: external,
     get el() { return dock; }
   };
-})(GoTV);
+})(G04TV);

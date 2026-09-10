@@ -1,4 +1,4 @@
-# GoTV v1.0.0
+# G04TV v1.0.0
 
 Abspieler für **eigene IPTV-Playlisten** — als eigenständige Web-App für **iPhone, Android und
 Desktop**. Ohne Backend, ohne Konto, ohne Tracking. Playlisten, Favoriten und Zugangsdaten bleiben
@@ -10,7 +10,7 @@ gesperrten Einträge. Die Umsetzung als installierbare Web-App folgt **GoFit**.
 
 ---
 
-## Was GoTV kann
+## Was G04TV kann
 
 | Bereich | Beschreibung |
 |:--|:--|
@@ -36,7 +36,7 @@ gesperrten Einträge. Die Umsetzung als installierbare Web-App folgt **GoFit**.
 
 ## Womit gespielt wird
 
-Ein Browser bringt keinen IPTV-Abspieler mit. GoTV entscheidet nach der Adresse — dieselbe Logik
+Ein Browser bringt keinen IPTV-Abspieler mit. G04TV entscheidet nach der Adresse — dieselbe Logik
 wie in Connect+ (`IptvPlayerPage`):
 
 | Format | Weg |
@@ -81,7 +81,7 @@ Danach am Handy `http://<IP-des-Rechners>:8080` aufrufen — Rechner und Handy i
 
 ### 3. GitHub Pages
 
-Läuft bereits: **https://paulfv.github.io/GoTV/**
+Läuft bereits: **https://paulfv.github.io/G04TV/**
 
 Eingeschaltet unter **Settings › Pages › Source: Deploy from a branch › `main` / (root)**. Jeder
 Push auf `main` wird von GitHub selbst veröffentlicht — es braucht keinen eigenen Actions-Ablauf.
@@ -93,7 +93,7 @@ Push auf `main` wird von GitHub selbst veröffentlicht — es braucht keinen eig
 * **iPhone / iPad:** in **Safari** öffnen → **Teilen** → **Zum Home-Bildschirm**.
 * **Android:** in **Chrome** öffnen → Menü ⋮ → **App installieren**.
 
-Danach startet GoTV im Vollbild wie eine normale App; die gespeicherten Playlisten sind dieselben.
+Danach startet G04TV im Vollbild wie eine normale App; die gespeicherten Playlisten sind dieselben.
 
 ---
 
@@ -105,9 +105,9 @@ Der häufigste Fall — und kein Fehler der App:
    meisten IPTV-Anbieter erlauben es nicht.
    → Playlist beim Anbieter als Datei speichern und unter **Playlisten › Datei** einlesen, oder den
    Inhalt unter **Einfügen** hineinkopieren.
-2. **Gemischter Inhalt.** Läuft GoTV über `https` (GitHub Pages) und die Playlist über `http`,
+2. **Gemischter Inhalt.** Läuft G04TV über `https` (GitHub Pages) und die Playlist über `http`,
    blockiert der Browser das.
-   → **GoTV versucht das von selbst zu lösen:** viele Anbieter geben dieselbe Liste auch über
+   → **G04TV versucht das von selbst zu lösen:** viele Anbieter geben dieselbe Liste auch über
    `https` heraus, nur auf dem Standardanschluss statt auf `:8080`. Gelingt das, wird die Quelle
    dauerhaft darauf umgestellt (Meldung *„Auf https gehoben"*) — und es braucht **keinen
    Vermittler**. Panels, die den Aufruf über `https` beantworten, schreiben meist auch die Sender
@@ -141,10 +141,10 @@ npx wrangler secret put KEY
 npx wrangler deploy
 ```
 
-Die ausgegebene Adresse in GoTV unter **Einstellungen › Playlisten aus dem Netz** eintragen:
+Die ausgegebene Adresse in G04TV unter **Einstellungen › Playlisten aus dem Netz** eintragen:
 
 ```
-https://gotv-proxy.dein-name.workers.dev/?url={url}&key=DEIN_SCHLUESSEL
+https://g04tv-proxy.dein-name.workers.dev/?url={url}&key=DEIN_SCHLUESSEL
 ```
 
 **Vermittler verwenden** einschalten — und für das Bild zusätzlich **Auch Streams über den
@@ -156,7 +156,7 @@ Sender), deshalb ist es getrennt schaltbar. Einzelheiten in [`proxy/README.md`](
 ## Aufbau
 
 ```
-GoTV/
+G04TV/
   index.html                Rahmen: Seitenleiste, Kopfzeile, Ansichten, Bühne
   manifest.webmanifest      Installation als App
   sw.js                     Service Worker (nur eigene Programmdateien)
@@ -213,7 +213,7 @@ Unter **Einstellungen › Alles löschen** verschwindet alles davon restlos. Sie
 
 ## Zu den Inhalten
 
-GoTV liefert **keine Sender mit** und vermittelt keine. Die App spielt allein das, was man selbst
+G04TV liefert **keine Sender mit** und vermittelt keine. Die App spielt allein das, was man selbst
 einträgt. Für die Rechtmäßigkeit der eigenen Quellen ist man selbst verantwortlich.
 
 ---

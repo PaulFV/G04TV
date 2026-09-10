@@ -1,5 +1,5 @@
 /* ============================================================
-   GoTV — Bereich Einstellungen
+   G04TV — Bereich Einstellungen
 
    Wiedergabe, Darstellung, der Weg ins Netz und die Verwaltung
    der eigenen Daten. Es gibt kein Konto: alles hier gilt für
@@ -64,7 +64,7 @@
         '<div class="field" style="padding:0 13px 8px">' +
           '<label for="setProxy">Adresse des Vermittlers</label>' +
           '<input class="input" id="setProxy" spellcheck="false" autocomplete="off" ' +
-          'placeholder="https://gotv-proxy.dein-name.workers.dev/?url={url}&amp;key=…" value="' +
+          'placeholder="https://g04tv-proxy.dein-name.workers.dev/?url={url}&amp;key=…" value="' +
           u.esc(G.store.state.settings.proxy) + '">' +
           '<span class="field__hint">Der Platzhalter <b>{url}</b> wird durch die abzurufende Adresse ersetzt. ' +
           'Fehlt er, wird sie hinten angehängt. Im Ordner <b>proxy/</b> des Projekts liegt ein fertiger ' +
@@ -109,7 +109,7 @@
           '<div><b>iPhone / iPad:</b> in Safari öffnen, <b>Teilen</b> antippen, ' +
           '<b>Zum Home-Bildschirm</b>. <br>' +
           '<b>Android:</b> in Chrome öffnen, Menü ⋮, <b>App installieren</b>.<br>' +
-          'Danach startet GoTV im Vollbild wie eine normale App — und die gespeicherten ' +
+          'Danach startet G04TV im Vollbild wie eine normale App — und die gespeicherten ' +
           'Playlisten sind dieselben.</div></div>' +
           '<button class="btn btn--primary" id="setInstall" hidden>' + u.icon('download', 16) + ' Jetzt installieren</button>' +
         '</div>' +
@@ -197,7 +197,7 @@
         body.querySelector('#expGo').onclick = function () {
           var secrets = body.querySelector('#expSecrets');
           var json = G.store.exportAll(secrets ? secrets.checked : false);
-          var name = 'GoTV-Sicherung-' + new Date().toISOString().slice(0, 10) + '.json';
+          var name = 'G04TV-Sicherung-' + new Date().toISOString().slice(0, 10) + '.json';
           var ok = u.download(name, json, 'application/json');
           u.closeSheet();
           u.toast(ok ? 'Sicherung erstellt' : 'Ging nicht', ok ? name : 'Der Browser hat den Download verhindert.',
@@ -239,4 +239,4 @@
     render: render,
     mount: mount
   };
-})(GoTV);
+})(G04TV);

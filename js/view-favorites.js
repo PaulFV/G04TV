@@ -1,5 +1,5 @@
 /* ============================================================
-   GoTV — Bereich Favoriten
+   G04TV — Bereich Favoriten
 
    Die mit dem Stern markierten Sender, quer über alle Playlisten.
    Sie behalten ihre Adresse: verschwindet eine Playlist, bleibt
@@ -105,7 +105,7 @@
         lines.push('#EXTINF:-1 tvg-logo="' + (c.logo || '') + '" group-title="' + (c.group || 'Favoriten') + '",' + c.name);
         lines.push(c.url);
       });
-      var ok = u.download('GoTV-Favoriten.m3u', lines.join('\n'), 'audio/x-mpegurl');
+      var ok = u.download('G04TV-Favoriten.m3u', lines.join('\n'), 'audio/x-mpegurl');
       u.toast(ok ? 'Datei erstellt' : 'Ging nicht',
         ok ? s.favorites.length + ' Sender als M3U gespeichert.' : 'Der Browser hat den Download verhindert.',
         ok ? 'ok' : 'warn');
@@ -121,4 +121,4 @@
     render: render,
     mount: mount
   };
-})(GoTV);
+})(G04TV);

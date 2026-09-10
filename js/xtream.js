@@ -1,5 +1,5 @@
 /* ============================================================
-   GoTV — Xtream-Zugaenge
+   G04TV — Xtream-Zugaenge
 
    Viele Anbieter geben keine fertige M3U heraus, sondern drei
    Angaben: Adresse des Servers, Benutzer und Kennwort. Daraus
@@ -87,4 +87,4 @@
     hasSecret: hasSecret,
     masked: masked
   };
-})(GoTV);
+})(G04TV);

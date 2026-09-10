@@ -1,5 +1,5 @@
 /* ============================================================
-   GoTV — M3U/M3U8 lesen
+   G04TV — M3U/M3U8 lesen
 
    Uebernommen aus Connect+ (Services/M3uPlaylist.cs) und auf den
    Browser uebertragen.
@@ -244,4 +244,4 @@
     hostOf: hostOf,
     sameSource: sameSource
   };
-})(GoTV);
+})(G04TV);

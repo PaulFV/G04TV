@@ -1,12 +1,12 @@
 /* ============================================================
-   GoTV — Service Worker
+   G04TV — Service Worker
 
    Sorgt dafür, dass die App nach dem ersten Aufruf auch ohne
    Internetverbindung startet. Zwischengespeichert werden
    ausschließlich die eigenen Programmdateien — keine Playlisten,
    keine Streams, keine Anfragen an fremde Server.
    ============================================================ */
-var CACHE = 'gotv-v1.0.1';
+var CACHE = 'g04tv-v1.0.2';
 
 var ASSETS = [
   './',

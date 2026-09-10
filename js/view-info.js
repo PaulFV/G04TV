@@ -1,5 +1,5 @@
 /* ============================================================
-   GoTV — Bereich Info
+   G04TV — Bereich Info
 
    Was die App tut, was sie nicht tut, wie sie bedient wird und
    was rechtlich gilt.
@@ -51,7 +51,7 @@
 
       '<div class="card">' +
         '<div class="card__head">' + u.icon('info', 18) + '<h3>Womit gespielt wird</h3></div>' +
-        '<p class="small muted">Der Browser bringt keinen Abspieler für IPTV mit. GoTV entscheidet ' +
+        '<p class="small muted">Der Browser bringt keinen Abspieler für IPTV mit. G04TV entscheidet ' +
         'nach der Adresse, welcher Weg passt:</p>' +
         '<div class="list">' +
           [['HLS · *.m3u8', 'Auf iPhone, iPad und in Safari der eingebaute Weg, sonst hls.js'],
@@ -95,7 +95,7 @@
   function privacyTab() {
     return '<div class="stack">' +
       '<div class="note note--acc">' + u.icon('shield', 18) +
-      '<div><b>Kein Konto, kein Server, kein Tracking.</b> GoTV ist eine reine Web-App. ' +
+      '<div><b>Kein Konto, kein Server, kein Tracking.</b> G04TV ist eine reine Web-App. ' +
       'Es gibt keine Anmeldung und keine Stelle, an die Daten gemeldet würden.</div></div>' +
 
       '<div class="card">' +
@@ -126,7 +126,7 @@
       '</div>' +
 
       '<div class="note note--warn">' + u.icon('warn', 18) +
-      '<div><b>Zu den Inhalten.</b> GoTV liefert keine Sender mit und vermittelt keine. ' +
+      '<div><b>Zu den Inhalten.</b> G04TV liefert keine Sender mit und vermittelt keine. ' +
       'Die App spielt allein, was du selbst einträgst. Für die Rechtmäßigkeit deiner Quellen ' +
       'bist du verantwortlich.</div></div>' +
     '</div>';
@@ -156,4 +156,4 @@
     render: render,
     mount: mount
   };
-})(GoTV);
+})(G04TV);

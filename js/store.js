@@ -1,7 +1,7 @@
 /* ============================================================
-   GoTV — Zustand und Speicherung
+   G04TV — Zustand und Speicherung
 
-   Anders als GoFit kennt GoTV keine Benutzer und keine
+   Anders als GoFit kennt G04TV keine Benutzer und keine
    Einwilligungsstufen: die Playlisten sind der Zweck der App und
    werden deshalb immer gespeichert - auf dem Geraet, nirgends
    sonst. Es gibt kein Konto, keinen Server, keine Anmeldung.
@@ -16,7 +16,10 @@
 (function (G) {
   'use strict';
 
-  var KEY = 'gotv.v1';
+  var KEY = 'g04tv.v1';
+
+  /** Unter diesem Schluessel lag alles, bevor die App umbenannt wurde. */
+  var KEY_ALT = 'gotv.v1';
 
   var listeners = [];
   var storageOk = true;
@@ -106,6 +109,18 @@
 
   function load() {
     var raw = readRaw(KEY);
+
+    // Was noch unter dem alten Namen liegt, wird einmal uebernommen - sonst
+    // waeren Playlisten und Favoriten nach der Umbenennung scheinbar weg.
+    // Beide Namen wohnen im selben Ursprung, deshalb genuegt das Umhaengen.
+    if (!raw) {
+      raw = readRaw(KEY_ALT);
+      if (raw) {
+        writeRaw(KEY, raw);
+        removeRaw(KEY_ALT);
+      }
+    }
+
     if (!raw) return state;
 
     try {
@@ -120,7 +135,7 @@
       state.last = d.last || null;
       if (d.settings) Object.assign(state.settings, d.settings);
     } catch (e) {
-      G.u.toast('Gespeicherte Daten unlesbar', 'GoTV startet mit einer leeren Ablage.', 'warn');
+      G.u.toast('Gespeicherte Daten unlesbar', 'G04TV startet mit einer leeren Ablage.', 'warn');
     }
     return state;
   }
@@ -365,7 +380,7 @@
     });
 
     return JSON.stringify({
-      app: 'GoTV',
+      app: 'G04TV',
       version: state.version,
       exportedAt: new Date().toISOString(),
       containsSecrets: !!withSecrets,
@@ -383,7 +398,8 @@
    */
   function importAll(json) {
     var d = JSON.parse(json);
-    if (!d || d.app !== 'GoTV') throw new Error('Keine GoTV-Sicherung.');
+    // 'GoTV' hiess die App vor der Umbenennung - solche Sicherungen gelten weiter.
+    if (!d || (d.app !== 'G04TV' && d.app !== 'GoTV')) throw new Error('Keine G04TV-Sicherung.');
 
     if (Array.isArray(d.playlists)) {
       d.playlists.forEach(function (p) {
@@ -487,4 +503,4 @@
 
     get storageOk() { return storageOk; }
   };
-})(GoTV);
+})(G04TV);

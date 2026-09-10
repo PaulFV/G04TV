@@ -1,5 +1,5 @@
 /* ============================================================
-   GoTV — Bereich Playlisten
+   G04TV — Bereich Playlisten
 
    Vier Wege hinein, wie im IPTV-Fenster von Connect+:
      Adresse    eine M3U/M3U8 im Netz
@@ -112,7 +112,7 @@
       (s.playlists.length
         ? '<div class="grid grid--auto" id="plGrid">' + s.playlists.map(card).join('') + '</div>'
         : '<div class="card"><div class="empty">' + u.icon('playlists', 40) +
-          '<b>Noch keine Playlist</b><p>GoTV bringt keine Sender mit — du trägst deine eigene Quelle ein. ' +
+          '<b>Noch keine Playlist</b><p>G04TV bringt keine Sender mit — du trägst deine eigene Quelle ein. ' +
           'Sie bleibt auf dem Gerät gespeichert.</p>' +
           '<div class="btn-row"><button class="btn btn--primary" id="plAdd2">' + u.icon('plus', 16) + ' Jetzt hinzufügen</button></div>' +
           '</div></div>') +
@@ -491,4 +491,4 @@
     render: render,
     mount: mount
   };
-})(GoTV);
+})(G04TV);

@@ -1,4 +1,4 @@
-# GoTV — Vermittler (Cloudflare Worker)
+# G04TV — Vermittler (Cloudflare Worker)
 
 Ein kleiner Server, der Playlisten und Streams stellvertretend holt und über **HTTPS mit
 CORS-Kopfzeilen** zurückgibt. Damit fallen die beiden Grenzen weg, an denen ein Browser sonst
@@ -7,7 +7,7 @@ scheitert:
 | Grenze | Was der Vermittler tut |
 |:--|:--|
 | **CORS** — der Anbieter erlaubt das Lesen aus dem Browser nicht | Er setzt selbst `Access-Control-Allow-Origin: *` |
-| **Mixed Content** — GoTV läuft über `https`, der Sender über `http` | Er liefert alles über `https` aus |
+| **Mixed Content** — G04TV läuft über `https`, der Sender über `http` | Er liefert alles über `https` aus |
 | **User-Agent-Sperre** — der Anbieter antwortet nur bekannten Abspielern | Er gibt sich als `VLC/3.0.20` aus; ein Browser darf das nicht |
 
 Bei einer **HLS-Playlist** bleibt es nicht beim Durchreichen: die Adressen der Segmente, der
@@ -27,12 +27,12 @@ npx wrangler deploy
 ```
 
 `wrangler deploy` nennt am Ende die Adresse, etwa
-`https://gotv-proxy.dein-name.workers.dev`.
+`https://g04tv-proxy.dein-name.workers.dev`.
 
-In GoTV unter **Einstellungen › Playlisten aus dem Netz** eintragen:
+In G04TV unter **Einstellungen › Playlisten aus dem Netz** eintragen:
 
 ```
-https://gotv-proxy.dein-name.workers.dev/?url={url}&key=DEIN_SCHLUESSEL
+https://g04tv-proxy.dein-name.workers.dev/?url={url}&key=DEIN_SCHLUESSEL
 ```
 
 Dann **Vermittler verwenden** einschalten — und, wenn auch das Bild darüber laufen soll,

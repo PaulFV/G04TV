@@ -1,5 +1,5 @@
 /* ============================================================
-   GoTV — Ersteinrichtung
+   G04TV — Ersteinrichtung
 
    Drei Schritte, einmalig. Keine Anmeldung, keine Einwilligung -
    nur die Frage, woher die Sender kommen sollen. Wer will,
@@ -41,7 +41,7 @@
     return '<div class="ob-step">' +
       progress() +
       '<h2 style="font-size:24px">Was du mitbringst</h2>' +
-      '<p class="muted">GoTV liefert keine Sender mit. Die App spielt allein das, was du selbst ' +
+      '<p class="muted">G04TV liefert keine Sender mit. Die App spielt allein das, was du selbst ' +
       'einträgst — die Playlist deines Anbieters oder frei verfügbare Listen.</p>' +
       '<div class="note note--warn">' + u.icon('warn', 18) +
       '<div>Für die Rechtmäßigkeit deiner Quellen bist du selbst verantwortlich.</div></div>' +
@@ -146,4 +146,4 @@
   }
 
   G.onboarding = { start: start, finish: finish };
-})(GoTV);
+})(G04TV);
