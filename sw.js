@@ -6,7 +6,7 @@
    ausschließlich die eigenen Programmdateien — keine Playlisten,
    keine Streams, keine Anfragen an fremde Server.
    ============================================================ */
-var CACHE = 'gotv-v1.0.0';
+var CACHE = 'gotv-v1.0.1';
 
 var ASSETS = [
   './',
@@ -32,6 +32,7 @@ var ASSETS = [
   './js/view-info.js',
   './js/onboarding.js',
   './js/app.js',
+  './icons/favicon-32.png',
   './icons/icon-180.png',
   './icons/icon-192.png',
   './icons/icon-512.png',
