@@ -1,9 +1,9 @@
 {
   "id": "g04tv-v1",
-  "name": "G04TV — IPTV-Playlisten",
+  "name": "G04TV — IPTV Playlists",
   "short_name": "G04TV",
-  "description": "Abspieler für eigene IPTV-Playlisten. Playlisten, Favoriten und Zugänge bleiben auf dem Gerät — ohne Konto, ohne Server.",
-  "lang": "de",
+  "description": "Player for your own IPTV playlists. Playlists, favorites and credentials stay on the device — no account, no server.",
+  "lang": "en",
   "dir": "ltr",
   "start_url": "./index.html",
   "scope": "./",
@@ -21,8 +21,8 @@
     { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
-    { "name": "Sender", "short_name": "Sender", "url": "./index.html#live" },
-    { "name": "Favoriten", "short_name": "Favoriten", "url": "./index.html#favorites" },
-    { "name": "Playlisten", "short_name": "Playlisten", "url": "./index.html#playlists" }
+    { "name": "Channels", "short_name": "Channels", "url": "./index.html#live" },
+    { "name": "Favorites", "short_name": "Favorites", "url": "./index.html#favorites" },
+    { "name": "Playlists", "short_name": "Playlists", "url": "./index.html#playlists" }
   ]
 }

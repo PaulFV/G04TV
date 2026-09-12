@@ -68,6 +68,7 @@
       last: null,
 
       settings: {
+        language: 'en',
         volume: 80,
         muted: false,
         autoplay: true,          // beim Antippen sofort abspielen
@@ -432,7 +433,10 @@
         if (f && f.url && !isFavorite(f.url)) state.favorites.push(f);
       });
     }
-    if (d.settings) Object.assign(state.settings, d.settings);
+    if (d.settings) {
+      Object.assign(state.settings, d.settings);
+      if (G.i18n) G.i18n.useState(state.settings);
+    }
 
     if (!state.activeId && state.playlists.length) state.activeId = state.playlists[0].id;
     state.onboarded = true;

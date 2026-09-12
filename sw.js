@@ -17,6 +17,7 @@ var ASSETS = [
   './css/components.css',
   './css/player.css',
   './js/util.js',
+  './js/i18n.js',
   './js/m3u.js',
   './js/xtream.js',
   './js/db.js',
