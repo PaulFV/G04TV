@@ -6,7 +6,7 @@
    ausschließlich die eigenen Programmdateien — keine Playlisten,
    keine Streams, keine Anfragen an fremde Server.
    ============================================================ */
-var CACHE = 'g04tv-v1.0.5';
+var CACHE = 'g04tv-v1.0.6';
 
 var ASSETS = [
   './',
@@ -18,6 +18,7 @@ var ASSETS = [
   './css/player.css',
   './css/start.css',
   './css/playlists.css',
+  './css/settings.css',
   './css/legal.css',
   './js/util.js',
   './js/m3u.js',

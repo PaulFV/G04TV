@@ -218,7 +218,8 @@ G04TV.NAME = 'G04TV';
     chevron: '<path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
     edit: '<path d="M5 19h3.4L19 8.4a2.4 2.4 0 10-3.4-3.4L5 15.6V19z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>',
     grid: '<rect x="4" y="4" width="6.4" height="6.4" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13.6" y="4" width="6.4" height="6.4" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="4" y="13.6" width="6.4" height="6.4" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13.6" y="13.6" width="6.4" height="6.4" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.8"/>',
-    history: '<path d="M4 12a8 8 0 108-8 8 8 0 00-6.4 3.2M4 4v3.6h3.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 7.6V12l3 1.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>'
+    history: '<path d="M4 12a8 8 0 108-8 8 8 0 00-6.4 3.2M4 4v3.6h3.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 7.6V12l3 1.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+    database: '<ellipse cx="12" cy="5.8" rx="7.5" ry="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M4.5 5.8v6.2c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3V5.8M4.5 12v6.2c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3V12" fill="none" stroke="currentColor" stroke-width="1.7"/>'
   };
 
   function icon(name, size) {

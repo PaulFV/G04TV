@@ -119,6 +119,84 @@
     '</div>';
   }
 
+  function renderModern() {
+    var s = G.store.state.settings;
+
+    return '<div class="view settings-view">' +
+      '<div class="settings-intro">' +
+        '<div><h2>Deine Einstellungen</h2><p>Wiedergabe, Darstellung und lokale Daten verwalten.</p></div>' +
+        '<span class="settings-device">' + u.icon('shield', 18) + ' Nur auf diesem Gerät</span>' +
+      '</div>' +
+
+      '<section class="card settings-section">' +
+        '<div class="settings-section__head">' + u.icon('grid', 22) + '<h3>Sprache &amp; Darstellung</h3></div>' +
+        '<div class="settings-grid settings-grid--2">' +
+          '<div class="settings-panel settings-panel__language">' +
+            u.icon('grid', 22) +
+            '<div class="field"><label for="setLanguage">Anzeigesprache</label><select class="select" id="setLanguage" disabled><option>Deutsch</option></select></div>' +
+          '</div>' +
+          '<div class="settings-panel">' + sw('reduceMotion', 'Bewegung reduzieren', 'Animationen und Hintergrundschein abschalten.') + '</div>' +
+        '</div>' +
+      '</section>' +
+
+      '<section class="card settings-section">' +
+        '<div class="settings-section__head">' + u.icon('play', 22) + '<h3>Wiedergabe</h3></div>' +
+        '<div class="settings-grid settings-grid--2">' +
+          '<div class="settings-panel">' + sw('autoplay', 'Sofort abspielen', 'Sender beim Antippen direkt starten.') + '</div>' +
+          '<div class="settings-panel">' + sw('resume', 'Letzten Sender beim Start laden', 'Zuletzt gesehenen Sender vorbereiten.') + '</div>' +
+          '<div class="settings-panel settings-panel--wide">' + sw('confirmExternal', 'Vor „Extern öffnen“ fragen', 'Übergabe an einen anderen Player bestätigen.') + '</div>' +
+          '<div class="settings-panel settings-range">' +
+            '<div class="settings-range__head"><span>Lautstärke</span><span id="setVolV">' + s.volume + ' %</span></div>' +
+            '<input type="range" id="setVol" min="0" max="100" value="' + s.volume + '">' +
+            '<div class="settings-range__ends"><span>Leise</span><span>Laut</span></div>' +
+          '</div>' +
+        '</div>' +
+      '</section>' +
+
+      '<section class="card settings-section">' +
+        '<div class="settings-section__head">' + u.icon('link', 22) + '<h3>Playlisten aus dem Netz</h3></div>' +
+        '<div class="settings-proxy__intro">' + u.icon('shield', 17) + '<div>Der Vermittler ist optional. Er holt eine blockierte Playlist stellvertretend — trage nur eine Adresse ein, der du selbst vertraust.</div></div>' +
+        '<div class="settings-panel">' + sw('proxyOn', 'Vermittler verwenden', 'Direkt versuchen; nur bei Bedarf über den Vermittler laden.') + '</div>' +
+        '<div class="field settings-proxy__field"><label for="setProxy">Adresse des Vermittlers</label>' +
+          '<input class="input" id="setProxy" spellcheck="false" autocomplete="off" placeholder="https://g04tv-proxy.dein-name.workers.dev/?url={url}&amp;key=…" value="' + u.esc(s.proxy) + '">' +
+          '<span class="settings-proxy__hint">Der Platzhalter <b>{url}</b> wird durch die abgerufene Adresse ersetzt.</span>' +
+        '</div>' +
+        '<div class="settings-panel">' + sw('proxyStreams', 'Auch Streams über den Vermittler', 'Playlist und Videostream über den Vermittler laden.') + '</div>' +
+        (s.proxyStreams && !G.store.proxy()
+          ? '<div class="note note--warn" style="margin-top:10px">' + u.icon('warn', 16) + '<div>Es ist kein Vermittler eingeschaltet — der Schalter bleibt wirkungslos.</div></div>'
+          : '') +
+      '</section>' +
+
+      '<section class="card settings-section">' +
+        '<div class="settings-section__head">' + u.icon('shield', 22) + '<h3>Daten auf diesem Gerät</h3></div>' +
+        '<div class="settings-data">' +
+          '<div class="settings-stat">' + u.icon('playlists', 30) + '<div class="settings-stat__main"><span class="stat__v">' + G.store.state.playlists.length + '</span><span class="stat__d">Playlisten</span></div></div>' +
+          '<div class="settings-stat">' + u.icon('database', 30) + '<div class="settings-stat__main"><span class="stat__v" id="setUsage">' + (usage ? u.fmtSize(usage.used) : '…') + '</span><span class="stat__d">Playlists, Favoriten, Einstellungen</span></div></div>' +
+        '</div>' +
+        '<div class="settings-actions">' +
+          '<button class="btn" id="setExport">' + u.icon('download', 16) + ' Sicherung speichern</button>' +
+          '<button class="btn" id="setImport">' + u.icon('upload', 16) + ' Sicherung einlesen</button>' +
+          '<button class="btn btn--danger" id="setWipe">' + u.icon('trash', 16) + ' Alles löschen</button>' +
+        '</div>' +
+        '<p class="settings-section__foot">Die Sicherung enthält Einstellungen und Listen, nicht die Senderlisten selbst.</p>' +
+      '</section>' +
+
+      '<section class="card settings-section">' +
+        '<div class="settings-section__head">' + u.icon('live', 22) + '<h3>Als App installieren</h3></div>' +
+        '<div class="settings-install">' +
+          '<div class="settings-install__art">' + u.icon('live', 22) + '</div>' +
+          '<div class="settings-platforms">' +
+            '<div class="settings-platform"><span class="settings-platform__os">●</span><b>iPhone / iPad</b><span>Safari · Teilen · Zum Home-Bildschirm</span></div>' +
+            '<div class="settings-platform"><span class="settings-platform__os">◆</span><b>Android</b><span>Chrome · Menü · App installieren</span></div>' +
+          '</div>' +
+          '<div class="settings-install__action"><button class="btn btn--primary" id="setInstall" hidden>' + u.icon('download', 16) + ' Jetzt installieren</button></div>' +
+        '</div>' +
+      '</section>' +
+
+      '<p class="tiny dim center">' + u.esc(G.NAME) + ' ' + u.esc(G.VERSION) + '</p>' +
+    '</div>';
+  }
+
   /* ------------------------------------------------------------
      Einhaengen
      ------------------------------------------------------------ */
@@ -236,7 +314,7 @@
   G.views.settings = {
     title: 'Einstellungen',
     sub: 'Gilt für dieses Gerät — es gibt kein Konto',
-    render: render,
+    render: renderModern,
     mount: mount
   };
 })(G04TV);
