@@ -194,7 +194,9 @@
         .filter(function (x) { return G.m3u.sameSource(x.url, url); })[0];
       if (!c) return;
       G.views.live.playChannel(c);
-      G.app.go('live');
+      // Auf Start bleibt der Player als schwebendes Fenster sichtbar.
+      // Nur der ausdrückliche Weg „Zu den Sendern“ wechselt den Bereich.
+      G.app.rerender();
     });
 
     u.on(host, 'click', '[data-open]', function (e, t) {
