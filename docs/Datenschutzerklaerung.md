@@ -1,12 +1,21 @@
 # Datenschutzerklärung — G04TV
 
-Stand: Version 1.0.0
+Stand: 12. September 2026
 
 ## Kurz
 
-G04TV ist eine reine Web-App ohne Backend. Es gibt **kein Benutzerkonto**, **keine Anmeldung** und
-**keinen Server**, an den Daten übermittelt würden. Alles, was du in G04TV einträgst, bleibt in dem
-Browser, in dem du es eingetragen hast.
+G04TV ist eine reine Web-App ohne Betreiber-Backend. Es gibt **kein Benutzerkonto**, **keine Anmeldung**,
+**keine Werbung**, **keine Analyse** und **kein Tracking**. Alles, was G04TV selbst speichert, bleibt in
+dem Browser, in dem es eingetragen wurde. Ein vom Nutzer selbst eingetragener Vermittler/Proxy ist davon
+zu unterscheiden: An ihn können Playlist- und Stream-Adressen einschließlich eingebetteter Zugangsdaten
+übertragen werden.
+
+## Verantwortlich und Kontakt
+
+G04TV wird als Open-Source-Projekt **PaulFV/G04TV** veröffentlicht. Datenschutzfragen und Löschanfragen
+können über die [G04TV GitHub Issues](https://github.com/PaulFV/G04TV/issues) gestellt werden. Vor einer
+Google-Play-Veröffentlichung müssen Betreibername, rechtliche Anschrift und direkter Datenschutzkontakt
+mit dem Play-Console-Konto abgeglichen und gegebenenfalls ergänzt werden.
 
 ## Welche Daten wo liegen
 
@@ -49,7 +58,15 @@ eigenen Webserver entfällt auch das.
 Favoriten, Verlauf und Einstellungen restlos. Dasselbe erreicht das Löschen der Website-Daten im
 Browser.
 
-## Verantwortlich
+## Google Play
 
-Diese App wird ohne Betreiberinfrastruktur verteilt. Für die Inhalte der eingetragenen Quellen ist
-allein die Person verantwortlich, die sie einträgt.
+Für eine Veröffentlichung im Google Play Store muss die Data-Safety-Erklärung in der Play Console die
+tatsächlich ausgelieferte Android-Version, die TWA und alle verwendeten Bibliotheken abbilden. Auch wenn
+G04TV kein Konto und kein Tracking hat, können vom Nutzer eingetragene Adressen an den gewählten Anbieter
+oder einen aktivierten Proxy gesendet werden. Die Angaben dürfen deshalb nicht pauschal als „keine
+Datenübertragung“ eingetragen werden.
+
+## Inhalte
+
+Für die Inhalte der eingetragenen Quellen ist allein die Person verantwortlich, die sie einträgt. Siehe
+auch den [Copyright- und Inhaltshinweis](../copyright.html).

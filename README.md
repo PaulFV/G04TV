@@ -163,6 +163,8 @@ G04TV/
   index.html                Rahmen: Seitenleiste, Kopfzeile, Ansichten, Bühne
   manifest.webmanifest      Installation als App
   sw.js                     Service Worker (nur eigene Programmdateien)
+  privacy.html              Öffentliche Datenschutzerklärung für Web und Play Store
+  copyright.html            Copyright- und Inhaltshinweise
   css/
     theme.css               Farben, Schriften, Grundlagen
     layout.css              Rahmen, Navigation, Blatt, Meldungen
@@ -189,7 +191,8 @@ G04TV/
     worker.js               Vermittler: holt Playlisten und Streams, schreibt HLS um
     wrangler.toml           Einstellungen für Cloudflare
   icons/                    Sinnbilder für die Installation
-  docs/                     Datenschutzerklärung
+  docs/                     Markdown-Dokumentation zur Datenschutzerklärung
+  play-store/               TWA- und Google-Play-Vorbereitung
 ```
 
 ---
@@ -209,8 +212,9 @@ Verbindungen gehen an **deinen Anbieter** (Playlist und Streams), an die Adresse
 aus der Playlist, bei Bedarf an **cdnjs/jsDelivr** (die beiden Abspiel-Bibliotheken) und an einen
 **Vermittler**, falls du selbst einen einträgst.
 
-Unter **Einstellungen › Alles löschen** verschwindet alles davon restlos. Siehe auch
-[docs/Datenschutzerklaerung.md](docs/Datenschutzerklaerung.md).
+Unter **Einstellungen › Alles löschen** verschwindet alles davon restlos. Siehe auch die öffentlich
+erreichbare [Datenschutzerklärung](privacy.html), den [Copyright- und Inhaltshinweis](copyright.html)
+und die [ausführliche Markdown-Fassung](docs/Datenschutzerklaerung.md).
 
 ---
 

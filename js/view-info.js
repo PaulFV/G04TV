@@ -125,6 +125,15 @@
         '</div>' +
       '</div>' +
 
+      '<div class="card">' +
+        '<div class="card__head">' + u.icon('shield', 18) + '<h3>Datenschutz &amp; Urheberrecht</h3></div>' +
+        '<p class="small muted">Die vollständigen Hinweise stehen öffentlich und auch offline als eigene Seiten zur Verfügung.</p>' +
+        '<div class="btn-row">' +
+          '<a class="btn" href="privacy.html">Datenschutzerklärung</a>' +
+          '<a class="btn" href="copyright.html">Urheberrecht &amp; Inhalte</a>' +
+        '</div>' +
+      '</div>' +
+
       '<div class="note note--warn">' + u.icon('warn', 18) +
       '<div><b>Zu den Inhalten.</b> G04TV liefert keine Sender mit und vermittelt keine. ' +
       'Die App spielt allein, was du selbst einträgst. Für die Rechtmäßigkeit deiner Quellen ' +

@@ -1,0 +1,4 @@
+# GitHub Pages normally omits dot-directories. Keep Digital Asset Links
+# available when a .well-known/assetlinks.json is added for the Android app.
+include:
+  - .well-known
