@@ -42,11 +42,10 @@ G04TV.NAME = 'G04TV';
   function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
   function num(v, fallback) { var n = parseFloat(v); return isFinite(n) ? n : (fallback || 0); }
 
-  /** 12345 -> localized thousands */
+  /** 12345 -> "12.345" */
   function fmtInt(v) {
     if (v == null || !isFinite(v)) return '–';
-    var separator = G.i18n && G.i18n.language === 'en' ? ',' : '.';
-    return Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, separator);
+    return Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   }
 
   /** Byte-Zahl in eine lesbare Groesse */
@@ -54,8 +53,7 @@ G04TV.NAME = 'G04TV';
     if (!isFinite(bytes) || bytes <= 0) return '0 KB';
     if (bytes < 1024) return bytes + ' B';
     if (bytes < 1024 * 1024) return Math.round(bytes / 1024) + ' KB';
-    var decimal = G.i18n && G.i18n.language === 'en' ? '.' : ',';
-    return (bytes / 1048576).toFixed(1).replace('.', decimal) + ' MB';
+    return (bytes / 1048576).toFixed(1).replace('.', ',') + ' MB';
   }
 
   /** Kuerzt einen langen Text in der Mitte - fuer Adressen */
@@ -76,35 +74,31 @@ G04TV.NAME = 'G04TV';
   }
 
   /* ---------- Datum ---------- */
-  var MONTHS_DE = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
-  var MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  var MONTHS = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
 
   function fmtDateTime(iso) {
     if (!iso) return '–';
     var d = new Date(iso);
     if (isNaN(d)) return '–';
-    var months = G.i18n && G.i18n.language === 'en' ? MONTHS_EN : MONTHS_DE;
-    var day = G.i18n && G.i18n.language === 'en' ? d.getDate() : d.getDate() + '.';
-    return day + ' ' + months[d.getMonth()] + ' ' + d.getFullYear() + ', ' +
+    return d.getDate() + '. ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear() + ', ' +
       String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
   }
 
   /** "gerade eben" / "vor 12 Minuten" / "vor 3 Tagen" */
   function relTime(iso) {
-    var english = G.i18n && G.i18n.language === 'en';
-    if (!iso) return english ? 'never' : 'nie';
+    if (!iso) return 'nie';
     var ms = Date.now() - new Date(iso).getTime();
-    if (!isFinite(ms)) return english ? 'never' : 'nie';
+    if (!isFinite(ms)) return 'nie';
     var min = Math.floor(ms / 60000);
-    if (min < 1) return english ? 'just now' : 'gerade eben';
-    if (min < 60) return english ? min + (min === 1 ? ' minute ago' : ' minutes ago') : 'vor ' + min + (min === 1 ? ' Minute' : ' Minuten');
+    if (min < 1) return 'gerade eben';
+    if (min < 60) return 'vor ' + min + (min === 1 ? ' Minute' : ' Minuten');
     var h = Math.floor(min / 60);
-    if (h < 24) return english ? h + (h === 1 ? ' hour ago' : ' hours ago') : 'vor ' + h + (h === 1 ? ' Stunde' : ' Stunden');
+    if (h < 24) return 'vor ' + h + (h === 1 ? ' Stunde' : ' Stunden');
     var d = Math.floor(h / 24);
-    if (d === 1) return english ? 'yesterday' : 'gestern';
-    if (d < 30) return english ? d + ' days ago' : 'vor ' + d + ' Tagen';
+    if (d === 1) return 'gestern';
+    if (d < 30) return 'vor ' + d + ' Tagen';
     var mo = Math.floor(d / 30);
-    return english ? mo + (mo === 1 ? ' month ago' : ' months ago') : 'vor ' + mo + (mo === 1 ? ' Monat' : ' Monaten');
+    return 'vor ' + mo + (mo === 1 ? ' Monat' : ' Monaten');
   }
 
   /* ---------- Diverses ---------- */

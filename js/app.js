@@ -67,7 +67,7 @@
     var title = typeof view.title === 'function' ? view.title() : view.title;
     u.$('#viewTitle').textContent = title;
     u.$('#viewSub').textContent = typeof view.sub === 'function' ? view.sub() : (view.sub || '');
-    document.title = G.NAME + ' — ' + (G.i18n ? G.i18n.t(title) : title);
+    document.title = G.NAME + ' — ' + title;
 
     var host = u.$('#viewHost');
     host.innerHTML = view.render(currentParams) || '';
@@ -145,8 +145,6 @@
   function boot() {
     G.store.load();
     var s = G.store.state;
-
-    if (G.i18n) G.i18n.useState(s.settings);
 
     if (s.settings.reduceMotion) document.body.classList.add('no-motion');
 

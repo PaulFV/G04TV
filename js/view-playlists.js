@@ -317,7 +317,6 @@
      Einzelne Sender
      ------------------------------------------------------------ */
   function channelSheet() {
-    var defaultGroup = G.i18n && G.i18n.language === 'en' ? 'Individual channels' : 'Eigene Sender';
     u.openSheet('Einzelnen Sender eintragen',
       '<div class="stack">' +
         '<div class="field"><label for="cName">Name</label>' +
@@ -326,7 +325,7 @@
         '<input class="input" id="cUrl" type="url" inputmode="url" spellcheck="false" autocomplete="off" ' +
         'placeholder="https://…/stream.m3u8"></div>' +
         '<div class="field"><label for="cGroup">Gruppe</label>' +
-        '<input class="input" id="cGroup" value="' + u.esc(defaultGroup) + '" autocomplete="off"></div>' +
+        '<input class="input" id="cGroup" value="Eigene Sender" autocomplete="off"></div>' +
         '<button class="btn btn--primary btn--block" id="cSave">' + u.icon('check', 16) + ' Eintragen</button>' +
       '</div>',
       function (body) {

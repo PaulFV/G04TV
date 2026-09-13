@@ -18,7 +18,6 @@ var ASSETS = [
   './css/player.css',
   './css/legal.css',
   './js/util.js',
-  './js/i18n.js',
   './js/m3u.js',
   './js/xtream.js',
   './js/db.js',

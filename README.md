@@ -12,9 +12,6 @@ gesperrten Einträge. Die Umsetzung als installierbare Web-App folgt **GoFit**.
 
 ## Was G04TV kann
 
-Die Oberfläche startet beim ersten Öffnen auf Englisch. Unter **Settings › Language** kann jederzeit
-**Deutsch** ausgewählt werden; die Auswahl wird nur lokal in diesem Browser gespeichert.
-
 | Bereich | Beschreibung |
 |:--|:--|
 | **Start** | Was zuletzt lief, Favoriten als Kacheln, Stand der Playlisten |

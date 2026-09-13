@@ -26,18 +26,6 @@
 
     return '<div class="view stack">' +
 
-      /* ---- Sprache ---- */
-      '<div class="card">' +
-        '<div class="card__head">' + u.icon('grid', 18) + '<h3>Sprache</h3></div>' +
-        '<div class="field" style="padding:0 13px 8px">' +
-          '<label for="setLanguage">Anzeigesprache</label>' +
-          '<select class="select" id="setLanguage" style="width:100%">' +
-            '<option value="en"' + (s.language !== 'de' ? ' selected' : '') + '>English</option>' +
-            '<option value="de"' + (s.language === 'de' ? ' selected' : '') + '>Deutsch</option>' +
-          '</select>' +
-        '</div>' +
-      '</div>' +
-
       /* ---- Wiedergabe ---- */
       '<div class="card">' +
         '<div class="card__head">' + u.icon('play', 18) + '<h3>Wiedergabe</h3></div>' +
@@ -135,12 +123,6 @@
      Einhaengen
      ------------------------------------------------------------ */
   function mount(host) {
-    var language = u.$('#setLanguage');
-    if (language) language.onchange = function () {
-      G.store.setSetting('language', language.value);
-      G.i18n.setLanguage(language.value);
-    };
-
     /* Schalter */
     u.on(host, 'change', '[data-set]', function (e, t) {
       var key = t.getAttribute('data-set');
