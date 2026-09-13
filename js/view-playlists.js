@@ -75,12 +75,12 @@
   function ownChannels() {
     var s = G.store.state;
 
-    return '<div class="card">' +
-      '<div class="card__head">' + u.icon('live', 18) + '<h3>Einzelne Sender</h3>' +
-      '<span class="spacer"></span>' +
-      '<button class="btn btn--sm" id="plAddChannel">' + u.icon('plus', 14) + ' Sender</button></div>' +
-      '<p class="tiny dim" style="margin-bottom:12px">Ein einzelner Stream ohne Playlist — etwa ein Radiosender ' +
-      'oder eine feste Adresse. Diese Sender stehen im Bereich Sender immer oben.</p>' +
+    return '<section class="card pl-own">' +
+      '<div class="pl-own__head">' +
+        '<div class="pl-own__title">' + u.icon('live', 22) + '<div><h3>Einzelne Sender</h3>' +
+        '<p>Ein einzelner Stream ohne Playlist — etwa ein Radiosender oder eine feste Adresse.</p></div></div>' +
+        '<button class="btn" id="plAddChannel">' + u.icon('plus', 16) + ' Sender</button>' +
+      '</div>' +
       (s.channels.length
         ? '<div class="list">' + s.channels.map(function (c) {
             return '<div class="list__row">' +
@@ -94,52 +94,74 @@
                 'style="width:32px;height:32px;border-radius:9px">' + u.icon('trash', 14) + '</button>' +
               '</span></div>';
           }).join('') + '</div>'
-        : '<div class="empty" style="padding:18px 6px"><b>Keine eigenen Sender</b></div>') +
-    '</div>';
+        : '<div class="pl-own__empty"><img src="art/playlist-channel.png" alt=""><b>Keine eigenen Sender</b></div>') +
+    '</section>';
   }
 
   function render() {
     var s = G.store.state;
 
-    return '<div class="view stack">' +
-
-      '<div class="row row--wrap">' +
-        '<button class="btn btn--primary" id="plAdd">' + u.icon('plus', 16) + ' Playlist hinzufügen</button>' +
-        (s.playlists.length ? '<button class="btn" id="plRefreshAll">' + u.icon('refresh', 16) + ' Alle aktualisieren</button>' : '') +
-        '<span class="spacer"></span>' +
+    return '<div class="view playlists-view">' +
+      '<div class="playlists-intro">' +
+        '<div><h2>Deine Playlists</h2><p>Füge deine eigenen Quellen sicher und lokal hinzu.</p></div>' +
+        '<div class="playlists-intro__actions">' +
+          '<button class="btn btn--primary" id="plAdd">' + u.icon('plus', 18) + ' Playlist hinzufügen</button>' +
+          (s.playlists.length ? '<button class="btn" id="plRefreshAll">' + u.icon('refresh', 16) + ' Alle aktualisieren</button>' : '') +
+        '</div>' +
       '</div>' +
+
+      '<section class="card pl-import">' +
+        '<div class="pl-import__head">' +
+          '<div class="pl-import__title">' + u.icon('download', 22) + '<div><h3>Playlist importieren</h3><p>Wähle, wie du deine Sender hinzufügen möchtest.</p></div></div>' +
+          '<span class="pl-import__badge">' + u.icon('shield', 17) + ' Bleibt auf diesem Gerät</span>' +
+        '</div>' +
+        '<div class="pl-import-grid">' +
+          importOption('url', 'playlist-link.png', 'Adresse', 'M3U- oder M3U8-Link') +
+          importOption('file', 'playlist-file.png', 'Datei', 'Lokale Playlist') +
+          importOption('text', 'playlist-text.png', 'Text einfügen', 'Playlist direkt einfügen') +
+          importOption('xtream', 'playlist-xtream.png', 'Xtream-Zugang', 'Server und Login') +
+        '</div>' +
+      '</section>' +
 
       (s.playlists.length
         ? '<div class="grid grid--auto" id="plGrid">' + s.playlists.map(card).join('') + '</div>'
-        : '<div class="card"><div class="empty">' + u.icon('playlists', 40) +
-          '<b>Noch keine Playlist</b><p>G04TV bringt keine Sender mit — du trägst deine eigene Quelle ein. ' +
-          'Sie bleibt auf dem Gerät gespeichert.</p>' +
-          '<div class="btn-row"><button class="btn btn--primary" id="plAdd2">' + u.icon('plus', 16) + ' Jetzt hinzufügen</button></div>' +
-          '</div></div>') +
+        : '<section class="card pl-empty">' +
+            '<div class="pl-empty__art"><img src="art/playlist-empty.png" alt=""></div>' +
+            '<div class="pl-empty__copy"><h3>Noch keine Playlist</h3>' +
+            '<p>G04TV bringt keine Sender mit — du trägst deine eigene Quelle ein.</p>' +
+            '<button class="btn btn--primary" id="plAdd2">' + u.icon('plus', 17) + ' Jetzt hinzufügen</button></div>' +
+          '</section>') +
 
       ownChannels() +
 
-      '<div class="note">' + u.icon('info', 18) +
-      '<div>Lässt sich eine Adresse nicht laden, liegt es fast immer am Anbieter: der Browser darf ' +
-      'fremde Adressen nur lesen, wenn sie es erlauben (CORS). Dann die Playlist als Datei speichern ' +
-      'und hier einlesen — oder in den Einstellungen einen Vermittler eintragen.</div></div>' +
-
+      '<button class="card pl-help" id="plHelp" type="button">' + u.icon('info', 18) +
+        '<span class="pl-help__main"><b>Probleme beim Laden einer Adresse?</b><span>CORS, Anbieterfreigaben und Vermittler prüfen</span></span>' +
+        '<span class="pl-help__action"><a>Hilfe öffnen</a>' + u.icon('chevron', 18) + '</span>' +
+      '</button>' +
     '</div>';
+  }
+
+  function importOption(kind, image, name, description) {
+    return '<button class="pl-import-option" type="button" data-add-kind="' + kind + '">' +
+      '<span class="pl-import-option__art"><img src="art/' + image + '" alt=""></span>' +
+      '<strong class="pl-import-option__name">' + name + '</strong>' +
+      '<span class="pl-import-option__desc">' + description + u.icon('chevron', 17) + '</span>' +
+    '</button>';
   }
 
   /* ------------------------------------------------------------
      Hinzufuegen
      ------------------------------------------------------------ */
-  function addSheet() {
-    var tab = 'url';
+  function addSheet(initialTab) {
+    var tab = initialTab || 'url';
 
     u.openSheet('Playlist hinzufügen',
       '<div class="stack">' +
         '<div class="tabs" id="plTabs">' +
-          '<button class="tabs__b is-on" data-tab="url">Adresse</button>' +
-          '<button class="tabs__b" data-tab="file">Datei</button>' +
-          '<button class="tabs__b" data-tab="text">Einfügen</button>' +
-          '<button class="tabs__b" data-tab="xtream">Xtream</button>' +
+          '<button class="tabs__b' + (tab === 'url' ? ' is-on' : '') + '" data-tab="url">Adresse</button>' +
+          '<button class="tabs__b' + (tab === 'file' ? ' is-on' : '') + '" data-tab="file">Datei</button>' +
+          '<button class="tabs__b' + (tab === 'text' ? ' is-on' : '') + '" data-tab="text">Einfügen</button>' +
+          '<button class="tabs__b' + (tab === 'xtream' ? ' is-on' : '') + '" data-tab="xtream">Xtream</button>' +
         '</div>' +
         '<div id="plTabBody"></div>' +
       '</div>',
@@ -313,6 +335,15 @@
     u.toast('Playlist gespeichert', p.name + ' · ' + u.fmtInt(count) + ' Sender', 'ok');
   }
 
+  function helpSheet() {
+    u.openSheet('Hilfe zum Laden',
+      '<div class="stack">' +
+        '<div class="note note--acc">' + u.icon('shield', 18) + '<div>Playlisten und Zugangsdaten bleiben auf diesem Gerät. G04TV liefert keine Sender mit.</div></div>' +
+        '<p>Wenn eine Online-Adresse nicht geladen wird, blockiert der Anbieter häufig den Browserzugriff (CORS). Prüfe zuerst die Adresse und ob die Playlist außerhalb von G04TV erreichbar ist.</p>' +
+        '<p>Alternativ kannst du die M3U-Datei speichern und über <b>Datei</b> importieren. Für Quellen ohne Browserfreigabe kann ein eigener Vermittler in den Einstellungen helfen.</p>' +
+      '</div>');
+  }
+
   /* ------------------------------------------------------------
      Einzelne Sender
      ------------------------------------------------------------ */
@@ -351,8 +382,14 @@
      Einhaengen
      ------------------------------------------------------------ */
   function mount(host) {
-    if (u.$('#plAdd')) u.$('#plAdd').onclick = addSheet;
-    if (u.$('#plAdd2')) u.$('#plAdd2').onclick = addSheet;
+    if (u.$('#plAdd')) u.$('#plAdd').onclick = function () { addSheet('url'); };
+    if (u.$('#plAdd2')) u.$('#plAdd2').onclick = function () { addSheet('url'); };
+
+    u.on(host, 'click', '[data-add-kind]', function (e, t) {
+      addSheet(t.getAttribute('data-add-kind'));
+    });
+
+    if (u.$('#plHelp')) u.$('#plHelp').onclick = helpSheet;
 
     var all = u.$('#plRefreshAll');
     if (all) all.onclick = refreshAll;
