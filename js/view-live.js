@@ -52,14 +52,12 @@
   }
 
   function emptyView() {
-    return '<div class="view"><div class="card">' +
-      '<div class="empty">' + u.icon('live', 42) +
-      '<b>Noch keine Playlist</b>' +
-      '<p>G04TV bringt keine Sender mit. Trage deine eigene Playlist ein — als Adresse, ' +
-      'als Datei vom Gerät, als eingefügten Text oder als Xtream-Zugang.</p>' +
-      '<div class="btn-row"><button class="btn btn--primary" data-go="playlists">' +
-      u.icon('plus', 17) + ' Playlist hinzufügen</button></div>' +
-      '</div></div></div>';
+    return '<div class="view live live--empty">' +
+      '<div class="stage-wrap">' +
+        '<div class="stage-slot" id="stageSlot"></div>' +
+        '<div class="transport" id="transport"></div>' +
+      '</div>' +
+    '</div>';
   }
 
   function playlistPicker() {
@@ -299,6 +297,10 @@
 
     G.dock.place(slot);
     paintTransport();
+
+    // Ohne Playlist bleibt nur der Player sichtbar. Die Senderliste mit
+    // Suche und Gruppen gibt es erst, sobald eine Quelle vorhanden ist.
+    if (!u.$('#chSearch')) return;
 
     // Suche
     var search = u.$('#chSearch');
