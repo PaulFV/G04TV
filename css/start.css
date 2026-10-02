@@ -120,10 +120,23 @@
 
 @media (max-width:620px){
   .start-view{gap:14px}
-  .start-live{border-radius:var(--r-lg)}
-  .start-now__name{font-size:16px}
-  .start-card{padding:18px 16px;min-height:330px}
-  .start-card .card__head h3{font-size:19px}
+  .start-live{border-radius:var(--r-lg);gap:10px;padding:8px}
+  .start-now{gap:10px}
+  .start-now__head{gap:10px}
+  .start-now__logo{width:40px;height:40px;border-radius:10px}
+  .start-now__name{font-size:15px}
+  .start-now__sub{font-size:12px}
+  .start-now__state{font-size:11.5px}
+  .start-now__actions{gap:6px}
+  .start-now__main{min-height:40px;font-size:14px;border-radius:12px}
+  .start-now__main svg{width:16px;height:16px}
+  .start-now__icon{width:40px;height:40px;border-radius:12px}
+  .start-now__icon svg{width:18px;height:18px}
+  .start-now__head .start-now__icon{width:36px;height:36px;border-radius:10px}
+  .start-card .card__head h3{font-size:17px}
+  .start-card .card__head .btn{padding:5px 11px;font-size:12px;border-radius:9px}
+  .start-card:not(.start-card--empty) .grid--tiles{margin-top:12px}
+  .start-card{padding:14px 12px;min-height:330px}
   .start-card__visual{height:170px}
   .start-card__copy b{font-size:19px}
   .start-card__copy p{font-size:14px}
