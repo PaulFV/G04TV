@@ -48,6 +48,52 @@
 .stage__idle b{font-size:16px;font-weight:640}
 .stage__idle p{font-size:13px;color:var(--tx-2);max-width:340px}
 
+/* ---------- Ruhebild: dezente Bewegung ----------
+   Laeuft nur, solange nichts spielt (das Ruhebild ist sonst
+   ausgeblendet und damit auch die Animation angehalten).
+   Zwei weiche Lichtflecken ziehen langsam durchs Bild, ein feiner
+   Lichtstreifen wandert gelegentlich darueber, um das Zeichen
+   breitet sich ein ruhiger Ring aus. "Bewegung reduzieren" haelt
+   alles an (siehe theme.css). */
+.stage__idle{overflow:hidden;isolation:isolate}
+.stage__idle > *{position:relative;z-index:1}
+.stage__idle::before{
+  content:"";position:absolute;inset:-30%;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(closest-side at 32% 40%,rgba(49,216,255,.16),transparent 70%),
+    radial-gradient(closest-side at 70% 62%,rgba(167,139,250,.12),transparent 70%);
+  animation:idleDrift 18s ease-in-out infinite alternate;
+}
+.stage__idle::after{
+  content:"";position:absolute;top:0;bottom:0;left:0;width:40%;z-index:0;pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.035) 45%,rgba(49,216,255,.05) 50%,transparent 60%);
+  transform:translateX(-120%);
+  animation:idleSweep 9s ease-in-out infinite;
+}
+@keyframes idleDrift{
+  0%{transform:translate3d(-6%,-4%,0) rotate(0deg) scale(1)}
+  50%{transform:translate3d(5%,3%,0) rotate(8deg) scale(1.08)}
+  100%{transform:translate3d(-2%,6%,0) rotate(-6deg) scale(1.02)}
+}
+@keyframes idleSweep{
+  0%,55%{transform:translateX(-120%)}
+  100%{transform:translateX(320%)}
+}
+
+/* Ring um das Zeichen */
+.stage__mark{position:relative}
+.stage__mark::after{
+  content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;
+  border:1px solid var(--acc-line);
+  animation:idlePulse 3.6s ease-out infinite;
+}
+@keyframes idlePulse{
+  0%{transform:scale(1);opacity:.75}
+  70%,100%{transform:scale(1.55);opacity:0}
+}
+.stage__idle.is-tap .stage__mark{animation:idleBreathe 3.6s ease-in-out infinite}
+@keyframes idleBreathe{50%{box-shadow:0 0 44px rgba(49,216,255,.32)}}
+
 /* Ladeanzeige */
 .stage__busy{
   position:absolute;inset:0;display:none;place-items:center;background:rgba(0,0,0,.42);
