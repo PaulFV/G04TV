@@ -42,7 +42,7 @@ wie in Connect+ (`IptvPlayerPage`):
 | Format | Weg |
 |:--|:--|
 | **HLS** (`*.m3u8`) | Auf iPhone, iPad und in Safari der eingebaute Weg, sonst `hls.js` |
-| **MPEG-TS** (`*.ts`, `output=ts`, Xtream ohne Endung) | `mpegts.js` — auf iPhone und iPad nicht möglich |
+| **MPEG-TS** (`*.ts`, `output=ts`, Xtream ohne Endung) | `mpegts.js` — auf dem iPhone ab iOS 17.1 (ManagedMediaSource). Bei Xtream-Sendern wird zusätzlich die HLS-Fassung (`.m3u8`) versucht — auf dem iPhone zuerst |
 | **MP4, WebM, MP3 …** | Das Videofeld des Browsers selbst |
 | **MKV, AVI, WMV …** | Kennt keine Browser-Engine — hier hilft **Extern öffnen** |
 
