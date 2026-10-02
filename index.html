@@ -25,6 +25,12 @@
 <link rel="stylesheet" href="css/start.css">
 <link rel="stylesheet" href="css/playlists.css">
 <link rel="stylesheet" href="css/settings.css">
+<link rel="stylesheet" href="css/theme-light.css">
+<script>
+  /* Hell/Dunkel so frueh wie moeglich setzen - sonst blitzt beim Start
+     kurz die falsche Farbe auf. */
+  try { if (localStorage.getItem('g04tv.theme') === 'light') document.documentElement.setAttribute('data-theme', 'light'); } catch (e) {}
+</script>
 </head>
 <body>
 
@@ -79,6 +85,7 @@
           <button type="button" data-lang="en" title="English">EN</button>
         </div>
         <button class="live-chip" id="liveChip" title="Was gerade läuft"><i class="live-chip__dot"></i><span>Nichts läuft</span></button>
+        <button class="icon-btn theme-btn" id="themeBtn" type="button" title="Hellen Modus aktivieren" aria-label="Hellen Modus aktivieren" aria-pressed="false"></button>
         <button class="icon-btn" id="infoBtn" title="Info" aria-label="Info">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.8v.4" stroke-width="2" stroke-linecap="round"/></svg>
         </button>
