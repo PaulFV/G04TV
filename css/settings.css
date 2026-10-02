@@ -41,10 +41,12 @@
 .settings-stat{display:flex;align-items:center;gap:14px;padding:15px 18px;border:1px solid rgba(49,216,255,.3);border-radius:15px;background:linear-gradient(145deg,rgba(13,46,72,.72),rgba(5,22,39,.74))}
 .settings-stat > svg{width:40px;height:40px;flex:none;color:var(--acc);filter:drop-shadow(0 0 8px rgba(49,216,255,.52))}
 .settings-stat__main{min-width:0}
-.settings-stat__main .stat__v{font-size:28px;line-height:1.05}
-.settings-stat__main .stat__d{font-size:13px}
+.settings-stat__main .stat__v{display:block;font-size:28px;line-height:1.05}
+.settings-stat__main .stat__d{display:block;font-size:13px;margin-top:3px}
 .settings-actions{display:flex;gap:12px;flex-wrap:wrap}
-.settings-actions .btn{flex:1;min-width:180px;min-height:48px}
+.settings-actions .btn{flex:1;min-width:180px;min-height:48px;white-space:normal;text-align:center;line-height:1.2}
+.settings-actions .btn svg{flex:none}
+.settings-actions .btn{justify-content:center}
 .settings-section__foot{color:var(--tx-2);font-size:12.5px;line-height:1.45;margin-top:11px}
 
 .settings-install{display:grid;grid-template-columns:120px minmax(0,1fr) auto;align-items:center;gap:22px}
@@ -79,12 +81,20 @@
   .settings-panel__language{padding:12px}
   .settings-panel .switch{padding:15px 12px}
   .settings-range{padding:12px}
-  .settings-actions{gap:8px}
-  .settings-actions .btn{min-width:0;font-size:13px;padding-left:10px;padding-right:10px}
+  /* Zwei Knoepfe nebeneinander, "Alles loeschen" darunter ueber die volle Breite -
+     drei in einer Reihe passen auf dem Handy nicht. */
+  .settings-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .settings-actions .btn{min-width:0;min-height:44px;font-size:13px;padding:8px 10px}
+  .settings-actions .btn--danger{grid-column:1 / -1}
+  .settings-stat{padding:12px 14px;gap:12px}
+  .settings-stat > svg{width:32px;height:32px}
+  .settings-stat__main .stat__v{font-size:24px}
   .settings-install{grid-template-columns:78px 1fr;gap:13px}
   .settings-install__art{height:100px}
   .settings-install__art > svg{width:62px;height:62px}
-  .settings-platform{grid-template-columns:22px 86px 1fr;gap:7px}
-  .settings-platform b{font-size:12.5px}
-  .settings-platform span{font-size:11.5px}
+  /* Plattform: Name oben, Weg darunter - nebeneinander war es zu eng */
+  .settings-platform{grid-template-columns:22px minmax(0,1fr);row-gap:2px;column-gap:8px}
+  .settings-platform__os{grid-row:1 / span 2}
+  .settings-platform b{font-size:13.5px}
+  .settings-platform span:not(.settings-platform__os){grid-column:2;font-size:12px}
 }

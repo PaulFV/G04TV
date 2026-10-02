@@ -101,7 +101,10 @@
   .topbar__brand .brand__text{font-size:19px}
   .start-live{grid-template-columns:1fr;gap:14px;padding:10px}
   .start-now{padding:0 4px 4px}
-  .start-grid{grid-template-columns:1fr}
+  /* minmax(0,1fr): sonst darf die Spalte nicht schmaler werden als ihr
+     breitester Inhalt - auf dem iPhone SE wurde die Seite dadurch 10 px zu breit. */
+  .start-grid{grid-template-columns:minmax(0,1fr)}
+  .start-grid > .stack{min-width:0}
   .start-card{min-height:340px}
   .start-quick__hint{font-size:9px;letter-spacing:.18em}
 

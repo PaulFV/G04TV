@@ -260,3 +260,10 @@
   #infoBtn{display:none}
   .topbar__actions{gap:6px}
 }
+
+/* Kleine iPhones (SE, mini): die Beschriftung "Einstellungen" passt sonst
+   nicht in ihren Knopf der Leiste unten */
+@media (max-width:400px){
+  .tabbar__item{font-size:10.5px !important;padding-left:2px !important;padding-right:2px !important;min-width:0}
+  .tabbar__item span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}
