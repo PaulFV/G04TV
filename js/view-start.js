@@ -18,11 +18,11 @@
     return 'Guten Abend';
   }
 
-  function tile(c, playing) {
+  function tile(c, playing, sub) {
     return '<button class="ch-tile' + (playing ? ' is-playing' : '') + '" data-play="' + u.esc(c.url) + '">' +
       u.logoHtml(c, 'ch-tile__logo') +
       '<span class="ch-tile__name">' + u.esc(c.name) + '</span>' +
-      '<span class="ch-tile__grp">' + u.esc(c.group || '—') + '</span>' +
+      '<span class="ch-tile__grp">' + u.esc(sub || c.group || '—') + '</span>' +
     '</button>';
   }
 
@@ -182,20 +182,69 @@
       '</section>';
     }
 
-    // Alle Favoriten in einer Reihe zum Wischen; am Rechner mit Pfeilen.
-    return '<section class="card start-card start-card--data start-favs">' +
-      '<div class="card__head">' + u.icon('star', 22) + '<h3>Favoriten</h3>' +
-      '<span class="start-favs__count">' + s.favorites.length + '</span><span class="spacer"></span>' +
-      '<button class="start-favs__arrow" data-scroll="-1" aria-label="Zurück" title="Zurück">' + u.icon('chevron', 16) + '</button>' +
-      '<button class="start-favs__arrow" data-scroll="1" aria-label="Weiter" title="Weiter">' + u.icon('chevron', 16) + '</button>' +
-      '<button class="btn btn--sm" data-go="favorites">Alle</button></div>' +
-      // Ab 5 Favoriten zwei Reihen uebereinander - gewischt wird weiter seitlich.
-      '<div class="start-favs__row' + (s.favorites.length > 4 ? ' start-favs__row--two' : '') + '" id="stFavRow">' +
-        s.favorites.map(function (c) {
-          return tile(c, playing && G.m3u.sameSource(playing.url, c.url));
+    return shelfCard();
+  }
+
+  /* ------------------------------------------------------------
+     Regal: Favoriten | Zuletzt gesehen
+
+     Eine Kachel mit Umschalter. Beide Listen liegen in derselben
+     Reihe zum Wischen (ab 5 Eintraegen zweizeilig). Beim Umschalten
+     wird nur die Kachel neu gezeichnet - das Bild oben laeuft weiter.
+     ------------------------------------------------------------ */
+  var TAB_KEY = 'g04tv.startShelf';
+  var shelfTab = null;
+
+  function currentTab() {
+    var s = G.store.state;
+    if (!shelfTab) {
+      try { shelfTab = localStorage.getItem(TAB_KEY); } catch (e) { /* optional */ }
+    }
+    if (shelfTab !== 'fav' && shelfTab !== 'recent') shelfTab = s.favorites.length ? 'fav' : 'recent';
+    return shelfTab;
+  }
+
+  function shelfCard() {
+    return '<section class="card start-card start-card--data start-favs" id="stShelf">' + shelfInner() + '</section>';
+  }
+
+  function shelfInner() {
+    var s = G.store.state;
+    var tab = currentTab();
+    var playing = G.player.channel;
+    var list = tab === 'fav' ? s.favorites : s.recent;
+
+    var tabBtn = function (key, icon, label, n) {
+      var on = tab === key;
+      return '<button class="start-shelf__tab' + (on ? ' is-on' : '') + '" data-shelf="' + key + '" role="tab" aria-selected="' + on + '">' +
+        u.icon(icon, 16) + '<span>' + label + '</span><i>' + n + '</i></button>';
+    };
+
+    var body;
+    if (!list.length) {
+      body = '<p class="start-shelf__empty">' + (tab === 'fav'
+        ? 'Markiere Sender mit einem Stern — sie erscheinen dann hier.'
+        : 'Noch nichts gesehen — gespielte Sender erscheinen hier.') + '</p>';
+    } else {
+      body = '<div class="start-favs__row' + (list.length > 4 ? ' start-favs__row--two' : '') + '" id="stFavRow">' +
+        list.map(function (c) {
+          return tile(c, playing && G.m3u.sameSource(playing.url, c.url), tab === 'recent' ? u.relTime(c.at) : '');
         }).join('') +
-      '</div>' +
-    '</section>';
+      '</div>';
+    }
+
+    return '<div class="card__head start-shelf__head">' +
+        '<div class="start-shelf__tabs" role="tablist">' +
+          tabBtn('fav', 'star', 'Favoriten', s.favorites.length) +
+          tabBtn('recent', 'history', 'Zuletzt gesehen', s.recent.length) +
+        '</div>' +
+        '<span class="spacer"></span>' +
+        '<button class="start-favs__arrow" data-scroll="-1" aria-label="Zurück" title="Zurück">' + u.icon('chevron', 16) + '</button>' +
+        '<button class="start-favs__arrow" data-scroll="1" aria-label="Weiter" title="Weiter">' + u.icon('chevron', 16) + '</button>' +
+        (tab === 'fav'
+          ? '<button class="btn btn--sm" data-go="favorites">Alle</button>'
+          : (s.recent.length ? '<button class="btn btn--sm btn--ghost" id="stClearRecent">Leeren</button>' : '')) +
+      '</div>' + body;
   }
 
   function quickCard() {
@@ -214,25 +263,6 @@
     '</section>';
   }
 
-  function recentCard() {
-    var s = G.store.state;
-    if (!s.recent.length) return '';
-
-    return '<section class="card">' +
-      '<div class="card__head">' + u.icon('history', 18) + '<h3>Zuletzt gesehen</h3><span class="spacer"></span><button class="btn btn--sm btn--ghost" id="stClearRecent">Leeren</button></div>' +
-      '<div class="list">' +
-        s.recent.slice(0, 8).map(function (c) {
-          return '<div class="list__row list__row--click" data-play="' + u.esc(c.url) + '">' +
-            u.logoHtml(c, 'ch-row__logo') +
-            '<span class="list__main"><b>' + u.esc(c.name) + '</b>' +
-            '<span>' + u.esc(c.group || '—') + ' · ' + u.esc(u.relTime(c.at)) + '</span></span>' +
-            '<span class="list__end dim">' + u.icon('play', 15) + '</span>' +
-          '</div>';
-        }).join('') +
-      '</div>' +
-    '</section>';
-  }
-
   function hintCard() {
     var s = G.store.state;
     if (!s.playlists.length) return '';
@@ -245,14 +275,15 @@
   }
 
   function render() {
-    var hasFavs = G.store.state.favorites.length > 0;
-    var left = (hasFavs ? '' : favCard()) + recentCard();
+    var st = G.store.state;
+    var hasShelf = st.favorites.length > 0 || st.recent.length > 0;
+    var left = hasShelf ? '' : favCard();
     var right = playlistCard() + hintCard();
     return '<div class="view start-view">' +
       liveCard() +
       // Mit Favoriten: eigene Reihe ueber die volle Breite. Ohne: die
       // leere Karte mit Bild wie bisher im Raster.
-      (hasFavs ? favCard() : '') +
+      (hasShelf ? shelfCard() : '') +
       // Bleibt eine Spalte leer (noch kein Verlauf), nimmt die andere die volle Breite.
       '<div class="start-grid' + (left && right ? '' : ' start-grid--single') + '">' +
         (left ? '<div class="stack">' + left + '</div>' : '') +
@@ -290,29 +321,56 @@
       if (!row) return;
       row.scrollBy({ left: +t.getAttribute('data-scroll') * row.clientWidth * 0.85, behavior: 'smooth' });
     });
-    var row = u.$('#stFavRow');
-    if (row) {
-      var paintArrows = function () {
-        var max = row.scrollWidth - row.clientWidth;
-        var prev = u.$('[data-scroll="-1"]'), next = u.$('[data-scroll="1"]');
-        if (prev) prev.disabled = row.scrollLeft <= 2;
-        if (next) next.disabled = row.scrollLeft >= max - 2;
-        var card = row.closest('.start-favs');
-        if (card) card.classList.toggle('is-scrollable', max > 2);
-      };
-      row.addEventListener('scroll', paintArrows, { passive: true });
-      window.addEventListener('resize', paintArrows);
-      off.push(function () { window.removeEventListener('resize', paintArrows); });
-      // Der laufende Sender soll sichtbar sein
-      var on = row.querySelector('.ch-tile.is-playing');
-      if (on) row.scrollLeft = Math.max(0, on.offsetLeft - row.offsetLeft - 12);
-      paintArrows();
-    }
 
+    // Umschalter Favoriten | Zuletzt gesehen
+    u.on(host, 'click', '[data-shelf]', function (e, t) {
+      var next = t.getAttribute('data-shelf');
+      if (next === shelfTab) return;
+      shelfTab = next;
+      try { localStorage.setItem(TAB_KEY, next); } catch (err) { /* optional */ }
+      paintShelf();
+    });
+
+    var onResize = function () { paintArrows(); };
+    window.addEventListener('resize', onResize);
+    off.push(function () { window.removeEventListener('resize', onResize); });
+
+    wireShelf(true);
     u.on(host, 'click', '[data-open]', function (e, t) {
       G.store.setActive(t.getAttribute('data-open'));
       G.app.go('live');
     });
+
+  }
+
+  /** Nur die Regal-Kachel neu zeichnen - das Bild oben bleibt unberuehrt. */
+  function paintShelf() {
+    var card = u.$('#stShelf');
+    if (!card) return;
+    card.innerHTML = shelfInner();
+    wireShelf(false);
+  }
+
+  function paintArrows() {
+    var row = u.$('#stFavRow');
+    var card = u.$('#stShelf');
+    if (!card) return;
+    var max = row ? row.scrollWidth - row.clientWidth : 0;
+    var prev = u.$('[data-scroll="-1"]', card), next = u.$('[data-scroll="1"]', card);
+    if (prev) prev.disabled = !row || row.scrollLeft <= 2;
+    if (next) next.disabled = !row || row.scrollLeft >= max - 2;
+    card.classList.toggle('is-scrollable', max > 2);
+  }
+
+  function wireShelf(first) {
+    var row = u.$('#stFavRow');
+    if (row) {
+      row.addEventListener('scroll', paintArrows, { passive: true });
+      // Beim Oeffnen: der laufende Sender soll sichtbar sein
+      var on = first && row.querySelector('.ch-tile.is-playing');
+      if (on) row.scrollLeft = Math.max(0, on.offsetLeft - row.offsetLeft - 12);
+    }
+    paintArrows();
 
     var clear = u.$('#stClearRecent');
     if (clear) clear.onclick = async function () {
@@ -321,7 +379,7 @@
         body: 'Die Liste „Zuletzt gesehen“ wird geleert. Favoriten und Playlisten bleiben.',
         ok: 'Leeren'
       });
-      if (ok) { G.store.clearRecent(); G.app.rerender(); }
+      if (ok) { G.store.clearRecent(); paintShelf(); }
     };
   }
 

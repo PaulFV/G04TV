@@ -573,6 +573,8 @@
     , 'Playlisten, Favoriten, Einstellungen': 'Playlists, favorites, settings'
     // Info
     , 'Ohne Konto, ohne Server, ohne Tracking. ': 'No account, no server, no tracking. '
+    // Regal
+    , 'Noch nichts gesehen — gespielte Sender erscheinen hier.': 'Nothing watched yet — channels you play appear here.'
   };
 
 
