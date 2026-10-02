@@ -60,8 +60,9 @@ und welche Anbieter erlaubt sind.
   sich selbst reicht das bequem; als Verteilstelle für andere ist es nicht gedacht.
 * **Der Vermittler sieht alles**, auch Xtream-Benutzer und -Kennwort in der Adresse. Bei einem
   eigenen Worker ist das in Ordnung — trage niemals einen fremden Proxy ein.
-* **Auf dem iPhone** hilft er bei HLS zuverlässig. Rohes **MPEG-TS** bleibt dort unabspielbar, das
-  liegt an iOS und nicht am Vermittler.
+* **Auf dem iPhone** hilft er bei HLS zuverlässig. **MPEG-TS** spielt G04TV dort ab iOS 17.1 mit
+  `mpegts.js` — das liest den Strom per `fetch` und braucht deshalb CORS, also meist den Vermittler.
+  Bei Xtream-Sendern versucht G04TV auf dem iPhone zuerst die HLS-Fassung (`.m3u8`).
 * **Spulen** funktioniert: `Range`-Anfragen werden durchgereicht.
 
 ---
