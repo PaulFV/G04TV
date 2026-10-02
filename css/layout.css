@@ -147,7 +147,7 @@
 .ob-progress i.on{background:var(--acc);box-shadow:0 0 10px rgba(49,216,255,.6)}
 
 /* ---------- Blatt / Schleier ---------- */
-.scrim{position:fixed;inset:0;z-index:60;background:rgba(3,5,7,.72);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:fadeIn .25s var(--ease)}
+.scrim{position:fixed;inset:0;z-index:60;background:rgba(3,5,7,.55);animation:fadeIn .25s var(--ease)}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .sheet{
   position:fixed;z-index:70;right:0;top:0;height:100vh;width:min(580px,100%);
@@ -196,15 +196,18 @@
   .icon-btn.only-mobile{display:grid}
   .tabbar{display:grid}
   .shell{grid-template-columns:1fr}
+  /* Wie in G04Fit: ueber der Abdunklung (z-index 60), deckender Grund und
+     ohne backdrop-filter - Safari auf dem iPhone zeichnet ein festes,
+     per transform eingeschobenes Fenster mit Weichzeichner sonst nur als
+     dunkle, leere Flaeche. */
   .sidebar{
-    position:fixed;left:0;top:0;width:270px;
+    position:fixed;left:0;top:0;width:min(310px,88vw);z-index:65;
     transform:translateX(-100%);transition:transform .38s var(--ease);
     border-radius:0 var(--r-xl) var(--r-xl) 0;border-width:0 1px 0 0;
+    background:var(--bg-1);-webkit-backdrop-filter:none;backdrop-filter:none;
+    box-shadow:18px 0 48px rgba(0,0,0,.36);
   }
   .sidebar.is-open{transform:none}
-  /* Ueber der Abdunklung (.scrim, z-index 60) und mit festem Grund -
-     sonst deckt die Abdunklung das Menue zu und es wirkt leer. */
-  .sidebar{z-index:70;background:rgba(8,13,22,.97);overflow-y:auto}
   .main{padding-bottom:calc(var(--tabbar-h) + 34px)}
   .grid--3{grid-template-columns:1fr}
   .sheet{
