@@ -74,6 +74,10 @@
         <p id="viewSub"></p>
       </div>
       <div class="topbar__actions">
+        <div class="lang-switch" id="langSwitch" role="group" aria-label="Sprache / Language" data-no-translate>
+          <button type="button" data-lang="de" title="Deutsch">DE</button>
+          <button type="button" data-lang="en" title="English">EN</button>
+        </div>
         <button class="live-chip" id="liveChip" title="Was gerade läuft"><i class="live-chip__dot"></i><span>Nichts läuft</span></button>
         <button class="icon-btn" id="infoBtn" title="Info" aria-label="Info">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.8v.4" stroke-width="2" stroke-linecap="round"/></svg>
@@ -148,6 +152,7 @@
 
 <!-- ============ SKRIPTE (klassisch, damit file:// funktioniert) ============ -->
 <script src="js/util.js"></script>
+<script src="js/i18n.js"></script>
 <script src="js/m3u.js"></script>
 <script src="js/xtream.js"></script>
 <script src="js/db.js"></script>

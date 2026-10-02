@@ -29,6 +29,8 @@ gesperrten Einträge. Die Umsetzung als installierbare Web-App folgt **GoFit**.
   spielbar.
 * **Der Ton läuft weiter,** während man in den Favoriten oder in den Playlisten blättert — das Bild
   wandert dabei als kleines Fenster nach unten rechts.
+* **Deutsch und Englisch:** Umschalter DE/EN oben in der Kopfzeile. Der Wechsel geht ohne
+  Neuladen, ein laufender Sender spielt weiter. Sendernamen und Gruppen bleiben unübersetzt.
 * **Offline lauffähig:** ein Service Worker legt die Programmdateien ab. Die Streams selbst kommen
   natürlich weiter aus dem Netz.
 
