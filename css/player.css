@@ -48,51 +48,84 @@
 .stage__idle b{font-size:16px;font-weight:640}
 .stage__idle p{font-size:13px;color:var(--tx-2);max-width:340px}
 
-/* ---------- Ruhebild: dezente Bewegung ----------
+/* ---------- Ruhebild: lebendige, aber ruhige Bewegung ----------
    Laeuft nur, solange nichts spielt (das Ruhebild ist sonst
-   ausgeblendet und damit auch die Animation angehalten).
-   Zwei weiche Lichtflecken ziehen langsam durchs Bild, ein feiner
-   Lichtstreifen wandert gelegentlich darueber, um das Zeichen
-   breitet sich ein ruhiger Ring aus. "Bewegung reduzieren" haelt
-   alles an (siehe theme.css). */
-.stage__idle{overflow:hidden;isolation:isolate}
+   ausgeblendet und die Animation damit angehalten).
+   - drei Lichtflecken (Cyan, Violett, Pink) ziehen und wechseln
+     langsam die Farbe
+   - feine Lichtpunkte schweben nach oben
+   - ein farbiger Lichtstreifen wandert gelegentlich darueber
+   - zwei versetzte Ringe um das Zeichen
+   "Bewegung reduzieren" haelt alles an (siehe theme.css). */
+.stage__idle{
+  overflow:hidden;isolation:isolate;
+  background:
+    radial-gradient(1.2px 1.2px at 12% 22%,rgba(255,255,255,.55),transparent 60%),
+    radial-gradient(1px 1px at 28% 78%,rgba(49,216,255,.7),transparent 60%),
+    radial-gradient(1.4px 1.4px at 46% 38%,rgba(255,255,255,.4),transparent 60%),
+    radial-gradient(1px 1px at 63% 86%,rgba(167,139,250,.75),transparent 60%),
+    radial-gradient(1.2px 1.2px at 78% 18%,rgba(255,255,255,.5),transparent 60%),
+    radial-gradient(1px 1px at 90% 64%,rgba(49,216,255,.6),transparent 60%),
+    radial-gradient(1.3px 1.3px at 6% 58%,rgba(244,114,182,.6),transparent 60%),
+    radial-gradient(1px 1px at 54% 8%,rgba(255,255,255,.45),transparent 60%),
+    radial-gradient(circle at 50% 42%,var(--bg-2) 0%,#000 72%);
+  background-size:240px 160px,240px 160px,240px 160px,240px 160px,240px 160px,240px 160px,240px 160px,240px 160px,100% 100%;
+  background-repeat:repeat,repeat,repeat,repeat,repeat,repeat,repeat,repeat,no-repeat;
+  animation:idleStars 38s linear infinite;
+}
+@keyframes idleStars{
+  from{background-position:0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,center}
+  to{background-position:0 -160px,0 -160px,0 -160px,0 -160px,0 -160px,0 -160px,0 -160px,0 -160px,center}
+}
 .stage__idle > *{position:relative;z-index:1}
 .stage__idle::before{
-  content:"";position:absolute;inset:-30%;z-index:0;pointer-events:none;
+  content:"";position:absolute;inset:-35%;z-index:0;pointer-events:none;
   background:
-    radial-gradient(closest-side at 32% 40%,rgba(49,216,255,.16),transparent 70%),
-    radial-gradient(closest-side at 70% 62%,rgba(167,139,250,.12),transparent 70%);
-  animation:idleDrift 18s ease-in-out infinite alternate;
+    radial-gradient(closest-side at 30% 38%,rgba(49,216,255,.30),transparent 70%),
+    radial-gradient(closest-side at 72% 60%,rgba(167,139,250,.26),transparent 70%),
+    radial-gradient(closest-side at 55% 20%,rgba(244,114,182,.18),transparent 70%),
+    radial-gradient(closest-side at 22% 78%,rgba(52,211,153,.12),transparent 70%);
+  animation:idleDrift 13s ease-in-out infinite alternate,idleHue 24s linear infinite;
 }
 .stage__idle::after{
-  content:"";position:absolute;top:0;bottom:0;left:0;width:40%;z-index:0;pointer-events:none;
-  background:linear-gradient(100deg,transparent,rgba(255,255,255,.035) 45%,rgba(49,216,255,.05) 50%,transparent 60%);
-  transform:translateX(-120%);
-  animation:idleSweep 9s ease-in-out infinite;
+  content:"";position:absolute;top:-10%;bottom:-10%;left:0;width:45%;z-index:0;pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(49,216,255,.07) 40%,rgba(167,139,250,.10) 50%,rgba(244,114,182,.06) 58%,transparent 70%);
+  transform:translateX(-130%) skewX(-12deg);
+  animation:idleSweep 7s ease-in-out infinite;
 }
 @keyframes idleDrift{
-  0%{transform:translate3d(-6%,-4%,0) rotate(0deg) scale(1)}
-  50%{transform:translate3d(5%,3%,0) rotate(8deg) scale(1.08)}
-  100%{transform:translate3d(-2%,6%,0) rotate(-6deg) scale(1.02)}
+  0%{transform:translate3d(-7%,-5%,0) rotate(0deg) scale(1)}
+  33%{transform:translate3d(6%,2%,0) rotate(12deg) scale(1.12)}
+  66%{transform:translate3d(-3%,7%,0) rotate(-8deg) scale(1.04)}
+  100%{transform:translate3d(5%,-3%,0) rotate(6deg) scale(1.1)}
 }
+@keyframes idleHue{to{filter:hue-rotate(60deg)}}
 @keyframes idleSweep{
-  0%,55%{transform:translateX(-120%)}
-  100%{transform:translateX(320%)}
+  0%,45%{transform:translateX(-130%) skewX(-12deg)}
+  100%{transform:translateX(330%) skewX(-12deg)}
 }
 
-/* Ring um das Zeichen */
+/* Zwei Ringe um das Zeichen, versetzt, in Cyan und Violett */
 .stage__mark{position:relative}
+.stage__mark::before,
 .stage__mark::after{
   content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;
-  border:1px solid var(--acc-line);
-  animation:idlePulse 3.6s ease-out infinite;
+  border:1.5px solid rgba(49,216,255,.55);
+  animation:idlePulse 3.2s ease-out infinite;
 }
+.stage__mark::before{border-color:rgba(167,139,250,.55);animation-delay:1.6s}
 @keyframes idlePulse{
-  0%{transform:scale(1);opacity:.75}
-  70%,100%{transform:scale(1.55);opacity:0}
+  0%{transform:scale(1);opacity:.85}
+  75%,100%{transform:scale(1.75);opacity:0}
 }
-.stage__idle.is-tap .stage__mark{animation:idleBreathe 3.6s ease-in-out infinite}
-@keyframes idleBreathe{50%{box-shadow:0 0 44px rgba(49,216,255,.32)}}
+.stage__mark{animation:idleBreathe 3.2s ease-in-out infinite}
+.stage__mark svg{animation:idleGlow 6s ease-in-out infinite}
+@keyframes idleBreathe{
+  50%{box-shadow:0 0 46px rgba(49,216,255,.38),0 0 80px rgba(167,139,250,.18);transform:scale(1.04)}
+}
+@keyframes idleGlow{
+  50%{color:#A78BFA;filter:drop-shadow(0 0 8px rgba(167,139,250,.7))}
+}
 
 /* Ladeanzeige */
 .stage__busy{
@@ -238,4 +271,15 @@
 @media (max-width:1180px){
   .stage-wrap.is-sticky{position:sticky;top:calc(env(safe-area-inset-top) + 4px);z-index:20}
   .stage-wrap.is-sticky .stage{box-shadow:0 12px 34px rgba(0,0,0,.6)}
+}
+
+/* Play-Knopf im Ruhebild: kleiner */
+.stage__mark{width:50px;height:50px;border-radius:15px}
+.stage__mark svg{width:22px;height:22px}
+.stage__idle{gap:10px}
+@media (max-width:620px){
+  .stage__mark{width:44px;height:44px;border-radius:13px}
+  .stage__mark svg{width:19px;height:19px}
+  .stage__idle b{font-size:14.5px}
+  .stage__idle p{font-size:12px}
 }
