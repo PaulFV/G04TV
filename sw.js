@@ -6,7 +6,7 @@
    ausschließlich die eigenen Programmdateien — keine Playlisten,
    keine Streams, keine Anfragen an fremde Server.
    ============================================================ */
-var CACHE = 'g04tv-v1.0.15';
+var CACHE = 'g04tv-v1.0.17';
 
 var ASSETS = [
   './',
@@ -92,15 +92,17 @@ self.addEventListener('fetch', function (e) {
   // Navigationsanfragen: erst Netz, sonst die zwischengespeicherte Startseite
   if (req.mode === 'navigate') {
     e.respondWith(
-      fetch(req).catch(function () { return caches.match('./index.html'); })
+      fetch(req, { cache: 'no-cache' }).catch(function () { return caches.match('./index.html'); })
     );
     return;
   }
 
   // Programmdateien: erst das Netz, damit Änderungen sofort ankommen.
   // Der Zwischenspeicher ist die Rückfallebene ohne Verbindung.
+  // cache: 'no-cache' fragt immer beim Server nach - GitHub Pages laesst
+  // Dateien sonst bis zu 10 Minuten im Browser-Zwischenspeicher liegen.
   e.respondWith(
-    fetch(req).then(function (res) {
+    fetch(req, { cache: 'no-cache' }).then(function (res) {
       if (res && res.status === 200 && res.type === 'basic') {
         var copy = res.clone();
         caches.open(CACHE).then(function (c) { c.put(req, copy); });
