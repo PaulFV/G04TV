@@ -67,7 +67,7 @@
     var title = typeof view.title === 'function' ? view.title() : view.title;
     u.$('#viewTitle').textContent = title;
     u.$('#viewSub').textContent = typeof view.sub === 'function' ? view.sub() : (view.sub || '');
-    document.title = G.NAME + ' — ' + title;
+    document.title = G.NAME + ' — ' + (G.i18n ? G.i18n.t(title) : title);
 
     var host = u.$('#viewHost');
     host.innerHTML = view.render(currentParams) || '';
@@ -86,6 +86,27 @@
 
     buildNav();
     if (afterFn) afterFn();
+  }
+
+  /* ------------------------------------------------------------
+     Sprachumschalter in der Kopfzeile
+     ------------------------------------------------------------ */
+  function initLangSwitch() {
+    var box = u.$('#langSwitch');
+    if (!box || !G.i18n) return;
+    var paint = function () {
+      u.$$('[data-lang]', box).forEach(function (b) {
+        var on = b.getAttribute('data-lang') === G.i18n.language;
+        b.classList.toggle('is-on', on);
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+    };
+    box.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-lang]');
+      if (b) G.i18n.setLanguage(b.getAttribute('data-lang'));
+    });
+    document.addEventListener('g04tv:language', paint);
+    paint();
   }
 
   function go(key, params) {
@@ -147,9 +168,12 @@
     G.store.load();
     var s = G.store.state;
 
+    if (G.i18n) G.i18n.useState(s.settings);
+
     if (s.settings.reduceMotion) document.body.classList.add('no-motion');
 
     G.dock.init();
+    initLangSwitch();
 
     document.addEventListener('click', function (e) {
       var nav = e.target.closest('[data-nav]');

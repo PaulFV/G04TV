@@ -14,6 +14,9 @@
   var dock, stage, video, idle, busy, err, errText, dockTitle;
   var slotNow = null;
 
+  /** Feste Texte in Bereichen, die sonst Sendernamen tragen (dort uebersetzt i18n.js nicht). */
+  function tr(text) { return G.i18n ? G.i18n.t(text) : text; }
+
   function init() {
     dock = u.$('#pdock');
     stage = u.$('#stage');
@@ -52,6 +55,10 @@
     paint(G.player.status, G.player.message, G.player.channel);
     paintMute();
     paintFull();
+
+    document.addEventListener('g04tv:language', function () {
+      paint(G.player.status, G.player.message, G.player.channel);
+    });
   }
 
   /* ------------------------------------------------------------
@@ -121,7 +128,7 @@
 
     paintIdle(channel);
 
-    dockTitle.textContent = channel ? channel.name : 'Nichts läuft';
+    dockTitle.textContent = channel ? channel.name : tr('Nichts läuft');
 
     paintChip(status, channel);
     paintVisibility();
@@ -136,7 +143,7 @@
   function paintIdle(channel) {
     var last = channel || G.store.state.last;
     var ib = idle.querySelector('b'), ip = idle.querySelector('p');
-    if (ib) ib.textContent = last ? last.name : 'Kein Sender';
+    if (ib) ib.textContent = last ? last.name : tr('Kein Sender');
     if (ip) ip.textContent = last ? 'Antippen zum Abspielen'
       : 'Wähle einen Sender aus der Liste — oder trage zuerst eine Playlist ein.';
     idle.classList.toggle('is-tap', !!last);
@@ -147,7 +154,7 @@
     var chip = u.$('#liveChip');
     var side = u.$('#sideNow');
     var running = status === 'loading' || status === 'playing';
-    var name = channel ? channel.name : 'Nichts läuft';
+    var name = channel ? channel.name : tr('Nichts läuft');
 
     if (chip) {
       chip.classList.toggle('is-live', status === 'playing');
@@ -160,7 +167,7 @@
       side.innerHTML =
         '<span class="now-chip__ic">' + u.icon(running ? 'play' : 'live', 17) + '</span>' +
         '<span class="now-chip__meta"><b>' + u.esc(name) + '</b>' +
-        '<span>' + u.esc(channel && channel.group ? channel.group : (running ? 'läuft' : 'bereit')) + '</span></span>';
+        '<span>' + u.esc(channel && channel.group ? channel.group : tr(running ? 'läuft' : 'bereit')) + '</span></span>';
     }
   }
 
