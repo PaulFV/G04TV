@@ -202,7 +202,7 @@
 
     u.$('#app').hidden = false;
     var start = location.hash.replace('#', '');
-    current = G.views[start] ? start : (s.playlists.length ? 'live' : 'start');
+    current = G.views[start] ? start : 'start';
     render();
 
     // Verwaiste Senderlisten aufraeumen (geloeschte Playlisten)

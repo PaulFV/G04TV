@@ -142,7 +142,7 @@
     G.store.commit('onboarded');
     u.$('#onboarding').hidden = true;
     u.$('#app').hidden = false;
-    G.app.go(G.store.state.playlists.length ? 'live' : 'start');
+    G.app.go('start');
   }
 
   G.onboarding = { start: start, finish: finish };

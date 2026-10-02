@@ -23,7 +23,7 @@
     'Hauptnavigation': 'Main navigation',
     'Navigation': 'Navigation',
     'Menü': 'Menu',
-    'Start': 'Home',
+    'Start': 'Start',
     'Sender': 'Channels',
     'Playlist': 'Playlist',
     'Playlisten': 'Playlists',
