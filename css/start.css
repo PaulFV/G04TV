@@ -8,7 +8,7 @@
    Oben das Bild (die wandernde Buehne), darunter bzw. daneben eine
    schlanke Bedienleiste mit grossen Tippflaechen. */
 .start-live{
-  display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,1fr);gap:20px;align-items:center;
+  display:grid;grid-template-columns:minmax(0,2.3fr) minmax(260px,1fr);gap:20px;align-items:center;
   padding:14px;border-color:rgba(49,216,255,.42);border-radius:var(--r-xl);
   background:
     radial-gradient(520px 220px at 0% 0%,rgba(49,216,255,.13),transparent 70%),
@@ -120,7 +120,14 @@
 
 @media (max-width:620px){
   .start-view{gap:14px}
-  .start-live{border-radius:var(--r-lg);gap:10px;padding:8px}
+  /* Handy: das Bild geht ueber die ganze Breite, wie in einer TV-App */
+  .start-live{
+    --edge-l:max(16px,env(safe-area-inset-left));--edge-r:max(16px,env(safe-area-inset-right));
+    margin-left:calc(var(--edge-l) * -1);margin-right:calc(var(--edge-r) * -1);
+    gap:10px;padding:0 0 12px;border-radius:0;border-left:0;border-right:0;border-top:0;
+  }
+  .start-live .pdock.is-inline .stage{border-radius:0;border-left:0;border-right:0;border-top:0}
+  .start-now{padding:0 var(--edge-r) 0 var(--edge-l)}
   .start-now{gap:10px}
   .start-now__head{gap:10px}
   .start-now__logo{width:40px;height:40px;border-radius:10px}
