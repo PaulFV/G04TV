@@ -182,12 +182,15 @@
       '</section>';
     }
 
-    return '<section class="card start-card start-card--data">' +
-      '<div class="card__head">' + u.icon('star', 22) + '<h3>Favoriten</h3><span class="spacer"></span>' +
-      '<span class="tiny dim">' + s.favorites.length + '</span>' +
+    // Alle Favoriten in einer Reihe zum Wischen; am Rechner mit Pfeilen.
+    return '<section class="card start-card start-card--data start-favs">' +
+      '<div class="card__head">' + u.icon('star', 22) + '<h3>Favoriten</h3>' +
+      '<span class="start-favs__count">' + s.favorites.length + '</span><span class="spacer"></span>' +
+      '<button class="start-favs__arrow" data-scroll="-1" aria-label="Zurück" title="Zurück">' + u.icon('chevron', 16) + '</button>' +
+      '<button class="start-favs__arrow" data-scroll="1" aria-label="Weiter" title="Weiter">' + u.icon('chevron', 16) + '</button>' +
       '<button class="btn btn--sm" data-go="favorites">Alle</button></div>' +
-      '<div class="grid grid--tiles">' +
-        s.favorites.slice(0, 8).map(function (c) {
+      '<div class="start-favs__row" id="stFavRow">' +
+        s.favorites.map(function (c) {
           return tile(c, playing && G.m3u.sameSource(playing.url, c.url));
         }).join('') +
       '</div>' +
@@ -241,11 +244,18 @@
   }
 
   function render() {
+    var hasFavs = G.store.state.favorites.length > 0;
+    var left = (hasFavs ? '' : favCard()) + recentCard();
+    var right = playlistCard() + hintCard();
     return '<div class="view start-view">' +
       liveCard() +
-      '<div class="start-grid">' +
-        '<div class="stack">' + favCard() + recentCard() + '</div>' +
-        '<div class="stack">' + playlistCard() + hintCard() + '</div>' +
+      // Mit Favoriten: eigene Reihe ueber die volle Breite. Ohne: die
+      // leere Karte mit Bild wie bisher im Raster.
+      (hasFavs ? favCard() : '') +
+      // Bleibt eine Spalte leer (noch kein Verlauf), nimmt die andere die volle Breite.
+      '<div class="start-grid' + (left && right ? '' : ' start-grid--single') + '">' +
+        (left ? '<div class="stack">' + left + '</div>' : '') +
+        (right ? '<div class="stack">' + right + '</div>' : '') +
       '</div>' +
       quickCard() +
     '</div>';
@@ -272,6 +282,31 @@
       // Das Bild sitzt oben auf der Startseite - dorthin zurueck.
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+
+    // Pfeile: um eine knappe Reihenbreite weiter
+    u.on(host, 'click', '[data-scroll]', function (e, t) {
+      var row = u.$('#stFavRow');
+      if (!row) return;
+      row.scrollBy({ left: +t.getAttribute('data-scroll') * row.clientWidth * 0.85, behavior: 'smooth' });
+    });
+    var row = u.$('#stFavRow');
+    if (row) {
+      var paintArrows = function () {
+        var max = row.scrollWidth - row.clientWidth;
+        var prev = u.$('[data-scroll="-1"]'), next = u.$('[data-scroll="1"]');
+        if (prev) prev.disabled = row.scrollLeft <= 2;
+        if (next) next.disabled = row.scrollLeft >= max - 2;
+        var card = row.closest('.start-favs');
+        if (card) card.classList.toggle('is-scrollable', max > 2);
+      };
+      row.addEventListener('scroll', paintArrows, { passive: true });
+      window.addEventListener('resize', paintArrows);
+      off.push(function () { window.removeEventListener('resize', paintArrows); });
+      // Der laufende Sender soll sichtbar sein
+      var on = row.querySelector('.ch-tile.is-playing');
+      if (on) row.scrollLeft = Math.max(0, on.offsetLeft - row.offsetLeft - 12);
+      paintArrows();
+    }
 
     u.on(host, 'click', '[data-open]', function (e, t) {
       G.store.setActive(t.getAttribute('data-open'));
