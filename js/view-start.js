@@ -189,7 +189,8 @@
       '<button class="start-favs__arrow" data-scroll="-1" aria-label="Zurück" title="Zurück">' + u.icon('chevron', 16) + '</button>' +
       '<button class="start-favs__arrow" data-scroll="1" aria-label="Weiter" title="Weiter">' + u.icon('chevron', 16) + '</button>' +
       '<button class="btn btn--sm" data-go="favorites">Alle</button></div>' +
-      '<div class="start-favs__row" id="stFavRow">' +
+      // Ab 5 Favoriten zwei Reihen uebereinander - gewischt wird weiter seitlich.
+      '<div class="start-favs__row' + (s.favorites.length > 4 ? ' start-favs__row--two' : '') + '" id="stFavRow">' +
         s.favorites.map(function (c) {
           return tile(c, playing && G.m3u.sameSource(playing.url, c.url));
         }).join('') +
