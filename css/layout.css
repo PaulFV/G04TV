@@ -234,3 +234,17 @@
     padding-right:max(16px,env(safe-area-inset-right));
   }
 }
+
+/* ---------- Sprachumschalter ---------- */
+.lang-switch{display:flex;align-items:center;gap:2px;padding:3px;border-radius:12px;border:1px solid var(--glass-br);background:var(--glass-bg);flex:none}
+.lang-switch button{min-width:34px;height:30px;padding:0 8px;border:0;border-radius:9px;background:none;color:var(--tx-2);font:inherit;font-size:12.5px;font-weight:750;letter-spacing:.04em;cursor:pointer;transition:background .2s,color .2s}
+.lang-switch button:hover{color:var(--tx-0)}
+.lang-switch button.is-on{background:linear-gradient(180deg,rgba(49,216,255,.28),rgba(13,98,146,.22));color:var(--tx-0);box-shadow:inset 0 0 0 1px rgba(49,216,255,.5)}
+
+/* Handy und Tablet: die Marke steht in der Kopfzeile - den Namen des
+   Bereichs zeigt die Leiste unten, der Titel entfaellt. */
+@media (max-width:980px){
+  .topbar__title{display:none}
+  .lang-switch{height:38px;align-items:stretch}
+  .lang-switch button{height:auto}
+}

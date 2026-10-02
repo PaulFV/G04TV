@@ -99,7 +99,6 @@
   .topbar__brand{display:flex;align-items:center;gap:8px;flex:none;margin-left:2px;padding:0}
   .topbar__brand .brand__mark{width:34px;height:34px;border-radius:10px}
   .topbar__brand .brand__text{font-size:19px}
-  .topbar__divider{display:block;width:1px;height:35px;flex:none;background:linear-gradient(180deg,transparent,var(--glass-hi),transparent);margin:0 3px}
   .start-live{grid-template-columns:1fr;gap:14px;padding:10px}
   .start-now{padding:0 4px 4px}
   .start-grid{grid-template-columns:1fr}
