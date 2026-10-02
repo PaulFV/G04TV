@@ -80,8 +80,9 @@
     // Bereichswechsel innerhalb einer Ansicht
     u.on(host, 'click', '[data-go]', function (e, t) { go(t.getAttribute('data-go')); });
 
-    // Ausserhalb des Bereichs Sender laeuft das Bild unten rechts weiter.
-    if (current !== 'live') G.dock.place(null);
+    // Ansichten mit eigenem Platz fuers Bild (Sender, Start) haengen es
+    // selbst ein - ueberall sonst laeuft es unten rechts weiter.
+    if (!host.querySelector('#stageSlot')) G.dock.place(null);
 
     buildNav();
     if (afterFn) afterFn();

@@ -35,6 +35,10 @@
       if (c) G.player.play(c);
     });
     u.$('#stageExternal').addEventListener('click', function () { external(); });
+    idle.addEventListener('click', function () {
+      var c = G.player.channel || G.store.state.last;
+      if (c && G.player.status === 'idle') G.player.play(c);
+    });
 
     u.$('#pdockOpen').addEventListener('click', function () { G.app.go('live'); });
     u.$('#pdockClose').addEventListener('click', function () { G.player.stop(); });
@@ -47,6 +51,7 @@
 
     paint(G.player.status, G.player.message, G.player.channel);
     paintMute();
+    paintFull();
   }
 
   /* ------------------------------------------------------------
@@ -64,7 +69,7 @@
   function place(slot) {
     if (!dock) return;
     if (slot === slotNow && (slot ? slot.contains(dock) : dock.parentNode === document.body)) {
-      paintVisibility();
+      refresh();
       return;
     }
 
@@ -84,6 +89,12 @@
       if (p && p.catch) p.catch(function () { /* der Browser will eine Beruehrung */ });
     }
 
+    refresh();
+  }
+
+  /** Ruhebild und Marken neu zeichnen (z. B. nach dem Einhaengen). */
+  function refresh() {
+    paintIdle(G.player.channel);
     paintVisibility();
   }
 
@@ -108,6 +119,8 @@
 
     if (status === 'error') errText.textContent = message || '';
 
+    paintIdle(channel);
+
     dockTitle.textContent = channel ? channel.name : 'Nichts läuft';
 
     paintChip(status, channel);
@@ -117,6 +130,16 @@
     document.dispatchEvent(new CustomEvent('g04tv:player', {
       detail: { status: status, message: message, channel: channel }
     }));
+  }
+
+  /** Ruhebild: ist schon ein Sender bekannt, genuegt ein Antippen. */
+  function paintIdle(channel) {
+    var last = channel || G.store.state.last;
+    var ib = idle.querySelector('b'), ip = idle.querySelector('p');
+    if (ib) ib.textContent = last ? last.name : 'Kein Sender';
+    if (ip) ip.textContent = last ? 'Antippen zum Abspielen'
+      : 'Wähle einen Sender aus der Liste — oder trage zuerst eine Playlist ein.';
+    idle.classList.toggle('is-tap', !!last);
   }
 
   /** Die Marke in der Kopfzeile und der Fuss der Seitenleiste. */

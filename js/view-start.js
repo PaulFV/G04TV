@@ -1,8 +1,9 @@
 /* ============================================================
    G04TV — Bereich Start
 
-   Die Startseite ist der schnelle Einstieg: zuletzt gesehen,
-   Favoriten, Playlisten und die drei Schritte bis zum Fernsehen.
+   Die Startseite ist der schnelle Einstieg: oben das Live-Bild,
+   darunter Favoriten, zuletzt gesehen, Playlisten und die drei
+   Schritte bis zum Fernsehen.
    ============================================================ */
 (function (G) {
   'use strict';
@@ -25,42 +26,106 @@
     '</button>';
   }
 
-  function hero() {
+  /* ------------------------------------------------------------
+     Live-Fenster
+
+     Oben auf der Startseite sitzt dasselbe Bild wie im Bereich
+     Sender (die wandernde Buehne aus dock.js), darunter eine
+     schlanke Bedienleiste. So sieht man sofort, was laeuft.
+     ------------------------------------------------------------ */
+  function liveCard() {
+    return '<section class="card start-live">' +
+      '<div class="stage-slot start-live__stage" id="stageSlot"></div>' +
+      '<div class="start-now" id="stNow">' + nowHtml() + '</div>' +
+    '</section>';
+  }
+
+  function nowHtml() {
     var s = G.store.state;
     var c = G.player.channel || s.last;
-    var running = G.player.status === 'playing' || G.player.status === 'loading';
+    var status = G.player.status;
+    var running = status === 'playing' || status === 'loading';
 
     if (!c) {
-      return '<section class="card start-hero start-hero--empty">' +
-        '<div class="start-hero__copy">' +
-          '<span class="start-badge">' + u.icon('live', 16) + ' ' + u.esc(G.NAME) + ' ' + u.esc(G.VERSION) + '</span>' +
-          '<h2>' + greeting() + '</h2>' +
-          '<p>Noch läuft nichts. Wähle einen Sender aus deiner Playlist — oder trage zuerst eine Playlist ein.</p>' +
-          '<div class="start-hero__actions">' +
-            '<button class="btn btn--primary" data-go="live">' + u.icon('play', 17) + ' Zu den Sendern</button>' +
-            '<button class="btn" data-go="playlists">' + u.icon('plus', 17) + ' Playlist hinzufügen</button>' +
-          '</div>' +
+      return '<div class="start-now__head">' +
+          '<span class="start-now__logo start-now__logo--empty">' + u.icon('live', 20) + '</span>' +
+          '<span class="start-now__meta">' +
+            '<span class="start-now__state">' + greeting() + '</span>' +
+            '<b class="start-now__name">Noch kein Sender gewählt</b>' +
+            '<span class="start-now__sub">' + (s.playlists.length
+              ? 'Wähle einen Sender aus deiner Playlist.'
+              : 'Trage zuerst eine Playlist ein.') + '</span>' +
+          '</span>' +
         '</div>' +
-        '<div class="start-hero__art" aria-hidden="true"><img src="art/start-hero.png" alt=""></div>' +
-      '</section>';
+        '<div class="start-now__actions">' +
+          (s.playlists.length
+            ? '<button class="btn btn--primary start-now__main" data-go="live">' + u.icon('grid', 18) + ' Zu den Sendern</button>'
+            : '<button class="btn btn--primary start-now__main" data-go="playlists">' + u.icon('plus', 18) + ' Playlist hinzufügen</button>') +
+        '</div>';
     }
 
-    return '<section class="card start-hero">' +
-      '<div class="start-hero__copy">' +
-        '<div class="start-hero__status"><i class="pill__dot"></i>' + (running ? 'Läuft gerade' : 'Zuletzt gesehen') + '</div>' +
-        '<h2 class="ellips">' + u.esc(c.name) + '</h2>' +
-        '<p>' + u.esc(c.group || G.player.kindOf(c.url).toUpperCase()) +
-          (s.last && s.last.at ? ' · ' + u.esc(u.relTime(s.last.at)) : '') + '</p>' +
-        '<div class="start-hero__actions">' +
-          (running
-            ? '<button class="btn btn--primary" data-go="live">' + u.icon('live', 17) + ' Zum Bild</button>' +
-              '<button class="btn" id="stHeroStop">' + u.icon('stop', 17) + ' Anhalten</button>'
-            : '<button class="btn btn--primary" data-play="' + u.esc(c.url) + '">' + u.icon('play', 17) + ' Weitersehen</button>') +
-          '<button class="btn" id="stHeroExt">' + u.icon('external', 17) + ' Extern</button>' +
-        '</div>' +
+    var fav = G.store.isFavorite(c.url);
+    var state;
+    if (status === 'playing') state = '<span class="start-now__state is-live"><i></i>Live</span>';
+    else if (status === 'loading') state = '<span class="start-now__state is-busy"><i></i>Wird geladen …</span>';
+    else if (status === 'error') state = '<span class="start-now__state is-err"><i></i>Fehler</span>';
+    else state = '<span class="start-now__state"><i></i>Zuletzt gesehen' +
+      (s.last && s.last.at ? ' · ' + u.esc(u.relTime(s.last.at)) : '') + '</span>';
+
+    return '<div class="start-now__head">' +
+        u.logoHtml(c, 'start-now__logo') +
+        '<span class="start-now__meta">' +
+          state +
+          '<b class="start-now__name" title="' + u.esc(c.name) + '">' + u.esc(c.name) + '</b>' +
+          '<span class="start-now__sub">' + u.esc(c.group || G.player.kindOf(c.url).toUpperCase()) + '</span>' +
+        '</span>' +
+        '<button class="start-now__icon' + (fav ? ' is-on' : '') + '" id="stStar" ' +
+          'aria-label="' + (fav ? 'Favorit entfernen' : 'Als Favorit merken') + '" title="Favorit">' +
+          u.icon(fav ? 'starFill' : 'star', 20) + '</button>' +
       '</div>' +
-      '<div class="start-hero__art" aria-hidden="true"><img src="art/start-hero.png" alt=""></div>' +
-    '</section>';
+      '<div class="start-now__actions">' +
+        (running
+          ? '<button class="btn start-now__main" id="stStop">' + u.icon('stop', 18) + ' Anhalten</button>'
+          : '<button class="btn btn--primary start-now__main" id="stPlay">' + u.icon('play', 18) +
+            (status === 'error' ? ' Nochmal' : ' Abspielen') + '</button>') +
+        '<button class="start-now__icon" id="stExt" aria-label="Extern öffnen" title="Extern öffnen">' + u.icon('external', 20) + '</button>' +
+        '<button class="start-now__icon" data-go="live" aria-label="Alle Sender" title="Alle Sender">' + u.icon('grid', 20) + '</button>' +
+      '</div>';
+  }
+
+  function paintNow() {
+    var host = u.$('#stNow');
+    if (!host) return;
+    host.innerHTML = nowHtml();
+
+    var play = u.$('#stPlay');
+    if (play) play.onclick = function () {
+      var c = G.player.channel || G.store.state.last;
+      if (c) G.player.play(c);
+    };
+    var stop = u.$('#stStop');
+    if (stop) stop.onclick = function () { G.player.stop(); };
+
+    var ext = u.$('#stExt');
+    if (ext) ext.onclick = function () { G.dock.external(); };
+
+    var star = u.$('#stStar');
+    if (star) star.onclick = function () {
+      var c = G.player.channel || G.store.state.last;
+      if (!c) return;
+      var on = G.store.toggleFavorite(c);
+      u.toast(on ? 'Als Favorit gemerkt' : 'Favorit entfernt', c.name, 'ok', 2200);
+      G.app.rerender();
+    };
+  }
+
+  /** Markiert in Favoriten und Verlauf, was gerade laeuft. */
+  function paintPlaying() {
+    var playing = G.player.channel;
+    u.$$('.start-view [data-play]').forEach(function (el) {
+      var on = !!playing && G.m3u.sameSource(playing.url, el.getAttribute('data-play'));
+      el.classList.toggle('is-playing', on);
+    });
   }
 
   function playlistCard() {
@@ -177,7 +242,7 @@
 
   function render() {
     return '<div class="view start-view">' +
-      hero() +
+      liveCard() +
       '<div class="start-grid">' +
         '<div class="stack">' + favCard() + recentCard() + '</div>' +
         '<div class="stack">' + playlistCard() + hintCard() + '</div>' +
@@ -186,7 +251,17 @@
     '</div>';
   }
 
+  var off = [];
+
   function mount(host) {
+    var slot = u.$('#stageSlot');
+    if (slot) G.dock.place(slot);
+    paintNow();
+
+    var onPlayer = function () { paintNow(); paintPlaying(); };
+    document.addEventListener('g04tv:player', onPlayer);
+    off.push(function () { document.removeEventListener('g04tv:player', onPlayer); });
+
     u.on(host, 'click', '[data-play]', function (e, t) {
       var url = t.getAttribute('data-play');
       var s = G.store.state;
@@ -194,21 +269,14 @@
         .filter(function (x) { return G.m3u.sameSource(x.url, url); })[0];
       if (!c) return;
       G.views.live.playChannel(c);
-      // Auf Start bleibt der Player als schwebendes Fenster sichtbar.
-      // Nur der ausdrückliche Weg „Zu den Sendern“ wechselt den Bereich.
-      G.app.rerender();
+      // Das Bild sitzt oben auf der Startseite - dorthin zurueck.
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
     u.on(host, 'click', '[data-open]', function (e, t) {
       G.store.setActive(t.getAttribute('data-open'));
       G.app.go('live');
     });
-
-    var stop = u.$('#stHeroStop');
-    if (stop) stop.onclick = function () { G.player.stop(); G.app.rerender(); };
-
-    var ext = u.$('#stHeroExt');
-    if (ext) ext.onclick = function () { G.dock.external(); };
 
     var clear = u.$('#stClearRecent');
     if (clear) clear.onclick = async function () {
@@ -221,6 +289,13 @@
     };
   }
 
+  function unmount() {
+    off.forEach(function (fn) { fn(); });
+    off = [];
+    // Vor dem Neuzeichnen raus aus der Ansicht, sonst reisst das Bild ab.
+    G.dock.place(null);
+  }
+
   G.views.start = {
     title: 'Start',
     sub: function () {
@@ -230,6 +305,7 @@
         (s.playlists.length === 1 ? ' Playlist' : ' Playlisten') : 'Noch keine Playlist';
     },
     render: render,
-    mount: mount
+    mount: mount,
+    unmount: unmount
   };
 })(G04TV);
