@@ -167,3 +167,10 @@
 
 /* ---------- Knopf in der Kopfzeile ---------- */
 .theme-btn svg{display:block}
+
+/* Handy: Einstellungen als Zeilen ohne eigene Kaesten (siehe settings.css) */
+@media (max-width:620px){
+  [data-theme="light"] .settings-panel{background:none;border-color:transparent;border-bottom-color:rgba(16,44,66,.1)}
+  [data-theme="light"] .settings-grid > .settings-panel:last-child,
+  [data-theme="light"] .settings-section > .settings-panel:last-of-type{border-bottom-color:transparent}
+}
