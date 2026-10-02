@@ -156,3 +156,34 @@
   .start-step__icon{width:52px;height:52px}
   .start-step__label{font-size:12px;line-height:1.25}
 }
+
+/* ---------- Favoriten-Reihe (alle, zum Wischen) ---------- */
+.start-favs .card__head{gap:8px}
+.start-favs__count{font-size:12px;color:var(--tx-2);padding:1px 8px;border-radius:99px;border:1px solid var(--glass-br)}
+.start-favs__arrow{
+  width:32px;height:32px;display:none;place-items:center;flex:none;cursor:pointer;
+  border-radius:10px;border:1px solid var(--glass-br);background:var(--glass-bg);color:var(--tx-1);
+}
+.start-favs__arrow[data-scroll="-1"] svg{transform:rotate(180deg)}
+.start-favs__arrow:hover:not(:disabled){color:var(--acc);border-color:var(--acc-line)}
+.start-favs__arrow:disabled{opacity:.35;cursor:default}
+/* Pfeile nur mit Maus und nur, wenn es etwas zu blaettern gibt */
+@media (hover:hover) and (pointer:fine){
+  .start-favs.is-scrollable .start-favs__arrow{display:grid}
+}
+.start-favs__row{
+  display:grid;grid-auto-flow:column;grid-auto-columns:150px;gap:12px;
+  margin:16px -24px 0;padding:2px 24px 8px;
+  overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding:0 24px;
+  -webkit-overflow-scrolling:touch;scrollbar-width:thin;
+  /* weicher Rand rechts/links - zeigt, dass es weitergeht */
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 18px,#000 calc(100% - 18px),transparent 100%);
+  mask-image:linear-gradient(90deg,transparent 0,#000 18px,#000 calc(100% - 18px),transparent 100%);
+}
+.start-favs__row .ch-tile{scroll-snap-align:start}
+.start-favs__row::-webkit-scrollbar{height:6px}
+
+@media (max-width:620px){
+  .start-favs__row{grid-auto-columns:104px;gap:8px;margin:12px -12px 0;padding:2px 12px 6px;scroll-padding:0 12px}
+}
+.start-grid--single{grid-template-columns:minmax(0,1fr)}
