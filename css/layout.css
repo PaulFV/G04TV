@@ -202,6 +202,9 @@
     border-radius:0 var(--r-xl) var(--r-xl) 0;border-width:0 1px 0 0;
   }
   .sidebar.is-open{transform:none}
+  /* Ueber der Abdunklung (.scrim, z-index 60) und mit festem Grund -
+     sonst deckt die Abdunklung das Menue zu und es wirkt leer. */
+  .sidebar{z-index:70;background:rgba(8,13,22,.97);overflow-y:auto}
   .main{padding-bottom:calc(var(--tabbar-h) + 34px)}
   .grid--3{grid-template-columns:1fr}
   .sheet{
