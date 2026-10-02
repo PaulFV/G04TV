@@ -127,13 +127,28 @@
   /* ------------------------------------------------------------
      Navigation auf dem Handy
      ------------------------------------------------------------ */
+  // Ablauf wie in G04Fit: Seite sperren, Knopf wird zum Schliessen-Kreuz.
   function openMobileNav() {
     u.$('.sidebar').classList.add('is-open');
+    var menu = u.$('#mobileMenuBtn');
+    if (menu) {
+      menu.innerHTML = u.icon('close', 21);
+      menu.setAttribute('aria-label', 'Menü schließen');
+      menu.setAttribute('aria-expanded', 'true');
+    }
+    document.body.style.overflow = 'hidden';
     u.$('#scrim').hidden = false;
   }
   function closeMobileNav() {
     var sb = u.$('.sidebar');
     if (sb) sb.classList.remove('is-open');
+    var menu = u.$('#mobileMenuBtn');
+    if (menu && menu.getAttribute('aria-expanded') === 'true') {
+      menu.innerHTML = u.icon('menu', 21);
+      menu.setAttribute('aria-label', 'Menü öffnen');
+      menu.setAttribute('aria-expanded', 'false');
+    }
+    if (u.$('#sheet').hidden) document.body.style.overflow = '';
     if (u.$('#sheet').hidden) u.$('#scrim').hidden = true;
   }
 
@@ -180,7 +195,9 @@
       if (nav) go(nav.getAttribute('data-nav'));
     });
 
-    u.$('#mobileMenuBtn').addEventListener('click', openMobileNav);
+    u.$('#mobileMenuBtn').addEventListener('click', function () {
+      if (u.$('.sidebar').classList.contains('is-open')) closeMobileNav(); else openMobileNav();
+    });
     u.$('#infoBtn').addEventListener('click', function () { go('info'); });
     u.$('#liveChip').addEventListener('click', function () { go('live'); });
     u.$('#sheetClose').addEventListener('click', u.closeSheet);

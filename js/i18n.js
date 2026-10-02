@@ -560,6 +560,9 @@
     , 'Fernsehen': 'Watch TV'
     // Seitenleiste
     , 'läuft': 'playing'
+    // Menue-Knopf
+    , 'Menü schließen': 'Close menu'
+    , 'Menü öffnen': 'Open menu'
   };
 
 
