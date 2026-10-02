@@ -226,6 +226,9 @@
   .grid--2,.grid--4{grid-template-columns:1fr}
   .topbar{padding:max(14px,calc(env(safe-area-inset-top) + 6px)) 16px 14px}
   .topbar__title p{display:none}
+  /* Auf dem Handy ist kein Platz fuer die Marke neben dem Titel - was
+     laeuft, zeigt das Bild (Start, Sender) bzw. das kleine Fenster. */
+  .live-chip{display:none}
   .view-host{
     padding-left:max(16px,env(safe-area-inset-left));
     padding-right:max(16px,env(safe-area-inset-right));
