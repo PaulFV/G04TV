@@ -254,3 +254,9 @@
   .lang-switch{height:38px;align-items:stretch}
   .lang-switch button{height:auto}
 }
+
+/* Handy: Platz fuer Sprache und Hell/Dunkel - "Info" steht im Menue */
+@media (max-width:620px){
+  #infoBtn{display:none}
+  .topbar__actions{gap:6px}
+}
