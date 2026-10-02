@@ -183,7 +183,11 @@
 .start-favs__row .ch-tile{scroll-snap-align:start}
 .start-favs__row::-webkit-scrollbar{height:6px}
 
+/* Zwei Reihen: Spalte fuer Spalte gefuellt (oben, unten, naechste Spalte) */
+.start-favs__row--two{grid-template-rows:repeat(2,auto);row-gap:12px}
+
 @media (max-width:620px){
+  .start-favs__row--two{row-gap:8px}
   .start-favs__row{grid-auto-columns:104px;gap:8px;margin:12px -12px 0;padding:2px 12px 6px;scroll-padding:0 12px}
 }
 .start-grid--single{grid-template-columns:minmax(0,1fr)}
