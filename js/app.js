@@ -125,10 +125,17 @@
     applyTheme(s.theme);
     var b = u.$('#themeBtn');
     if (b) b.addEventListener('click', function () {
-      s.theme = s.theme === 'light' ? 'dark' : 'light';
-      G.store.commit('settings');
-      applyTheme(s.theme);
+      setTheme(s.theme === 'light' ? 'dark' : 'light');
     });
+  }
+
+  function setTheme(theme) {
+    var s = G.store.state.settings;
+    s.theme = theme === 'light' ? 'light' : 'dark';
+    G.store.commit('settings');
+    applyTheme(s.theme);
+    // Die Einstellungen zeigen das Farbschema als Auswahl - mitziehen.
+    if (current === 'settings') rerender();
   }
 
   function initLangSwitch() {
@@ -311,6 +318,7 @@
     NAV: NAV,
     go: go,
     rerender: rerender,
+    setTheme: setTheme,
     install: install,
     canInstall: function () { return !!installEvent; },
     get current() { return current; }

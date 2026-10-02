@@ -119,8 +119,12 @@
     '</div>';
   }
 
+  /** Auswahllisten werden von i18n.js nicht angefasst - hier selbst uebersetzen. */
+  function tr(text) { return G.i18n ? G.i18n.t(text) : text; }
+
   function renderModern() {
     var s = G.store.state.settings;
+    var lang = G.i18n ? G.i18n.language : 'de';
 
     return '<div class="view settings-view">' +
       '<div class="settings-intro">' +
@@ -133,9 +137,21 @@
         '<div class="settings-grid settings-grid--2">' +
           '<div class="settings-panel settings-panel__language">' +
             u.icon('grid', 22) +
-            '<div class="field"><label for="setLanguage">Anzeigesprache</label><select class="select" id="setLanguage" disabled><option>Deutsch</option></select></div>' +
+            '<div class="field"><label for="setLanguage">Anzeigesprache</label>' +
+              '<select class="select" id="setLanguage">' +
+                '<option value="de"' + (lang === 'de' ? ' selected' : '') + '>Deutsch</option>' +
+                '<option value="en"' + (lang === 'en' ? ' selected' : '') + '>English</option>' +
+              '</select></div>' +
           '</div>' +
-          '<div class="settings-panel">' + sw('reduceMotion', 'Bewegung reduzieren', 'Animationen und Hintergrundschein abschalten.') + '</div>' +
+          '<div class="settings-panel settings-panel__language">' +
+            u.icon('settings', 22) +
+            '<div class="field"><label for="setTheme">Farbschema</label>' +
+              '<select class="select" id="setTheme">' +
+                '<option value="dark"' + (s.theme !== 'light' ? ' selected' : '') + '>' + tr('Dunkel') + '</option>' +
+                '<option value="light"' + (s.theme === 'light' ? ' selected' : '') + '>' + tr('Hell') + '</option>' +
+              '</select></div>' +
+          '</div>' +
+          '<div class="settings-panel settings-panel--wide">' + sw('reduceMotion', 'Bewegung reduzieren', 'Animationen und Hintergrundschein abschalten.') + '</div>' +
         '</div>' +
       '</section>' +
 
@@ -171,7 +187,7 @@
         '<div class="settings-section__head">' + u.icon('shield', 22) + '<h3>Daten auf diesem Gerät</h3></div>' +
         '<div class="settings-data">' +
           '<div class="settings-stat">' + u.icon('playlists', 30) + '<div class="settings-stat__main"><span class="stat__v">' + G.store.state.playlists.length + '</span><span class="stat__d">Playlisten</span></div></div>' +
-          '<div class="settings-stat">' + u.icon('database', 30) + '<div class="settings-stat__main"><span class="stat__v" id="setUsage">' + (usage ? u.fmtSize(usage.used) : '…') + '</span><span class="stat__d">Playlists, Favoriten, Einstellungen</span></div></div>' +
+          '<div class="settings-stat">' + u.icon('database', 30) + '<div class="settings-stat__main"><span class="stat__v" id="setUsage">' + (usage ? u.fmtSize(usage.used) : '…') + '</span><span class="stat__d">Playlisten, Favoriten, Einstellungen</span></div></div>' +
         '</div>' +
         '<div class="settings-actions">' +
           '<button class="btn" id="setExport">' + u.icon('download', 16) + ' Sicherung speichern</button>' +
@@ -201,6 +217,12 @@
      Einhaengen
      ------------------------------------------------------------ */
   function mount(host) {
+    /* Sprache und Farbschema - dieselben Wege wie die Knoepfe in der Kopfzeile */
+    var language = u.$('#setLanguage');
+    if (language) language.onchange = function () { if (G.i18n) G.i18n.setLanguage(language.value); };
+    var theme = u.$('#setTheme');
+    if (theme) theme.onchange = function () { G.app.setTheme(theme.value); };
+
     /* Schalter */
     u.on(host, 'change', '[data-set]', function (e, t) {
       var key = t.getAttribute('data-set');

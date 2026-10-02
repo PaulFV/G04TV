@@ -566,6 +566,13 @@
     // Hell/Dunkel
     , 'Hellen Modus aktivieren': 'Switch to light mode'
     , 'Dunklen Modus aktivieren': 'Switch to dark mode'
+    // Einstellungen: Sprache und Farbschema
+    , 'Farbschema': 'Color scheme'
+    , 'Dunkel': 'Dark'
+    , 'Hell': 'Light'
+    , 'Playlisten, Favoriten, Einstellungen': 'Playlists, favorites, settings'
+    // Info
+    , 'Ohne Konto, ohne Server, ohne Tracking. ': 'No account, no server, no tracking. '
   };
 
 
