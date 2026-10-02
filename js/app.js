@@ -69,7 +69,13 @@
     u.$('#viewSub').textContent = typeof view.sub === 'function' ? view.sub() : (view.sub || '');
     document.title = G.NAME + ' — ' + (G.i18n ? G.i18n.t(title) : title);
 
-    var host = u.$('#viewHost');
+    // Frischer Behaelter fuer jede Ansicht: die Ansichten haengen ihre
+    // Klick-Reaktionen an ihn. Blieb er bestehen, sammelten sie sich an -
+    // dann sprang z. B. ein Favorit auf der Startseite in den Bereich Sender,
+    // weil die Reaktion der Favoriten-Ansicht noch mitlief.
+    var old = u.$('#viewHost');
+    var host = old.cloneNode(false);
+    old.parentNode.replaceChild(host, old);
     host.innerHTML = view.render(currentParams) || '';
 
     if (view.mount) {
