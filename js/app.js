@@ -91,6 +91,46 @@
   /* ------------------------------------------------------------
      Sprachumschalter in der Kopfzeile
      ------------------------------------------------------------ */
+  /* ------------------------------------------------------------
+     Hell / Dunkel (wie in G04Fit)
+     ------------------------------------------------------------ */
+  var SUN = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.8v2.3M12 18.9v2.3M21.2 12h-2.3M5.1 12H2.8M18.5 5.5l-1.6 1.6M7.1 16.9l-1.6 1.6M18.5 18.5l-1.6-1.6M7.1 7.1 5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+  var MOON = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20.2 15.2A8 8 0 018.8 3.8 8.5 8.5 0 1020.2 15.2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
+
+  function applyTheme(theme) {
+    theme = theme === 'light' ? 'light' : 'dark';
+    var root = document.documentElement;
+    if (theme === 'light') root.setAttribute('data-theme', 'light'); else root.removeAttribute('data-theme');
+    root.style.colorScheme = theme;
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', theme === 'light' ? '#EDF2F7' : '#05070B');
+    var scheme = document.querySelector('meta[name="color-scheme"]');
+    if (scheme) scheme.setAttribute('content', theme);
+    try { localStorage.setItem('g04tv.theme', theme); } catch (e) { /* optional */ }
+
+    var b = u.$('#themeBtn');
+    if (b) {
+      var light = theme === 'light';
+      var label = light ? 'Dunklen Modus aktivieren' : 'Hellen Modus aktivieren';
+      // Im dunklen Modus zeigt der Knopf die Sonne (dorthin geht es), im hellen den Mond.
+      b.innerHTML = light ? MOON : SUN;
+      b.title = label;
+      b.setAttribute('aria-label', label);
+      b.setAttribute('aria-pressed', light ? 'true' : 'false');
+    }
+  }
+
+  function initTheme() {
+    var s = G.store.state.settings;
+    applyTheme(s.theme);
+    var b = u.$('#themeBtn');
+    if (b) b.addEventListener('click', function () {
+      s.theme = s.theme === 'light' ? 'dark' : 'light';
+      G.store.commit('settings');
+      applyTheme(s.theme);
+    });
+  }
+
   function initLangSwitch() {
     var box = u.$('#langSwitch');
     if (!box || !G.i18n) return;
@@ -189,6 +229,7 @@
 
     G.dock.init();
     initLangSwitch();
+    initTheme();
 
     document.addEventListener('click', function (e) {
       var nav = e.target.closest('[data-nav]');

@@ -69,6 +69,7 @@
 
       settings: {
         language: 'de',
+        theme: 'dark',           // 'dark' | 'light'
         volume: 80,
         muted: false,
         autoplay: true,          // beim Antippen sofort abspielen

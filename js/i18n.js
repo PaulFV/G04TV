@@ -563,6 +563,9 @@
     // Menue-Knopf
     , 'Menü schließen': 'Close menu'
     , 'Menü öffnen': 'Open menu'
+    // Hell/Dunkel
+    , 'Hellen Modus aktivieren': 'Switch to light mode'
+    , 'Dunklen Modus aktivieren': 'Switch to dark mode'
   };
 
 
