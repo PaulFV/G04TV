@@ -201,8 +201,11 @@
     if (!s.onboarded) { G.onboarding.start(); return; }
 
     u.$('#app').hidden = false;
-    var start = location.hash.replace('#', '');
-    current = G.views[start] ? start : 'start';
+    // Die App beginnt immer mit der Startseite - auch wenn die Adresse
+    // noch den zuletzt besuchten Bereich traegt (#live). Auf dem iPhone
+    // wird die App vom Home-Bildschirm oft genau mit dieser Adresse geoeffnet.
+    current = 'start';
+    if (location.hash && location.hash !== '#start') history.replaceState(null, '', '#start');
     render();
 
     // Verwaiste Senderlisten aufraeumen (geloeschte Playlisten)
