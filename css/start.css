@@ -191,3 +191,34 @@
   .start-favs__row{grid-auto-columns:104px;gap:8px;margin:12px -12px 0;padding:2px 12px 6px;scroll-padding:0 12px}
 }
 .start-grid--single{grid-template-columns:minmax(0,1fr)}
+
+/* ---------- Umschalter Favoriten | Zuletzt gesehen ---------- */
+.start-shelf__head{gap:8px;flex-wrap:nowrap}
+.start-shelf__tabs{display:flex;gap:3px;padding:3px;border-radius:13px;border:1px solid var(--glass-br);background:rgba(0,0,0,.22);min-width:0}
+.start-shelf__tab{
+  display:flex;align-items:center;gap:7px;min-width:0;height:36px;padding:0 13px;
+  border:0;border-radius:10px;background:none;color:var(--tx-2);
+  font:inherit;font-size:14px;font-weight:650;cursor:pointer;white-space:nowrap;
+  transition:background .2s,color .2s;
+}
+.start-shelf__tab span{overflow:hidden;text-overflow:ellipsis}
+.start-shelf__tab i{font-style:normal;font-size:11.5px;font-weight:700;padding:0 7px;border-radius:99px;background:rgba(255,255,255,.07);color:var(--tx-2)}
+.start-shelf__tab:hover{color:var(--tx-0)}
+.start-shelf__tab.is-on{color:var(--tx-0);background:linear-gradient(180deg,rgba(49,216,255,.24),rgba(13,98,146,.18));box-shadow:inset 0 0 0 1px rgba(49,216,255,.5)}
+.start-shelf__tab.is-on svg{color:var(--acc)}
+.start-shelf__tab.is-on i{background:var(--acc-dim);color:var(--acc)}
+.start-shelf__empty{margin:16px 0 6px;color:var(--tx-2);font-size:14px}
+.start-favs .card__head h3{display:none}
+
+@media (max-width:620px){
+  .start-shelf__tabs{flex:1}
+  .start-shelf__head .spacer{display:none}
+  .start-shelf__tab svg{display:none}
+  .start-shelf__tab{flex:1 1 auto;justify-content:center;height:34px;padding:0 8px;gap:5px;font-size:13px}
+  .start-shelf__empty{font-size:13px;margin-top:12px}
+}
+/* Kleine iPhones: Zahlen weglassen, damit beide Beschriftungen passen */
+@media (max-width:400px){
+  .start-shelf__tab i{display:none}
+  .start-shelf__tab svg{display:none}
+}
