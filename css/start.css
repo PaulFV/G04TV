@@ -1,0 +1,270 @@
+/* ============================================================
+   G04TV — Startansicht
+   ============================================================ */
+
+.start-view{display:flex;flex-direction:column;gap:18px;padding-bottom:20px}
+
+/* ---------- Live-Fenster ----------
+   Oben das Bild (die wandernde Buehne), darunter bzw. daneben eine
+   schlanke Bedienleiste mit grossen Tippflaechen. */
+.start-live{
+  display:grid;grid-template-columns:minmax(0,2.3fr) minmax(260px,1fr);gap:20px;align-items:center;
+  padding:14px;border-color:rgba(49,216,255,.42);border-radius:var(--r-xl);
+  background:
+    radial-gradient(520px 220px at 0% 0%,rgba(49,216,255,.13),transparent 70%),
+    linear-gradient(150deg,rgba(9,24,38,.94),rgba(5,12,22,.92));
+  box-shadow:var(--sh-1),0 0 30px rgba(49,216,255,.08);
+}
+.start-live__stage{min-width:0}
+.start-live .pdock.is-inline .stage{border-radius:calc(var(--r-xl) - 8px)}
+
+.start-now{display:flex;flex-direction:column;gap:14px;min-width:0;padding:4px 6px 4px 0}
+.start-now__head{display:flex;align-items:center;gap:12px;min-width:0}
+.start-now__logo{
+  position:relative;flex:none;width:48px;height:48px;border-radius:12px;overflow:hidden;
+  display:grid;place-items:center;background:rgba(255,255,255,.06);border:1px solid var(--glass-br);
+  color:var(--acc);font-size:14px;font-weight:700;
+}
+.start-now__logo b{font-size:13px;font-weight:800;color:var(--tx-2)}
+.start-now__logo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:5px;background:#0b141f}
+.start-now__meta{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.start-now__name{
+  font-size:17px;line-height:1.3;font-weight:650;letter-spacing:-.01em;color:var(--tx-0);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;
+}
+.start-now__sub{font-size:13px;color:var(--tx-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.start-now__state{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:650;color:var(--tx-2);letter-spacing:.01em}
+.start-now__state i{width:7px;height:7px;border-radius:50%;background:var(--tx-2);flex:none}
+.start-now__state.is-live{color:#ff5a6a}
+.start-now__state.is-live i{background:#ff5a6a;box-shadow:0 0 8px #ff5a6a;animation:stLive 1.6s ease-in-out infinite}
+.start-now__state.is-busy{color:var(--acc)}
+.start-now__state.is-busy i{background:var(--acc)}
+.start-now__state.is-err{color:var(--danger)}
+.start-now__state.is-err i{background:var(--danger)}
+@keyframes stLive{50%{opacity:.35}}
+
+.start-now__actions{display:flex;gap:8px;align-items:center}
+.start-now__main{flex:1;min-height:48px;font-size:15px;justify-content:center}
+.start-now__icon{
+  flex:none;width:48px;height:48px;display:grid;place-items:center;border-radius:14px;cursor:pointer;
+  border:1px solid var(--glass-br);background:rgba(255,255,255,.05);color:var(--tx-1);
+  transition:background .2s,color .2s,border-color .2s;
+}
+.start-now__icon:hover{background:rgba(49,216,255,.12);color:var(--tx-0);border-color:var(--acc-line)}
+.start-now__icon:active{transform:scale(.96)}
+.start-now__icon.is-on{color:#ffc93c;border-color:rgba(255,201,60,.45);background:rgba(255,201,60,.1)}
+.start-now__head .start-now__icon{width:44px;height:44px;border-radius:12px}
+
+/* Ruhebild: mit bekanntem Sender genuegt ein Antippen */
+.stage__idle.is-tap{cursor:pointer}
+.stage__idle.is-tap b{max-width:90%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ---------- Favoriten / Playlisten ---------- */
+.start-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.start-card{min-height:360px;padding:22px 24px;display:flex;flex-direction:column;background:linear-gradient(150deg,rgba(12,28,45,.82),rgba(5,12,22,.88));border-color:rgba(82,156,220,.36)}
+.start-card .card__head{margin-bottom:0}
+.start-card .card__head svg{color:var(--acc);filter:drop-shadow(0 0 7px rgba(49,216,255,.45))}
+.start-card .card__head h3{font-size:21px;letter-spacing:-.025em}
+.start-card__visual{height:190px;display:grid;place-items:center;margin:8px -8px 2px;overflow:hidden}
+.start-card__visual img{width:100%;height:100%;object-fit:contain;display:block;filter:saturate(1.08);mix-blend-mode:screen}
+.start-card__copy{text-align:center;margin-top:auto}
+.start-card__copy b{display:block;color:var(--tx-0);font-size:21px;line-height:1.2;margin-bottom:8px}
+.start-card__copy p{max-width:410px;margin:0 auto;color:var(--tx-2);font-size:15px;line-height:1.5}
+.start-card__copy .btn-row{justify-content:center;margin-top:17px}
+.start-card--playlists .start-card__visual{margin-left:18px;margin-right:18px}
+.start-card--playlists .start-card__copy{margin-top:0}
+.start-card--playlists .start-card__copy .btn{min-width:160px}
+.start-card:not(.start-card--empty){min-height:0}
+.start-card:not(.start-card--empty) .grid--tiles{margin-top:18px}
+
+/* ---------- Schnellstart ---------- */
+.start-quick{padding:20px 25px 24px;border-color:rgba(49,216,255,.35);background:linear-gradient(100deg,rgba(8,24,39,.9),rgba(7,14,27,.82))}
+.start-quick__head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px}
+.start-quick__title{display:flex;align-items:center;gap:11px}
+.start-quick__title h3{font-size:21px;letter-spacing:-.025em}
+.start-quick__bolt{font-size:30px;line-height:1;color:var(--acc);text-shadow:0 0 16px rgba(49,216,255,.8);transform:skew(-8deg)}
+.start-quick__hint{color:var(--tx-2);font-size:10px;letter-spacing:.27em;font-weight:700;text-align:right}
+.start-steps{display:grid;grid-template-columns:1fr 54px 1fr 54px 1fr;align-items:center}
+.start-step{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0;border:0;background:none;color:var(--tx-1);cursor:pointer;font:inherit}
+.start-step__num{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--acc-line);border-radius:50%;color:var(--tx-0);background:rgba(6,31,51,.86);box-shadow:0 0 14px rgba(49,216,255,.18);font-size:17px;font-weight:700}
+.start-step__icon{width:62px;height:62px;display:grid;place-items:center;border:1px solid rgba(49,216,255,.34);border-radius:14px;background:linear-gradient(145deg,rgba(28,86,127,.6),rgba(6,24,42,.9));color:var(--acc);box-shadow:0 10px 24px rgba(0,0,0,.25),0 0 20px rgba(49,216,255,.12)}
+.start-step__icon svg{width:30px;height:30px;filter:drop-shadow(0 0 7px rgba(49,216,255,.6))}
+.start-step__label{font-size:15px;font-weight:650;color:var(--tx-0);text-align:center}
+.start-step__line{height:1px;background:linear-gradient(90deg,transparent,var(--acc),transparent);box-shadow:0 0 8px rgba(49,216,255,.55)}
+
+/* ---------- Kopfzeile auf kleinen Geräten ---------- */
+.topbar__brand,.topbar__divider{display:none}
+
+@media (max-width:980px){
+  .topbar__brand{display:flex;align-items:center;gap:8px;flex:none;margin-left:2px;padding:0}
+  .topbar__brand .brand__mark{width:34px;height:34px;border-radius:10px}
+  .topbar__brand .brand__text{font-size:19px}
+  .start-live{grid-template-columns:1fr;gap:14px;padding:10px}
+  .start-now{padding:0 4px 4px}
+  /* minmax(0,1fr): sonst darf die Spalte nicht schmaler werden als ihr
+     breitester Inhalt - auf dem iPhone SE wurde die Seite dadurch 10 px zu breit. */
+  .start-grid{grid-template-columns:minmax(0,1fr)}
+  .start-grid > .stack{min-width:0}
+  .start-card{min-height:340px}
+  .start-quick__hint{font-size:9px;letter-spacing:.18em}
+
+  .tabbar{
+    left:50%;right:auto;bottom:max(0px,calc(env(safe-area-inset-bottom) - 12px));
+    width:min(820px,calc(100% - 28px));height:var(--tabbar-h);padding:7px 9px;
+    border:1px solid rgba(49,216,255,.42);border-radius:32px;
+    background:rgba(7,17,30,.88);box-shadow:0 12px 34px rgba(0,0,0,.45),0 0 24px rgba(49,216,255,.16);
+    -webkit-backdrop-filter:blur(18px) saturate(150%);backdrop-filter:blur(18px) saturate(150%);
+    transform:translateX(-50%);
+  }
+  .tabbar__item{border-radius:25px;padding:7px 4px;gap:4px;font-size:11.5px}
+  .tabbar__item.is-active{background:linear-gradient(180deg,rgba(49,216,255,.25),rgba(13,98,146,.2));box-shadow:inset 0 0 0 1px rgba(49,216,255,.52),0 0 20px rgba(49,216,255,.16)}
+}
+
+@media (max-width:620px){
+  .start-view{gap:14px}
+  /* Handy: das Bild geht ueber die ganze Breite, wie in einer TV-App */
+  .start-live{
+    --edge-l:max(16px,env(safe-area-inset-left));--edge-r:max(16px,env(safe-area-inset-right));
+    margin-left:calc(var(--edge-l) * -1);margin-right:calc(var(--edge-r) * -1);
+    gap:10px;padding:0 0 12px;border-radius:0;border-left:0;border-right:0;border-top:0;
+  }
+  .start-live .pdock.is-inline .stage{border-radius:0;border-left:0;border-right:0;border-top:0}
+  .start-now{padding:0 var(--edge-r) 0 var(--edge-l)}
+  .start-now{gap:10px}
+  .start-now__head{gap:10px}
+  .start-now__logo{width:40px;height:40px;border-radius:10px}
+  .start-now__name{font-size:15px}
+  .start-now__sub{font-size:12px}
+  .start-now__state{font-size:11.5px}
+  .start-now__actions{gap:6px}
+  .start-now__main{min-height:40px;font-size:14px;border-radius:12px}
+  .start-now__main svg{width:16px;height:16px}
+  .start-now__icon{width:40px;height:40px;border-radius:12px}
+  .start-now__icon svg{width:18px;height:18px}
+  .start-now__head .start-now__icon{width:36px;height:36px;border-radius:10px}
+  .start-card .card__head h3{font-size:17px}
+  .start-card .card__head .btn{padding:5px 11px;font-size:12px;border-radius:9px}
+  .start-card:not(.start-card--empty) .grid--tiles{margin-top:12px}
+  .start-card{padding:14px 12px;min-height:330px}
+  .start-card__visual{height:170px}
+  .start-card__copy b{font-size:19px}
+  .start-card__copy p{font-size:14px}
+  .start-quick{padding:17px 14px 19px}
+  .start-quick__head{align-items:flex-start;flex-direction:column;gap:4px}
+  .start-quick__hint{align-self:flex-end;margin-top:-25px}
+  .start-steps{grid-template-columns:1fr 22px 1fr 22px 1fr;gap:0}
+  .start-step__icon{width:52px;height:52px}
+  .start-step__label{font-size:12px;line-height:1.25}
+}
+
+/* ---------- Favoriten-Reihe (alle, zum Wischen) ---------- */
+.start-favs .card__head{gap:8px}
+.start-favs__count{font-size:12px;color:var(--tx-2);padding:1px 8px;border-radius:99px;border:1px solid var(--glass-br)}
+.start-favs__arrow{
+  width:32px;height:32px;display:none;place-items:center;flex:none;cursor:pointer;
+  border-radius:10px;border:1px solid var(--glass-br);background:var(--glass-bg);color:var(--tx-1);
+}
+.start-favs__arrow[data-scroll="-1"] svg{transform:rotate(180deg)}
+.start-favs__arrow:hover:not(:disabled){color:var(--acc);border-color:var(--acc-line)}
+.start-favs__arrow:disabled{opacity:.35;cursor:default}
+/* Pfeile nur mit Maus und nur, wenn es etwas zu blaettern gibt */
+@media (hover:hover) and (pointer:fine){
+  .start-favs.is-scrollable .start-favs__arrow{display:grid}
+}
+.start-favs__row{
+  display:grid;grid-auto-flow:column;grid-auto-columns:150px;gap:12px;
+  margin:16px -24px 0;padding:2px 24px 8px;
+  overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding:0 24px;
+  -webkit-overflow-scrolling:touch;scrollbar-width:thin;
+  /* weicher Rand rechts/links - zeigt, dass es weitergeht */
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 18px,#000 calc(100% - 18px),transparent 100%);
+  mask-image:linear-gradient(90deg,transparent 0,#000 18px,#000 calc(100% - 18px),transparent 100%);
+}
+.start-favs__row .ch-tile{scroll-snap-align:start}
+.start-favs__row::-webkit-scrollbar{height:6px}
+
+/* Zwei Reihen: Spalte fuer Spalte gefuellt (oben, unten, naechste Spalte) */
+.start-favs__row--two{grid-template-rows:repeat(2,auto);row-gap:12px}
+
+@media (max-width:620px){
+  .start-favs__row--two{row-gap:8px}
+  .start-favs__row{grid-auto-columns:104px;gap:8px;margin:12px -12px 0;padding:2px 12px 6px;scroll-padding:0 12px}
+}
+.start-grid--single{grid-template-columns:minmax(0,1fr)}
+
+/* ---------- Umschalter Favoriten | Zuletzt gesehen ---------- */
+.start-shelf__head{gap:8px;flex-wrap:nowrap}
+.start-shelf__tabs{display:flex;gap:3px;padding:3px;border-radius:13px;border:1px solid var(--glass-br);background:rgba(0,0,0,.22);min-width:0}
+.start-shelf__tab{
+  display:flex;align-items:center;gap:7px;min-width:0;height:36px;padding:0 13px;
+  border:0;border-radius:10px;background:none;color:var(--tx-2);
+  font:inherit;font-size:14px;font-weight:650;cursor:pointer;white-space:nowrap;
+  transition:background .2s,color .2s;
+}
+.start-shelf__tab span{overflow:hidden;text-overflow:ellipsis}
+.start-shelf__tab i{font-style:normal;font-size:11.5px;font-weight:700;padding:0 7px;border-radius:99px;background:rgba(255,255,255,.07);color:var(--tx-2)}
+.start-shelf__tab:hover{color:var(--tx-0)}
+.start-shelf__tab.is-on{color:var(--tx-0);background:linear-gradient(180deg,rgba(49,216,255,.24),rgba(13,98,146,.18));box-shadow:inset 0 0 0 1px rgba(49,216,255,.5)}
+.start-shelf__tab.is-on svg{color:var(--acc)}
+.start-shelf__tab.is-on i{background:var(--acc-dim);color:var(--acc)}
+.start-shelf__empty{margin:16px 0 6px;color:var(--tx-2);font-size:14px}
+.start-favs .card__head h3{display:none}
+
+@media (max-width:620px){
+  .start-shelf__tabs{flex:1}
+  .start-shelf__head .spacer{display:none}
+  .start-shelf__tab svg{display:none}
+  .start-shelf__tab{flex:1 1 auto;justify-content:center;height:34px;padding:0 8px;gap:5px;font-size:13px}
+  .start-shelf__empty{font-size:13px;margin-top:12px}
+}
+/* Kleine iPhones: Zahlen weglassen, damit beide Beschriftungen passen */
+@media (max-width:400px){
+  .start-shelf__tab i{display:none}
+  .start-shelf__tab svg{display:none}
+}
+
+/* ---------- Handy: Playlisten-Kachel und Schnellstart kompakt ---------- */
+@media (max-width:620px){
+  /* Leere Kacheln (keine Playlist / keine Favoriten): Bild klein links,
+     Text und Knopf rechts - statt grossem Bild oben */
+  .start-card.start-card--empty{
+    min-height:0;padding:12px;
+    display:grid;grid-template-columns:96px minmax(0,1fr);grid-template-areas:"head head" "art copy";
+    column-gap:12px;row-gap:8px;align-items:center;
+  }
+  .start-card--empty .card__head{grid-area:head}
+  .start-card--empty .start-card__visual,
+  .start-card--playlists .start-card__visual{grid-area:art;height:72px;margin:0;border-radius:12px}
+  .start-card--empty .start-card__copy{grid-area:copy;text-align:left;margin:0}
+  .start-card--empty .start-card__copy b{font-size:15px;margin-bottom:2px}
+  .start-card--empty .start-card__copy p{font-size:12.5px;line-height:1.35;margin:0}
+  .start-card--empty .start-card__copy .btn-row{justify-content:flex-start;margin-top:8px}
+  .start-card--playlists .start-card__copy .btn{min-width:0;min-height:34px;padding:6px 14px;font-size:13px}
+  .start-card .card__head svg{width:20px;height:20px}
+
+  /* Playlisten mit Inhalt */
+  .start-card--data{padding:12px}
+  .start-card--data .grid--2{margin:10px 0 6px !important;gap:8px !important}
+  .start-card--data .stat{padding:9px 11px}
+  .start-card--data .stat__v{font-size:20px}
+  .start-card--data .stat__k{font-size:11px}
+  .start-card--data .list__row{padding-top:8px;padding-bottom:8px}
+
+  /* Hinweis "Alles bleibt auf dem Geraet" */
+  .start-view > .start-grid .note{font-size:12px;padding:10px 12px;gap:8px}
+
+  /* Schnellstart: eine flache Zeile mit drei Schritten */
+  .start-quick{padding:12px 12px 14px}
+  .start-quick__head{flex-direction:row;align-items:center;margin-bottom:10px}
+  .start-quick__title{gap:8px}
+  .start-quick__title h3{font-size:17px}
+  .start-quick__bolt{font-size:22px}
+  .start-quick__hint{display:none}
+  .start-steps{grid-template-columns:1fr 14px 1fr 14px 1fr;align-items:start}
+  .start-step__line{margin-top:22px}
+  .start-step{gap:5px;position:relative}
+  .start-step__num{position:absolute;top:-6px;left:calc(50% + 12px);width:20px;height:20px;font-size:11px;z-index:1}
+  .start-step__icon{width:44px;height:44px;border-radius:12px}
+  .start-step__icon svg{width:22px;height:22px}
+  .start-step__label{font-size:11.5px;line-height:1.2}
+}

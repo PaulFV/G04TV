@@ -29,6 +29,8 @@ gesperrten Einträge. Die Umsetzung als installierbare Web-App folgt **GoFit**.
   spielbar.
 * **Der Ton läuft weiter,** während man in den Favoriten oder in den Playlisten blättert — das Bild
   wandert dabei als kleines Fenster nach unten rechts.
+* **Deutsch und Englisch:** Umschalter DE/EN oben in der Kopfzeile. Der Wechsel geht ohne
+  Neuladen, ein laufender Sender spielt weiter. Sendernamen und Gruppen bleiben unübersetzt.
 * **Offline lauffähig:** ein Service Worker legt die Programmdateien ab. Die Streams selbst kommen
   natürlich weiter aus dem Netz.
 
@@ -42,7 +44,7 @@ wie in Connect+ (`IptvPlayerPage`):
 | Format | Weg |
 |:--|:--|
 | **HLS** (`*.m3u8`) | Auf iPhone, iPad und in Safari der eingebaute Weg, sonst `hls.js` |
-| **MPEG-TS** (`*.ts`, `output=ts`, Xtream ohne Endung) | `mpegts.js` — auf iPhone und iPad nicht möglich |
+| **MPEG-TS** (`*.ts`, `output=ts`, Xtream ohne Endung) | `mpegts.js` — auf dem iPhone ab iOS 17.1 (ManagedMediaSource). Bei Xtream-Sendern wird zusätzlich die HLS-Fassung (`.m3u8`) versucht — auf dem iPhone zuerst |
 | **MP4, WebM, MP3 …** | Das Videofeld des Browsers selbst |
 | **MKV, AVI, WMV …** | Kennt keine Browser-Engine — hier hilft **Extern öffnen** |
 
@@ -160,6 +162,8 @@ G04TV/
   index.html                Rahmen: Seitenleiste, Kopfzeile, Ansichten, Bühne
   manifest.webmanifest      Installation als App
   sw.js                     Service Worker (nur eigene Programmdateien)
+  privacy.html              Öffentliche Datenschutzerklärung für Web und Play Store
+  copyright.html            Copyright- und Inhaltshinweise
   css/
     theme.css               Farben, Schriften, Grundlagen
     layout.css              Rahmen, Navigation, Blatt, Meldungen
@@ -186,7 +190,8 @@ G04TV/
     worker.js               Vermittler: holt Playlisten und Streams, schreibt HLS um
     wrangler.toml           Einstellungen für Cloudflare
   icons/                    Sinnbilder für die Installation
-  docs/                     Datenschutzerklärung
+  docs/                     Markdown-Dokumentation zur Datenschutzerklärung
+  play-store/               TWA- und Google-Play-Vorbereitung
 ```
 
 ---
@@ -206,8 +211,9 @@ Verbindungen gehen an **deinen Anbieter** (Playlist und Streams), an die Adresse
 aus der Playlist, bei Bedarf an **cdnjs/jsDelivr** (die beiden Abspiel-Bibliotheken) und an einen
 **Vermittler**, falls du selbst einen einträgst.
 
-Unter **Einstellungen › Alles löschen** verschwindet alles davon restlos. Siehe auch
-[docs/Datenschutzerklaerung.md](docs/Datenschutzerklaerung.md).
+Unter **Einstellungen › Alles löschen** verschwindet alles davon restlos. Siehe auch die öffentlich
+erreichbare [Datenschutzerklärung](privacy.html), den [Copyright- und Inhaltshinweis](copyright.html)
+und die [ausführliche Markdown-Fassung](docs/Datenschutzerklaerung.md).
 
 ---
 

@@ -55,7 +55,7 @@
         'nach der Adresse, welcher Weg passt:</p>' +
         '<div class="list">' +
           [['HLS · *.m3u8', 'Auf iPhone, iPad und in Safari der eingebaute Weg, sonst hls.js'],
-           ['MPEG-TS · *.ts', 'mpegts.js — auf iPhone und iPad nicht möglich'],
+           ['MPEG-TS · *.ts', 'mpegts.js, auf dem iPhone ab iOS 17.1 — bei Xtream auch als HLS'],
            ['MP4, WebM, MP3 …', 'Das Videofeld des Browsers selbst'],
            ['MKV, AVI, WMV …', 'Kennt keine Browser-Engine — hier hilft „Extern öffnen“']].map(function (r) {
             return '<div class="list__row"><span class="list__main"><b>' + r[0] + '</b><span>' + r[1] + '</span></span></div>';
@@ -122,6 +122,15 @@
             'vollständige Adresse samt Zugangsdaten, und bei „auch Streams“ läuft das ganze Bild über ihn']].map(function (r) {
             return '<div class="list__row"><span class="list__main"><b>' + r[0] + '</b><span>' + r[1] + '</span></span></div>';
           }).join('') +
+        '</div>' +
+      '</div>' +
+
+      '<div class="card">' +
+        '<div class="card__head">' + u.icon('shield', 18) + '<h3>Datenschutz &amp; Urheberrecht</h3></div>' +
+        '<p class="small muted">Die vollständigen Hinweise stehen öffentlich und auch offline als eigene Seiten zur Verfügung.</p>' +
+        '<div class="btn-row">' +
+          '<a class="btn" href="privacy.html">Datenschutzerklärung</a>' +
+          '<a class="btn" href="copyright.html">Urheberrecht &amp; Inhalte</a>' +
         '</div>' +
       '</div>' +
 

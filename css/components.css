@@ -281,3 +281,15 @@
 .ch-row__star:hover{color:var(--gold);background:rgba(255,200,87,.1)}
 .ch-row__star.is-on{color:var(--gold)}
 .ch-row.is-playing .ch-row__main b{color:var(--acc)}
+
+/* Handy: kleinere Senderkacheln, drei nebeneinander */
+@media (max-width:620px){
+  .grid--tiles{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .ch-tile{padding:7px;gap:5px;border-radius:12px}
+  .ch-tile:hover{transform:none}
+  .ch-tile__logo{height:44px;border-radius:9px}
+  .ch-tile__logo img{inset:4px;max-width:calc(100% - 8px);max-height:calc(100% - 8px)}
+  .ch-tile__logo b{font-size:14px}
+  .ch-tile__name{font-size:12px}
+  .ch-tile__grp{font-size:10.5px}
+}

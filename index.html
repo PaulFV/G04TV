@@ -22,6 +22,15 @@
 <link rel="stylesheet" href="css/layout.css">
 <link rel="stylesheet" href="css/components.css">
 <link rel="stylesheet" href="css/player.css">
+<link rel="stylesheet" href="css/start.css">
+<link rel="stylesheet" href="css/playlists.css">
+<link rel="stylesheet" href="css/settings.css">
+<link rel="stylesheet" href="css/theme-light.css">
+<script>
+  /* Hell/Dunkel so frueh wie moeglich setzen - sonst blitzt beim Start
+     kurz die falsche Farbe auf. */
+  try { if (localStorage.getItem('g04tv.theme') === 'light') document.documentElement.setAttribute('data-theme', 'light'); } catch (e) {}
+</script>
 </head>
 <body>
 
@@ -61,12 +70,22 @@
       <button class="icon-btn only-mobile" id="mobileMenuBtn" aria-label="Menü">
         <svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
       </button>
+      <div class="topbar__brand brand" aria-label="G04TV">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <span class="brand__text">G0<b>4</b>TV</span>
+      </div>
+      <span class="topbar__divider" aria-hidden="true"></span>
       <div class="topbar__title">
         <h1 id="viewTitle">Start</h1>
         <p id="viewSub"></p>
       </div>
       <div class="topbar__actions">
+        <div class="lang-switch" id="langSwitch" role="group" aria-label="Sprache / Language" data-no-translate>
+          <button type="button" data-lang="de" title="Deutsch">DE</button>
+          <button type="button" data-lang="en" title="English">EN</button>
+        </div>
         <button class="live-chip" id="liveChip" title="Was gerade läuft"><i class="live-chip__dot"></i><span>Nichts läuft</span></button>
+        <button class="icon-btn theme-btn" id="themeBtn" type="button" title="Hellen Modus aktivieren" aria-label="Hellen Modus aktivieren" aria-pressed="false"></button>
         <button class="icon-btn" id="infoBtn" title="Info" aria-label="Info">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.8v.4" stroke-width="2" stroke-linecap="round"/></svg>
         </button>
@@ -93,7 +112,7 @@
         <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor" aria-hidden="true"><path d="M8 5.5l11 6.5-11 6.5v-13z"/></svg>
       </span>
       <b>Kein Sender</b>
-      <p>Wähle links einen Sender — oder trage zuerst eine Playlist ein.</p>
+      <p>Wähle einen Sender aus der Liste — oder trage zuerst eine Playlist ein.</p>
     </div>
 
     <div class="stage__busy" id="stageBusy"><div class="stage__ring"></div></div>
@@ -140,6 +159,7 @@
 
 <!-- ============ SKRIPTE (klassisch, damit file:// funktioniert) ============ -->
 <script src="js/util.js"></script>
+<script src="js/i18n.js"></script>
 <script src="js/m3u.js"></script>
 <script src="js/xtream.js"></script>
 <script src="js/db.js"></script>

@@ -147,7 +147,7 @@
 .ob-progress i.on{background:var(--acc);box-shadow:0 0 10px rgba(49,216,255,.6)}
 
 /* ---------- Blatt / Schleier ---------- */
-.scrim{position:fixed;inset:0;z-index:60;background:rgba(3,5,7,.72);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:fadeIn .25s var(--ease)}
+.scrim{position:fixed;inset:0;z-index:60;background:rgba(3,5,7,.55);animation:fadeIn .25s var(--ease)}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .sheet{
   position:fixed;z-index:70;right:0;top:0;height:100vh;width:min(580px,100%);
@@ -196,10 +196,16 @@
   .icon-btn.only-mobile{display:grid}
   .tabbar{display:grid}
   .shell{grid-template-columns:1fr}
+  /* Wie in G04Fit: ueber der Abdunklung (z-index 60), deckender Grund und
+     ohne backdrop-filter - Safari auf dem iPhone zeichnet ein festes,
+     per transform eingeschobenes Fenster mit Weichzeichner sonst nur als
+     dunkle, leere Flaeche. */
   .sidebar{
-    position:fixed;left:0;top:0;width:270px;
+    position:fixed;left:0;top:0;width:min(310px,88vw);z-index:65;
     transform:translateX(-100%);transition:transform .38s var(--ease);
     border-radius:0 var(--r-xl) var(--r-xl) 0;border-width:0 1px 0 0;
+    background:var(--bg-1);-webkit-backdrop-filter:none;backdrop-filter:none;
+    box-shadow:18px 0 48px rgba(0,0,0,.36);
   }
   .sidebar.is-open{transform:none}
   .main{padding-bottom:calc(var(--tabbar-h) + 34px)}
@@ -226,8 +232,38 @@
   .grid--2,.grid--4{grid-template-columns:1fr}
   .topbar{padding:max(14px,calc(env(safe-area-inset-top) + 6px)) 16px 14px}
   .topbar__title p{display:none}
+  /* Auf dem Handy ist kein Platz fuer die Marke neben dem Titel - was
+     laeuft, zeigt das Bild (Start, Sender) bzw. das kleine Fenster. */
+  .live-chip{display:none}
   .view-host{
     padding-left:max(16px,env(safe-area-inset-left));
     padding-right:max(16px,env(safe-area-inset-right));
   }
+}
+
+/* ---------- Sprachumschalter ---------- */
+.lang-switch{display:flex;align-items:center;gap:2px;padding:3px;border-radius:12px;border:1px solid var(--glass-br);background:var(--glass-bg);flex:none}
+.lang-switch button{min-width:34px;height:30px;padding:0 8px;border:0;border-radius:9px;background:none;color:var(--tx-2);font:inherit;font-size:12.5px;font-weight:750;letter-spacing:.04em;cursor:pointer;transition:background .2s,color .2s}
+.lang-switch button:hover{color:var(--tx-0)}
+.lang-switch button.is-on{background:linear-gradient(180deg,rgba(49,216,255,.28),rgba(13,98,146,.22));color:var(--tx-0);box-shadow:inset 0 0 0 1px rgba(49,216,255,.5)}
+
+/* Handy und Tablet: die Marke steht in der Kopfzeile - den Namen des
+   Bereichs zeigt die Leiste unten, der Titel entfaellt. */
+@media (max-width:980px){
+  .topbar__title{display:none}
+  .lang-switch{height:38px;align-items:stretch}
+  .lang-switch button{height:auto}
+}
+
+/* Handy: Platz fuer Sprache und Hell/Dunkel - "Info" steht im Menue */
+@media (max-width:620px){
+  #infoBtn{display:none}
+  .topbar__actions{gap:6px}
+}
+
+/* Kleine iPhones (SE, mini): die Beschriftung "Einstellungen" passt sonst
+   nicht in ihren Knopf der Leiste unten */
+@media (max-width:400px){
+  .tabbar__item{font-size:10.5px !important;padding-left:2px !important;padding-right:2px !important;min-width:0}
+  .tabbar__item span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 }

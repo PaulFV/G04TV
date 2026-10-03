@@ -8,7 +8,9 @@
    Drei Wege, je nachdem was hinter der Adresse steckt:
      HLS (*.m3u8)   hls.js - ausser auf iPhone/iPad und Safari,
                     die HLS von Haus aus koennen
-     MPEG-TS (*.ts) mpegts.js
+     MPEG-TS (*.ts) mpegts.js - auf dem iPhone ueber Apples
+                    ManagedMediaSource (ab iOS 17.1); bei Xtream
+                    zusaetzlich die HLS-Fassung desselben Senders
      alles Uebrige  das Videofeld selbst (mp4, webm, mp3 ...)
 
    Die beiden Bibliotheken werden erst geholt, wenn sie gebraucht
@@ -21,7 +23,7 @@
   var HLS_LOCAL = 'vendor/hls.min.js';
   var HLS_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.13/hls.min.js';
   var TS_LOCAL = 'vendor/mpegts.js';
-  var TS_CDN = 'https://cdn.jsdelivr.net/npm/mpegts.js@1.7.3/dist/mpegts.js';
+  var TS_CDN = 'https://cdn.jsdelivr.net/npm/mpegts.js@1.8.2/dist/mpegts.js';
 
   var video = null;
   var stage = null;
@@ -35,7 +37,8 @@
   var status = 'idle';       // idle | loading | playing | error
   var message = '';
   var tries = 0;
-  var nativeTried = false;
+  var queue = [];            // weitere Versuche, falls der laufende scheitert
+  var run = 0;               // zaehlt hoch bei jedem Umschalten
   var listeners = [];
   var loaded = {};           // welche Bibliothek schon da ist
 
@@ -129,6 +132,40 @@
     return location.protocol === 'https:' && /^http:\/\//i.test(String(url || ''));
   }
 
+  /** iPhone: HLS im Videofeld, aber kein klassisches MediaSource. */
+  function appleWithoutMse() {
+    return nativeHls() && typeof window.MediaSource !== 'function';
+  }
+
+  /**
+   * Xtream-Anbieter geben jeden Live-Sender auch als HLS heraus - unter
+   * derselben Adresse mit .m3u8 statt .ts. Das spielt iOS von Haus aus,
+   * ohne Bibliothek und ohne CORS. Liefert '' wenn die Adresse nicht
+   * nach Xtream aussieht.
+   *   host/live/benutzer/kennwort/123.ts  -> host/live/benutzer/kennwort/123.m3u8
+   *   host/benutzer/kennwort/123          -> host/live/benutzer/kennwort/123.m3u8
+   *   ...&output=ts                       -> ...&output=m3u8
+   */
+  function hlsVariant(url) {
+    var raw = String(url || '').trim();
+    var m = /^(https?:\/\/[^/?#]+)([^?#]*)(\?[^#]*)?/i.exec(raw);
+    if (!m) return '';
+    var host = m[1], path = m[2], query = m[3] || '';
+
+    if (/[?&]output=(ts|mpegts)\b/i.test(query)) {
+      return host + path + query.replace(/([?&]output=)(ts|mpegts)\b/i, '$1m3u8');
+    }
+
+    var parts = path.replace(/\/+$/, '').split('/').filter(Boolean);
+    if (parts[0] && parts[0].toLowerCase() === 'live') parts.shift();
+    if (parts.length !== 3) return '';
+
+    var id = /^(\d+)(\.(ts|mpegts))?$/i.exec(parts[2]);
+    if (!id) return '';
+
+    return host + '/live/' + parts[0] + '/' + parts[1] + '/' + id[1] + '.m3u8' + query;
+  }
+
   /* ------------------------------------------------------------
      Zustand melden
      ------------------------------------------------------------ */
@@ -169,17 +206,14 @@
     video.addEventListener('ended', function () { set('idle', 'Der Stream ist beendet.'); });
 
     video.addEventListener('error', function () {
-      // Adresse ohne Endung, die das Videofeld nicht mochte: fast immer ein
-      // MPEG-TS-Strom. Einmal mit mpegts.js nachfassen, bevor ein Fehler
-      // gemeldet wird.
-      if (nativeTried && !ts && current) {
-        nativeTried = false;
-        set('loading', 'Zweiter Versuch mit MPEG-TS …');
-        video.removeAttribute('src');
-        video.load();
-        startTs(playingUrl || current.url, 'ts');
-        return;
-      }
+      // Nur Fehler des Videofelds selbst - laufen hls.js oder mpegts.js,
+      // melden die ihre Fehler eigens.
+      if (hls || ts || !current || !video.getAttribute('src')) return;
+
+      // Ist noch ein anderer Weg offen (MPEG-TS hinter einer Adresse ohne
+      // Endung, die HLS-Fassung eines Xtream-Senders), wird der versucht,
+      // bevor ein Fehler gemeldet wird.
+      if (next()) return;
       var e = video.error;
       fail(e ? mediaErrorText(e.code) : 'Der Stream ließ sich nicht öffnen.');
     });
@@ -205,18 +239,46 @@
    * gewaehlten Sender gleich wieder vergisst.
    */
   function stop(silent) {
+    teardown();
+    if (!silent) {
+      run++;
+      queue = [];
+      current = null;
+      playingUrl = '';
+      set('idle');
+    }
+  }
+
+  /** Raeumt die laufende Wiedergabe ab, ohne den Sender zu vergessen. */
+  function teardown() {
     if (hls) { try { hls.destroy(); } catch (e) { } hls = null; }
     if (ts) { try { ts.destroy(); } catch (e) { } ts = null; }
     if (video) {
       try { video.pause(); } catch (e) { }
       video.removeAttribute('src');
       try { video.load(); } catch (e) { }
+      // mpegts.js schaltet AirPlay fuer ManagedMediaSource ab - fuer den
+      // naechsten Sender wieder freigeben.
+      try { video.disableRemotePlayback = false; } catch (e) { }
     }
-    if (!silent) {
-      current = null;
-      playingUrl = '';
-      set('idle');
-    }
+  }
+
+  /**
+   * Naechsten Weg aus der Warteschlange versuchen. false, wenn keiner
+   * mehr offen ist - dann meldet der Aufrufer den Fehler.
+   */
+  function next() {
+    var step = queue.shift();
+    if (!step) return false;
+    var mine = run;
+    setTimeout(function () {
+      if (mine !== run) return;          // inzwischen umgeschaltet
+      teardown();
+      tries = 0;
+      set('loading', step.label);
+      step.go(mine);
+    }, 0);
+    return true;
   }
 
   function startPromise(p) {
@@ -229,6 +291,9 @@
           return;
         }
         if (name === 'AbortError') return;   // schon wieder umgeschaltet
+        // Quelle unbrauchbar: das Videofeld meldet das gleich noch einmal
+        // als 'error' - dort wird der naechste Weg versucht.
+        if (name === 'NotSupportedError') return;
         fail(String((e && e.message) || e));
       });
     }
@@ -258,6 +323,7 @@
         tries++; set('loading', 'Bildfehler – neuer Versuch …'); hls.recoverMediaError(); return;
       }
 
+      if (next()) return;
       fail(hlsErrorText(data));
     });
 
@@ -292,16 +358,62 @@
         set('loading', 'Neuer Versuch …');
         try { ts.unload(); ts.load(); startPromise(ts.play()); return; } catch (e) { }
       }
-      fail(String(detail || type || 'MPEG-TS-Fehler'));
+      if (next()) return;
+      fail(tsErrorText(type, detail));
     });
 
+    // ManagedMediaSource (iPhone) oeffnet sich nur ohne AirPlay.
+    if (window.ManagedMediaSource && typeof window.MediaSource !== 'function') {
+      try { video.disableRemotePlayback = true; } catch (e) { }
+    }
     ts.attachMediaElement(video);
     ts.load();
     startPromise(ts.play());
   }
 
+  function tsErrorText(type, detail) {
+    if (type === 'NetworkError') {
+      return 'Der MPEG-TS-Strom war nicht erreichbar. Häufig blockiert der Anbieter den Abruf aus dem Browser (CORS) — ' +
+        (G.store.state.settings.proxyStreams
+          ? 'hier auch über den Vermittler nicht. Dann hilft „Extern öffnen“.'
+          : 'dann hilft ein Vermittler für Streams (Einstellungen) oder „Extern öffnen“.');
+    }
+    return String(detail || type || 'MPEG-TS-Fehler');
+  }
+
+  function tsMissingText() {
+    if (appleWithoutMse()) {
+      return 'MPEG-TS braucht auf dem iPhone iOS 17.1 oder neuer. Mit „Extern öffnen“ an einen Abspieler wie VLC weitergeben.';
+    }
+    return 'MPEG-TS lässt sich hier nicht abspielen — mpegts.js konnte nicht geladen werden.';
+  }
+
+  /* Die einzelnen Wege - jeder prueft selbst, ob er moeglich ist, und
+     reicht sonst an den naechsten weiter. */
+  function viaTs(url, kind) {
+    return async function (mine) {
+      var ok = await ensure('ts') && tsUsable();
+      if (mine !== run) return;
+      if (ok) { startTs(url, kind); return; }
+      if (!next()) fail(tsMissingText());
+    };
+  }
+
+  function viaHls(url) {
+    return async function (mine) {
+      if (nativeHls()) { startNative(url); return; }
+      var ok = await ensure('hls') && hlsUsable();
+      if (mine !== run) return;
+      if (ok) { startHls(url); return; }
+      if (!next()) fail('HLS lässt sich hier nicht abspielen — hls.js konnte nicht geladen werden.');
+    };
+  }
+
+  function viaNative(url) {
+    return function () { startNative(url); };
+  }
+
   function startNative(url) {
-    nativeTried = true;
     video.src = url;
     startPromise(video.play());
   }
@@ -314,9 +426,10 @@
     if (!video || !channel || !channel.url) return;
 
     stop(true);
+    var mine = ++run;
+    queue = [];
     current = channel;
     tries = 0;
-    nativeTried = false;
     set('loading', 'Verbindung wird aufgebaut …');
 
     var source = String(channel.url).trim();
@@ -336,7 +449,7 @@
       set('loading', 'Wird über https versucht …');
       var lifted = await G.library.httpsVariant(source, false);
 
-      if (current !== channel) return;      // inzwischen umgeschaltet
+      if (mine !== run) return;             // inzwischen umgeschaltet
 
       if (!lifted) {
         fail('Dieser Sender läuft über http, die App über https. Der Browser blockiert das, ' +
@@ -357,25 +470,37 @@
       return;
     }
 
+    // Die Adresse ohne Vermittler, aus der sich die HLS-Fassung ableitet.
+    var plain = viaProxy ? source : url;
+    var steps = [];
+
     if (kind === 'hls') {
       // Auf iPhone, iPad und in Safari ist der eingebaute Weg der bessere.
-      if (nativeHls()) { startNative(url); return; }
-      if (await ensure('hls') && hlsUsable()) { startHls(url); return; }
-      fail('HLS lässt sich hier nicht abspielen — hls.js konnte nicht geladen werden.');
-      return;
+      steps.push({ label: 'Verbindung wird aufgebaut …', go: viaHls(url) });
+    }
+    else if (kind === 'ts' || kind === 'flv') {
+      var tsStep = { label: 'Versuch über MPEG-TS …', go: viaTs(url, kind) };
+      var variant = kind === 'ts' ? hlsVariant(plain) : '';
+      var hlsStep = variant && {
+        label: 'Versuch über HLS …',
+        go: viaHls(G.store.streamViaProxy(variant))
+      };
+
+      // iPhone: die HLS-Fassung zuerst - sie laeuft im Videofeld, ohne
+      // CORS, mit AirPlay und gesperrtem Bildschirm. mpegts.js (ab iOS
+      // 17.1) bleibt als zweiter Weg. Ueberall sonst umgekehrt.
+      if (hlsStep && appleWithoutMse()) steps.push(hlsStep, tsStep);
+      else if (!hlsStep) steps.push(tsStep);
+      else steps.push(tsStep, hlsStep);
+    }
+    else {
+      // Unbekannt: erst das Videofeld, bei Fehlschlag mpegts.js.
+      steps.push({ label: 'Verbindung wird aufgebaut …', go: viaNative(url) });
+      steps.push({ label: 'Zweiter Versuch mit MPEG-TS …', go: viaTs(url, 'ts') });
     }
 
-    if (kind === 'ts' || kind === 'flv') {
-      if (await ensure('ts') && tsUsable()) { startTs(url, kind); return; }
-      fail('MPEG-TS lässt sich hier nicht abspielen — mpegts.js konnte nicht geladen werden. ' +
-           'Auf iPhone und iPad ist dieses Format nicht möglich; dort hilft „Extern öffnen“.');
-      return;
-    }
-
-    // Unbekannt: erst das Videofeld, bei Fehlschlag mpegts.js (siehe oben
-    // im Fehlerbehandler des Videofelds).
-    if (kind === 'unbekannt') await ensure('ts');
-    startNative(url);
+    queue = steps.slice(1);
+    steps[0].go(mine);
   }
 
   /* ------------------------------------------------------------
@@ -448,6 +573,7 @@
     fullscreen: fullscreen,
     isFull: isFull,
     kindOf: kindOf,
+    hlsVariant: hlsVariant,
     mixedContent: mixedContent,
     get channel() { return current; },
     get status() { return status; },

@@ -17,3 +17,10 @@ node_modules/
 *.m3u8
 !beispiel/*.m3u
 zugang.txt
+
+# Android / Trusted Web Activity secrets and build outputs
+*.jks
+*.keystore
+*.aab
+*.apk
+play-store/keystore/

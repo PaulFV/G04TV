@@ -67,9 +67,15 @@
     var title = typeof view.title === 'function' ? view.title() : view.title;
     u.$('#viewTitle').textContent = title;
     u.$('#viewSub').textContent = typeof view.sub === 'function' ? view.sub() : (view.sub || '');
-    document.title = G.NAME + ' — ' + title;
+    document.title = G.NAME + ' — ' + (G.i18n ? G.i18n.t(title) : title);
 
-    var host = u.$('#viewHost');
+    // Frischer Behaelter fuer jede Ansicht: die Ansichten haengen ihre
+    // Klick-Reaktionen an ihn. Blieb er bestehen, sammelten sie sich an -
+    // dann sprang z. B. ein Favorit auf der Startseite in den Bereich Sender,
+    // weil die Reaktion der Favoriten-Ansicht noch mitlief.
+    var old = u.$('#viewHost');
+    var host = old.cloneNode(false);
+    old.parentNode.replaceChild(host, old);
     host.innerHTML = view.render(currentParams) || '';
 
     if (view.mount) {
@@ -80,11 +86,80 @@
     // Bereichswechsel innerhalb einer Ansicht
     u.on(host, 'click', '[data-go]', function (e, t) { go(t.getAttribute('data-go')); });
 
-    // Ausserhalb des Bereichs Sender laeuft das Bild unten rechts weiter.
-    if (current !== 'live') G.dock.place(null);
+    // Ansichten mit eigenem Platz fuers Bild (Sender, Start) haengen es
+    // selbst ein - ueberall sonst laeuft es unten rechts weiter.
+    if (!host.querySelector('#stageSlot')) G.dock.place(null);
 
     buildNav();
     if (afterFn) afterFn();
+  }
+
+  /* ------------------------------------------------------------
+     Sprachumschalter in der Kopfzeile
+     ------------------------------------------------------------ */
+  /* ------------------------------------------------------------
+     Hell / Dunkel (wie in G04Fit)
+     ------------------------------------------------------------ */
+  var SUN = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.8v2.3M12 18.9v2.3M21.2 12h-2.3M5.1 12H2.8M18.5 5.5l-1.6 1.6M7.1 16.9l-1.6 1.6M18.5 18.5l-1.6-1.6M7.1 7.1 5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+  var MOON = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20.2 15.2A8 8 0 018.8 3.8 8.5 8.5 0 1020.2 15.2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
+
+  function applyTheme(theme) {
+    theme = theme === 'light' ? 'light' : 'dark';
+    var root = document.documentElement;
+    if (theme === 'light') root.setAttribute('data-theme', 'light'); else root.removeAttribute('data-theme');
+    root.style.colorScheme = theme;
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', theme === 'light' ? '#EDF2F7' : '#05070B');
+    var scheme = document.querySelector('meta[name="color-scheme"]');
+    if (scheme) scheme.setAttribute('content', theme);
+    try { localStorage.setItem('g04tv.theme', theme); } catch (e) { /* optional */ }
+
+    var b = u.$('#themeBtn');
+    if (b) {
+      var light = theme === 'light';
+      var label = light ? 'Dunklen Modus aktivieren' : 'Hellen Modus aktivieren';
+      // Im dunklen Modus zeigt der Knopf die Sonne (dorthin geht es), im hellen den Mond.
+      b.innerHTML = light ? MOON : SUN;
+      b.title = label;
+      b.setAttribute('aria-label', label);
+      b.setAttribute('aria-pressed', light ? 'true' : 'false');
+    }
+  }
+
+  function initTheme() {
+    var s = G.store.state.settings;
+    applyTheme(s.theme);
+    var b = u.$('#themeBtn');
+    if (b) b.addEventListener('click', function () {
+      setTheme(s.theme === 'light' ? 'dark' : 'light');
+    });
+  }
+
+  function setTheme(theme) {
+    var s = G.store.state.settings;
+    s.theme = theme === 'light' ? 'light' : 'dark';
+    G.store.commit('settings');
+    applyTheme(s.theme);
+    // Die Einstellungen zeigen das Farbschema als Auswahl - mitziehen.
+    if (current === 'settings') rerender();
+  }
+
+  function initLangSwitch() {
+    var box = u.$('#langSwitch');
+    if (!box || !G.i18n) return;
+    var paint = function () {
+      u.$$('[data-lang]', box).forEach(function (b) {
+        var on = b.getAttribute('data-lang') === G.i18n.language;
+        b.classList.toggle('is-on', on);
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+    };
+    box.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-lang]');
+      if (b) G.i18n.setLanguage(b.getAttribute('data-lang'));
+    });
+    document.addEventListener('g04tv:language', paint);
+    paint();
   }
 
   function go(key, params) {
@@ -105,13 +180,28 @@
   /* ------------------------------------------------------------
      Navigation auf dem Handy
      ------------------------------------------------------------ */
+  // Ablauf wie in G04Fit: Seite sperren, Knopf wird zum Schliessen-Kreuz.
   function openMobileNav() {
     u.$('.sidebar').classList.add('is-open');
+    var menu = u.$('#mobileMenuBtn');
+    if (menu) {
+      menu.innerHTML = u.icon('close', 21);
+      menu.setAttribute('aria-label', 'Menü schließen');
+      menu.setAttribute('aria-expanded', 'true');
+    }
+    document.body.style.overflow = 'hidden';
     u.$('#scrim').hidden = false;
   }
   function closeMobileNav() {
     var sb = u.$('.sidebar');
     if (sb) sb.classList.remove('is-open');
+    var menu = u.$('#mobileMenuBtn');
+    if (menu && menu.getAttribute('aria-expanded') === 'true') {
+      menu.innerHTML = u.icon('menu', 21);
+      menu.setAttribute('aria-label', 'Menü öffnen');
+      menu.setAttribute('aria-expanded', 'false');
+    }
+    if (u.$('#sheet').hidden) document.body.style.overflow = '';
     if (u.$('#sheet').hidden) u.$('#scrim').hidden = true;
   }
 
@@ -146,16 +236,22 @@
     G.store.load();
     var s = G.store.state;
 
+    if (G.i18n) G.i18n.useState(s.settings);
+
     if (s.settings.reduceMotion) document.body.classList.add('no-motion');
 
     G.dock.init();
+    initLangSwitch();
+    initTheme();
 
     document.addEventListener('click', function (e) {
       var nav = e.target.closest('[data-nav]');
       if (nav) go(nav.getAttribute('data-nav'));
     });
 
-    u.$('#mobileMenuBtn').addEventListener('click', openMobileNav);
+    u.$('#mobileMenuBtn').addEventListener('click', function () {
+      if (u.$('.sidebar').classList.contains('is-open')) closeMobileNav(); else openMobileNav();
+    });
     u.$('#infoBtn').addEventListener('click', function () { go('info'); });
     u.$('#liveChip').addEventListener('click', function () { go('live'); });
     u.$('#sheetClose').addEventListener('click', u.closeSheet);
@@ -176,8 +272,11 @@
     if (!s.onboarded) { G.onboarding.start(); return; }
 
     u.$('#app').hidden = false;
-    var start = location.hash.replace('#', '');
-    current = G.views[start] ? start : (s.playlists.length ? 'live' : 'start');
+    // Die App beginnt immer mit der Startseite - auch wenn die Adresse
+    // noch den zuletzt besuchten Bereich traegt (#live). Auf dem iPhone
+    // wird die App vom Home-Bildschirm oft genau mit dieser Adresse geoeffnet.
+    current = 'start';
+    if (location.hash && location.hash !== '#start') history.replaceState(null, '', '#start');
     render();
 
     // Verwaiste Senderlisten aufraeumen (geloeschte Playlisten)
@@ -225,6 +324,7 @@
     NAV: NAV,
     go: go,
     rerender: rerender,
+    setTheme: setTheme,
     install: install,
     canInstall: function () { return !!installEvent; },
     get current() { return current; }

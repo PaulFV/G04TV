@@ -6,7 +6,7 @@
    ausschließlich die eigenen Programmdateien — keine Playlisten,
    keine Streams, keine Anfragen an fremde Server.
    ============================================================ */
-var CACHE = 'g04tv-v1.0.3';
+var CACHE = 'g04tv-v1.0.27';
 
 var ASSETS = [
   './',
@@ -16,7 +16,13 @@ var ASSETS = [
   './css/layout.css',
   './css/components.css',
   './css/player.css',
+  './css/start.css',
+  './css/playlists.css',
+  './css/settings.css',
+  './css/theme-light.css',
+  './css/legal.css',
   './js/util.js',
+  './js/i18n.js',
   './js/m3u.js',
   './js/xtream.js',
   './js/db.js',
@@ -32,6 +38,17 @@ var ASSETS = [
   './js/view-info.js',
   './js/onboarding.js',
   './js/app.js',
+  './art/start-hero.png',
+  './art/start-favorites.png',
+  './art/start-playlists.png',
+  './art/playlist-link.png',
+  './art/playlist-file.png',
+  './art/playlist-text.png',
+  './art/playlist-xtream.png',
+  './art/playlist-empty.png',
+  './art/playlist-channel.png',
+  './privacy.html',
+  './copyright.html',
   './icons/favicon-32.png',
   './icons/icon-180.png',
   './icons/icon-192.png',
@@ -76,15 +93,17 @@ self.addEventListener('fetch', function (e) {
   // Navigationsanfragen: erst Netz, sonst die zwischengespeicherte Startseite
   if (req.mode === 'navigate') {
     e.respondWith(
-      fetch(req).catch(function () { return caches.match('./index.html'); })
+      fetch(req, { cache: 'no-cache' }).catch(function () { return caches.match('./index.html'); })
     );
     return;
   }
 
   // Programmdateien: erst das Netz, damit Änderungen sofort ankommen.
   // Der Zwischenspeicher ist die Rückfallebene ohne Verbindung.
+  // cache: 'no-cache' fragt immer beim Server nach - GitHub Pages laesst
+  // Dateien sonst bis zu 10 Minuten im Browser-Zwischenspeicher liegen.
   e.respondWith(
-    fetch(req).then(function (res) {
+    fetch(req, { cache: 'no-cache' }).then(function (res) {
       if (res && res.status === 200 && res.type === 'basic') {
         var copy = res.clone();
         caches.open(CACHE).then(function (c) { c.put(req, copy); });

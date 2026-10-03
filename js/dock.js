@@ -14,6 +14,9 @@
   var dock, stage, video, idle, busy, err, errText, dockTitle;
   var slotNow = null;
 
+  /** Feste Texte in Bereichen, die sonst Sendernamen tragen (dort uebersetzt i18n.js nicht). */
+  function tr(text) { return G.i18n ? G.i18n.t(text) : text; }
+
   function init() {
     dock = u.$('#pdock');
     stage = u.$('#stage');
@@ -35,6 +38,10 @@
       if (c) G.player.play(c);
     });
     u.$('#stageExternal').addEventListener('click', function () { external(); });
+    idle.addEventListener('click', function () {
+      var c = G.player.channel || G.store.state.last;
+      if (c && G.player.status === 'idle') G.player.play(c);
+    });
 
     u.$('#pdockOpen').addEventListener('click', function () { G.app.go('live'); });
     u.$('#pdockClose').addEventListener('click', function () { G.player.stop(); });
@@ -47,6 +54,11 @@
 
     paint(G.player.status, G.player.message, G.player.channel);
     paintMute();
+    paintFull();
+
+    document.addEventListener('g04tv:language', function () {
+      paint(G.player.status, G.player.message, G.player.channel);
+    });
   }
 
   /* ------------------------------------------------------------
@@ -64,7 +76,7 @@
   function place(slot) {
     if (!dock) return;
     if (slot === slotNow && (slot ? slot.contains(dock) : dock.parentNode === document.body)) {
-      paintVisibility();
+      refresh();
       return;
     }
 
@@ -84,6 +96,12 @@
       if (p && p.catch) p.catch(function () { /* der Browser will eine Beruehrung */ });
     }
 
+    refresh();
+  }
+
+  /** Ruhebild und Marken neu zeichnen (z. B. nach dem Einhaengen). */
+  function refresh() {
+    paintIdle(G.player.channel);
     paintVisibility();
   }
 
@@ -108,7 +126,9 @@
 
     if (status === 'error') errText.textContent = message || '';
 
-    dockTitle.textContent = channel ? channel.name : 'Nichts läuft';
+    paintIdle(channel);
+
+    dockTitle.textContent = channel ? channel.name : tr('Nichts läuft');
 
     paintChip(status, channel);
     paintVisibility();
@@ -119,12 +139,22 @@
     }));
   }
 
+  /** Ruhebild: ist schon ein Sender bekannt, genuegt ein Antippen. */
+  function paintIdle(channel) {
+    var last = channel || G.store.state.last;
+    var ib = idle.querySelector('b'), ip = idle.querySelector('p');
+    if (ib) ib.textContent = last ? last.name : tr('Kein Sender');
+    if (ip) ip.textContent = last ? 'Antippen zum Abspielen'
+      : 'Wähle einen Sender aus der Liste — oder trage zuerst eine Playlist ein.';
+    idle.classList.toggle('is-tap', !!last);
+  }
+
   /** Die Marke in der Kopfzeile und der Fuss der Seitenleiste. */
   function paintChip(status, channel) {
     var chip = u.$('#liveChip');
     var side = u.$('#sideNow');
     var running = status === 'loading' || status === 'playing';
-    var name = channel ? channel.name : 'Nichts läuft';
+    var name = channel ? channel.name : tr('Nichts läuft');
 
     if (chip) {
       chip.classList.toggle('is-live', status === 'playing');
@@ -137,7 +167,7 @@
       side.innerHTML =
         '<span class="now-chip__ic">' + u.icon(running ? 'play' : 'live', 17) + '</span>' +
         '<span class="now-chip__meta"><b>' + u.esc(name) + '</b>' +
-        '<span>' + u.esc(channel && channel.group ? channel.group : (running ? 'läuft' : 'bereit')) + '</span></span>';
+        '<span>' + u.esc(channel && channel.group ? channel.group : tr(running ? 'läuft' : 'bereit')) + '</span></span>';
     }
   }
 
