@@ -115,6 +115,29 @@
         '</div>' +
       '</div>' +
 
+      /* ---- Feedback ---- */
+      '<div class="card">' +
+        '<div class="card__head">' + u.icon('plus', 18) + '<h3>Feedback & Ideen</h3></div>' +
+        '<div class="stack stack--sm">' +
+          '<p class="small muted">Bug gefunden, eine Idee oder Wunsch? Schreib mir eine Nachricht — ganz ohne Konto.</p>' +
+          '<form id="settingsFeedbackForm" class="stack stack--sm">' +
+            '<div class="field">' +
+              '<label for="feedbackMsg">Deine Nachricht <span class="dim">(erforderlich)</span></label>' +
+              '<textarea id="feedbackMsg" name="message" rows="3" maxlength="2000" required placeholder="Was möchtest du loswerden…" style="font-family:inherit;resize:vertical"></textarea>' +
+            '</div>' +
+            '<div class="field">' +
+              '<label for="feedbackEmail">Deine E-Mail <span class="dim">(optional, für Antwort)</span></label>' +
+              '<input id="feedbackEmail" name="_replyto" type="email" maxlength="120" placeholder="you@example.com" style="font-family:inherit">' +
+            '</div>' +
+            '<input type="text" name="_honey" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none" tabindex="-1" autocomplete="off" aria-hidden="true">' +
+            '<div>' +
+              '<button type="submit" id="settingsFeedbackBtn" class="btn" style="margin-top:4px">' + u.icon('upload', 15) + ' Senden</button>' +
+              '<p id="settingsFeedbackStatus" class="tiny dim" style="margin:6px 0 0"></p>' +
+            '</div>' +
+          '</form>' +
+        '</div>' +
+      '</div>' +
+
       '<p class="tiny dim center">' + u.esc(G.NAME) + ' ' + u.esc(G.VERSION) + '</p>' +
     '</div>';
   }
@@ -172,6 +195,44 @@
       var out = u.$('#setUsage');
       if (out) out.textContent = u2 ? u.fmtSize(u2.used) : 'unbekannt';
     });
+
+    /* Feedback-Formular */
+    var feedbackForm = u.$('#settingsFeedbackForm');
+    if (feedbackForm) {
+      feedbackForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (feedbackForm._honey.value) return;
+        var msg = feedbackForm.message.value.trim();
+        if (!msg) return;
+
+        var btn = u.$('#settingsFeedbackBtn');
+        var status = u.$('#settingsFeedbackStatus');
+        btn.disabled = true;
+        status.textContent = 'Wird gesendet…';
+
+        fetch('https://formsubmit.co/ajax/FodorPaul@web.de', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            message: msg,
+            _replyto: feedbackForm._replyto.value.trim(),
+            _subject: 'G04TV — Feedback',
+            _template: 'table',
+            App: G.NAME + ' ' + G.VERSION
+          })
+        }).then(function (res) {
+          if (!res.ok) throw new Error('Status ' + res.status);
+          status.textContent = 'Danke! Deine Nachricht ist unterwegs.';
+          status.style.color = 'var(--ok)';
+          feedbackForm.reset();
+        }).catch(function (err) {
+          status.textContent = 'Senden hat nicht geklappt — bitte nochmal versuchen oder direkt an FodorPaul@web.de schreiben.';
+          status.style.color = 'var(--err)';
+        }).finally(function () {
+          btn.disabled = false;
+        });
+      });
+    }
   }
 
   /* ------------------------------------------------------------
