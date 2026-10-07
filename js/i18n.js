@@ -596,6 +596,10 @@
     , 'Feedback-Formular': 'Feedback form'
     , 'Nur wenn du selbst auf „Senden“ tippst — Nachricht, freiwillige E-Mail und ': 'Only when you tap “Send” yourself — message, optional email and '
     , 'App-Version gehen über formsubmit.co an den Entwickler': 'app version go to the developer via formsubmit.co'
+    // CarPlay/AirPlay
+    , 'Live-TV': 'Live TV'
+    , 'AirPlay hier nicht möglich': 'AirPlay not possible here'
+    , 'Dieser Sender läuft als MPEG-TS. AirPlay geht mit HLS-Sendern (.m3u8).': 'This channel plays as MPEG-TS. AirPlay works with HLS channels (.m3u8).'
   };
 
 
