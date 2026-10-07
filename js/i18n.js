@@ -589,6 +589,13 @@
     , 'Danke! Deine Nachricht ist unterwegs.': 'Thanks! Your message is on its way.'
     , 'Senden hat nicht geklappt — bitte nochmal versuchen oder direkt an FodorPaul@web.de schreiben.': 'Sending failed — please try again or write directly to FodorPaul@web.de.'
     , 'Bitte zuerst eine Nachricht schreiben.': 'Please write a message first.'
+    // Datenschutz: Feedback
+    , 'Nichts wird ohne dein Zutun gemeldet oder an Dritte gegeben': 'Nothing is reported or passed to third parties without your action'
+    , 'Es gibt keine Anmeldung und keine Stelle, an die Daten von selbst gemeldet würden. ': 'There is no sign-in and no place where data is reported automatically. '
+    , 'Nur wenn du selbst Feedback schickst, geht deine Nachricht über formsubmit.co an den Entwickler.': 'Only if you send feedback yourself does your message go to the developer via formsubmit.co.'
+    , 'Feedback-Formular': 'Feedback form'
+    , 'Nur wenn du selbst auf „Senden“ tippst — Nachricht, freiwillige E-Mail und ': 'Only when you tap “Send” yourself — message, optional email and '
+    , 'App-Version gehen über formsubmit.co an den Entwickler': 'app version go to the developer via formsubmit.co'
   };
 
 

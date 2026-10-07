@@ -28,7 +28,7 @@
       '<div class="list">' +
         [['playlists', 'Playlisten bleiben gespeichert', 'Einmal eintragen, danach immer da — auf diesem Gerät'],
          ['star', 'Favoriten quer über alle Listen', 'Der Stern merkt einen Sender vor'],
-         ['shield', 'Kein Konto, kein Server', 'Nichts wird gemeldet, nichts geht an Dritte']].map(function (r) {
+         ['shield', 'Kein Konto, kein Server', 'Nichts wird ohne dein Zutun gemeldet oder an Dritte gegeben']].map(function (r) {
           return '<div class="list__row"><span class="list__ic">' + u.icon(r[0], 17) + '</span>' +
             '<span class="list__main"><b>' + r[1] + '</b><span>' + r[2] + '</span></span></div>';
         }).join('') +

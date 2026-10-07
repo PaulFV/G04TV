@@ -96,7 +96,8 @@
     return '<div class="stack">' +
       '<div class="note note--acc">' + u.icon('shield', 18) +
       '<div><b>Kein Konto, kein Server, kein Tracking.</b> G04TV ist eine reine Web-App. ' +
-      'Es gibt keine Anmeldung und keine Stelle, an die Daten gemeldet würden.</div></div>' +
+      'Es gibt keine Anmeldung und keine Stelle, an die Daten von selbst gemeldet würden. ' +
+      'Nur wenn du selbst Feedback schickst, geht deine Nachricht über formsubmit.co an den Entwickler.</div></div>' +
 
       '<div class="card">' +
         '<div class="card__head">' + u.icon('shield', 18) + '<h3>Was gespeichert wird</h3></div>' +
@@ -119,7 +120,9 @@
            ['Senderlogos', 'Die Bilder stehen in der Playlist und werden von dort geladen'],
            ['hls.js / mpegts.js', 'Nur wenn sie gebraucht und nicht lokal hinterlegt sind: von cdnjs bzw. jsDelivr'],
            ['Vermittler', 'Nur wenn du selbst einen einträgst und einschaltest — dann sieht er die ' +
-            'vollständige Adresse samt Zugangsdaten, und bei „auch Streams“ läuft das ganze Bild über ihn']].map(function (r) {
+            'vollständige Adresse samt Zugangsdaten, und bei „auch Streams“ läuft das ganze Bild über ihn'],
+           ['Feedback-Formular', 'Nur wenn du selbst auf „Senden“ tippst — Nachricht, freiwillige E-Mail und ' +
+            'App-Version gehen über formsubmit.co an den Entwickler']].map(function (r) {
             return '<div class="list__row"><span class="list__main"><b>' + r[0] + '</b><span>' + r[1] + '</span></span></div>';
           }).join('') +
         '</div>' +
