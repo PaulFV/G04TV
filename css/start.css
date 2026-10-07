@@ -328,3 +328,24 @@
   .start-shelf .start-shelf__tab i{display:none}
   .start-shelf .start-shelf__tab{font-size:13px;gap:5px;padding:0 4px}
 }
+
+/* ---------- Abspielen-Knopf: dezenter und kleiner ----------
+   Nicht mehr ueber die ganze Breite und ohne Leuchten - zarte
+   Akzentfarbe, damit das Bild der Blickfang bleibt. */
+.start-now__actions{gap:8px}
+.start-now .start-now__main{
+  flex:0 0 auto;min-height:40px;padding:0 18px;font-size:14px;border-radius:12px;
+  background:var(--acc-dim);border:1px solid var(--acc-line);color:var(--acc);
+  box-shadow:none;
+}
+.start-now .start-now__main:hover{background:rgba(49,216,255,.22);box-shadow:none}
+.start-now .start-now__main svg{width:15px;height:15px}
+/* Anhalten: noch ruhiger, grau */
+.start-now .start-now__main:not(.btn--primary){background:var(--glass-bg);border-color:var(--glass-br);color:var(--tx-1)}
+.start-now__actions .start-now__icon{width:40px;height:40px;border-radius:12px}
+.start-now__actions .start-now__icon svg{width:18px;height:18px}
+@media (max-width:620px){
+  .start-now .start-now__main{min-height:36px;padding:0 14px;font-size:13px;border-radius:11px}
+  .start-now__actions .start-now__icon{width:36px;height:36px;border-radius:11px}
+  .start-now__actions .start-now__icon svg{width:17px;height:17px}
+}
