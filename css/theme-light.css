@@ -180,3 +180,9 @@
 [data-theme="light"] .start-shelf__tab i{background:rgba(16,44,66,.07)}
 [data-theme="light"] .start-shelf__tab.is-on{background:linear-gradient(180deg,rgba(10,143,194,.16),rgba(10,143,194,.08));box-shadow:inset 0 0 0 1px rgba(10,143,194,.45)}
 [data-theme="light"] .settings-feedback__status.is-ok{color:#0F8A5F}
+
+/* Reiter auf hellem Grund: kraeftigere Farben */
+[data-theme="light"] .start-shelf__tab--fav{--tab:#C98A00;--tab-bg:rgba(201,138,0,.13);--tab-line:rgba(201,138,0,.5)}
+[data-theme="light"] .start-shelf__tab--all{--tab:#0A8FC2;--tab-bg:rgba(10,143,194,.12);--tab-line:rgba(10,143,194,.45)}
+[data-theme="light"] .start-shelf__tab--recent{--tab:#7C5CE0;--tab-bg:rgba(124,92,224,.12);--tab-line:rgba(124,92,224,.45)}
+[data-theme="light"] .start-shelf .start-shelf__tab.is-on{background:var(--tab-bg);box-shadow:inset 0 0 0 1px var(--tab-line)}

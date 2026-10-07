@@ -308,3 +308,23 @@
   .stage__mark{width:56px;height:56px;border-radius:16px}
   .stage__mark svg{width:24px;height:24px}
 }
+
+/* ---------- Reiter: kurz und farbig ----------
+   Favoriten Gold, Alle Cyan, Verlauf Violett. Das Zeichen traegt die
+   Farbe immer, der gewaehlte Reiter fuellt sich in ihr. */
+.start-shelf__tab--fav{--tab:#FFC93C;--tab-bg:rgba(255,201,60,.16);--tab-line:rgba(255,201,60,.55)}
+.start-shelf__tab--all{--tab:#31D8FF;--tab-bg:rgba(49,216,255,.16);--tab-line:rgba(49,216,255,.55)}
+.start-shelf__tab--recent{--tab:#A78BFA;--tab-bg:rgba(167,139,250,.18);--tab-line:rgba(167,139,250,.55)}
+.start-shelf .start-shelf__tab{gap:6px;flex:1 1 0;min-width:0}
+.start-shelf .start-shelf__tab svg{display:block !important;flex:none;color:var(--tab);opacity:.85}
+.start-shelf .start-shelf__tab.is-on{
+  color:var(--tx-0);background:var(--tab-bg);
+  box-shadow:inset 0 0 0 1px var(--tab-line),0 0 16px var(--tab-bg);
+}
+.start-shelf .start-shelf__tab.is-on svg{opacity:1;filter:drop-shadow(0 0 6px var(--tab))}
+.start-shelf .start-shelf__tab.is-on i{background:var(--tab-bg);color:var(--tab)}
+/* Handy: keine Zahlen - die Namen passen dann ganz */
+@media (max-width:620px){
+  .start-shelf .start-shelf__tab i{display:none}
+  .start-shelf .start-shelf__tab{font-size:13px;gap:5px;padding:0 4px}
+}
