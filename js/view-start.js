@@ -164,10 +164,13 @@
     return '<section class="card start-shelf" id="stShelf">' + shelfInner() + '</section>';
   }
 
+  // Jeder Reiter mit eigenem Zeichen und eigener Farbe (siehe start.css)
+  var TAB_ICON = { fav: 'starFill', all: 'grid', recent: 'history' };
+
   function tabBtn(key, label, n, tab) {
     var on = tab === key;
-    return '<button class="start-shelf__tab' + (on ? ' is-on' : '') + '" data-shelf="' + key + '" role="tab" aria-selected="' + on + '">' +
-      '<span>' + label + '</span>' + (n != null ? '<i>' + u.fmtInt(n) + '</i>' : '') + '</button>';
+    return '<button class="start-shelf__tab start-shelf__tab--' + key + (on ? ' is-on' : '') + '" data-shelf="' + key + '" role="tab" aria-selected="' + on + '">' +
+      u.icon(TAB_ICON[key], 15) + '<span>' + label + '</span>' + (n != null ? '<i>' + u.fmtInt(n) + '</i>' : '') + '</button>';
   }
 
   function shelfInner() {
@@ -177,8 +180,8 @@
 
     var head = '<div class="start-shelf__tabs" role="tablist">' +
         tabBtn('fav', 'Favoriten', s.favorites.length, tab) +
-        tabBtn('all', 'Alle Sender', allCount || null, tab) +
-        tabBtn('recent', 'Zuletzt gesehen', s.recent.length, tab) +
+        tabBtn('all', 'Alle', allCount || null, tab) +
+        tabBtn('recent', 'Verlauf', s.recent.length, tab) +
       '</div>';
 
     var body;

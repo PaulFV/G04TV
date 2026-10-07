@@ -606,6 +606,8 @@
     , 'Verlauf leeren': 'Clear history'
     , 'Noch keine Playlist — trage zuerst eine ein.': 'No playlist yet — add one first.'
     , 'Sender werden geladen …': 'Loading channels …'
+    // Reiter kurz
+    , 'Verlauf': 'Recent'
   };
 
 
