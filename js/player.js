@@ -200,9 +200,17 @@
     video.addEventListener('playing', function () {
       set('playing');
     });
+    // Kurze Aussetzer (Bruchteile einer Sekunde) nicht gleich mit der
+    // Ladeanzeige quittieren - das Aufblitzen wirkte selbst wie Stottern.
+    var waitTimer = null;
     video.addEventListener('waiting', function () {
-      if (status === 'playing') set('loading', 'Zwischenspeicher füllt sich …');
+      if (status !== 'playing') return;
+      clearTimeout(waitTimer);
+      waitTimer = setTimeout(function () {
+        if (status === 'playing' && video.readyState < 3) set('loading', 'Zwischenspeicher füllt sich …');
+      }, 800);
     });
+    video.addEventListener('playing', function () { clearTimeout(waitTimer); });
     video.addEventListener('ended', function () { set('idle', 'Der Stream ist beendet.'); });
 
     video.addEventListener('error', function () {
@@ -300,9 +308,16 @@
   }
 
   function startHls(url) {
+    // Kein Low-Latency-Modus: IPTV-Sender sind kein LL-HLS, und der Modus
+    // haelt den Puffer klein - das stottert. Lieber 3-4 Segmente Abstand
+    // zur Live-Kante und bis zu 30 s Vorrat.
     hls = new window.Hls({
-      lowLatencyMode: true,
-      backBufferLength: 60,
+      lowLatencyMode: false,
+      liveSyncDurationCount: 4,
+      liveMaxLatencyDurationCount: 12,
+      maxBufferLength: 30,
+      maxMaxBufferLength: 60,
+      backBufferLength: 30,
       manifestLoadingTimeOut: 20000,
       fragLoadingTimeOut: 20000
     });
@@ -346,9 +361,26 @@
   function startTs(url, kind) {
     var live = kind !== 'flv';
 
+    // Stabile Wiedergabe statt geringster Verzoegerung: frueher jagte
+    // mpegts.js der Live-Kante hinterher (liveBufferLatencyChasing) und
+    // hielt dabei nur ~1,5 s Puffer - bei IPTV-Servern, die ungleichmaessig
+    // liefern, stotterte das Bild staendig. Jetzt darf sich ein Polster
+    // aufbauen; alter Puffer wird regelmaessig freigegeben (wichtig auf dem
+    // iPhone, wo ManagedMediaSource wenig Speicher hat).
     ts = window.mpegts.createPlayer(
       { type: live ? 'mpegts' : 'flv', isLive: live, url: url },
-      { enableWorker: true, liveBufferLatencyChasing: live, lazyLoad: false });
+      {
+        enableWorker: true,
+        enableStashBuffer: true,
+        stashInitialSize: 512 * 1024,
+        liveBufferLatencyChasing: false,
+        liveSync: false,
+        lazyLoad: false,
+        autoCleanupSourceBuffer: true,
+        autoCleanupMaxBackwardDuration: 60,
+        autoCleanupMinBackwardDuration: 30,
+        fixAudioTimestampGap: true
+      });
 
     ts.on(window.mpegts.Events.ERROR, function (type, detail) {
       // Auch hier zweimal still nachfassen - ein Sender bricht schon einmal
