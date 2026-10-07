@@ -1,9 +1,8 @@
 /* ============================================================
    G04TV — Bereich Start
 
-   Die Startseite ist der schnelle Einstieg: oben das Live-Bild,
-   darunter Favoriten, zuletzt gesehen, Playlisten und die drei
-   Schritte bis zum Fernsehen.
+   So einfach wie moeglich: oben das Live-Bild, darunter eine
+   Kachel mit Favoriten, allen Sendern und dem Verlauf.
    ============================================================ */
 (function (G) {
   'use strict';
@@ -128,168 +127,192 @@
     });
   }
 
-  function playlistCard() {
-    var s = G.store.state;
-
-    if (!s.playlists.length) {
-      return '<section class="card start-card start-card--empty start-card--playlists">' +
-        '<div class="card__head">' + u.icon('playlists', 22) + '<h3>Playlisten</h3></div>' +
-        '<div class="start-card__visual"><img src="art/start-playlists.png" alt=""></div>' +
-        '<div class="start-card__copy">' +
-          '<b>Keine Playlist</b>' +
-          '<p>Füge eine Adresse, Datei oder einen Stream-Zugang hinzu.</p>' +
-          '<div class="btn-row"><button class="btn btn--primary" data-go="playlists">Hinzufügen</button></div>' +
-        '</div>' +
-      '</section>';
-    }
-
-    var total = s.playlists.reduce(function (n, p) { return n + (p.count || 0); }, 0);
-    var broken = s.playlists.filter(function (p) { return !!p.error; }).length;
-
-    return '<section class="card start-card start-card--data">' +
-      '<div class="card__head">' + u.icon('playlists', 22) + '<h3>Playlisten</h3><span class="spacer"></span>' +
-        '<button class="btn btn--sm" data-go="playlists">Verwalten</button></div>' +
-      '<div class="grid grid--2" style="gap:12px;margin:18px 0 14px">' +
-        '<div class="stat stat--acc"><span class="stat__k">Sender</span><span class="stat__v">' + u.fmtInt(total) + '</span></div>' +
-        '<div class="stat"><span class="stat__k">Listen</span><span class="stat__v">' + s.playlists.length + '</span>' +
-        (broken ? '<span class="stat__d" style="color:var(--warn)">' + broken + ' mit Fehler</span>' : '') + '</div>' +
-      '</div>' +
-      '<div class="list">' +
-        s.playlists.slice(0, 4).map(function (p) {
-          return '<div class="list__row list__row--click" data-open="' + u.esc(p.id) + '">' +
-            '<span class="list__ic">' + u.icon(p.kind === 'xtream' ? 'key' : p.kind === 'url' ? 'link' : 'file', 17) + '</span>' +
-            '<span class="list__main"><b>' + u.esc(p.name) + '</b>' +
-            '<span>' + (p.error ? '⚠ ' + u.esc(p.error.slice(0, 60)) : u.fmtInt(p.count) + ' Sender · ' + u.esc(u.relTime(p.updatedAt))) + '</span></span>' +
-            '<span class="list__end dim">' + u.icon('chevron', 16) + '</span>' +
-          '</div>';
-        }).join('') +
-      '</div>' +
-    '</section>';
-  }
-
-  function favCard() {
-    var s = G.store.state;
-    var playing = G.player.channel;
-
-    if (!s.favorites.length) {
-      return '<section class="card start-card start-card--empty start-card--favorites">' +
-        '<div class="card__head">' + u.icon('star', 22) + '<h3>Favoriten</h3></div>' +
-        '<div class="start-card__visual"><img src="art/start-favorites.png" alt=""></div>' +
-        '<div class="start-card__copy">' +
-          '<b>Noch keine Favoriten</b>' +
-          '<p>Markiere Sender mit einem Stern — sie erscheinen dann hier.</p>' +
-        '</div>' +
-      '</section>';
-    }
-
-    return shelfCard();
-  }
-
   /* ------------------------------------------------------------
-     Regal: Favoriten | Zuletzt gesehen
+     Sender-Kachel: Favoriten | Alle Sender | Zuletzt gesehen
 
-     Eine Kachel mit Umschalter. Beide Listen liegen in derselben
-     Reihe zum Wischen (ab 5 Eintraegen zweizeilig). Beim Umschalten
-     wird nur die Kachel neu gezeichnet - das Bild oben laeuft weiter.
+     Unter dem Bild nur noch eine Kachel. Die Sender stehen in einem
+     Raster, das nach unten weiterlaeuft. "Alle Sender" zeigt die
+     aktive Playlist - bei zehntausenden Sendern stueckweise: weitere
+     kommen nach, sobald man unten ankommt. Beim Umschalten wird nur
+     die Kachel neu gezeichnet, das Bild oben laeuft weiter.
      ------------------------------------------------------------ */
   var TAB_KEY = 'g04tv.startShelf';
-  var shelfTab = null;
+  var CHUNK = 60;
 
+  var shelfTab = null;
+  var allPool = null;          // Sender der aktiven Playlist (geladen)
+  var allPoolId = null;        // ... fuer welche Playlist
+  var allQuery = '';
+  var allList = [];            // nach Suche gefiltert
+  var allShown = 0;
+  var observer = null;
+
+  function tr(text) { return G.i18n ? G.i18n.t(text) : text; }
+
+  /** Der zuletzt selbst gewaehlte Reiter - sonst Favoriten, wenn es welche gibt. */
   function currentTab() {
     var s = G.store.state;
     if (!shelfTab) {
       try { shelfTab = localStorage.getItem(TAB_KEY); } catch (e) { /* optional */ }
     }
-    if (shelfTab !== 'fav' && shelfTab !== 'recent') shelfTab = s.favorites.length ? 'fav' : 'recent';
-    return shelfTab;
+    if (shelfTab === 'fav' || shelfTab === 'all' || shelfTab === 'recent') return shelfTab;
+    shelfTab = null;
+    return s.favorites.length ? 'fav' : 'all';
   }
 
   function shelfCard() {
-    return '<section class="card start-card start-card--data start-favs" id="stShelf">' + shelfInner() + '</section>';
+    return '<section class="card start-shelf" id="stShelf">' + shelfInner() + '</section>';
+  }
+
+  function tabBtn(key, label, n, tab) {
+    var on = tab === key;
+    return '<button class="start-shelf__tab' + (on ? ' is-on' : '') + '" data-shelf="' + key + '" role="tab" aria-selected="' + on + '">' +
+      '<span>' + label + '</span>' + (n != null ? '<i>' + u.fmtInt(n) + '</i>' : '') + '</button>';
   }
 
   function shelfInner() {
     var s = G.store.state;
     var tab = currentTab();
+    var allCount = (G.store.activePlaylist() || {}).count;
+
+    var head = '<div class="start-shelf__tabs" role="tablist">' +
+        tabBtn('fav', 'Favoriten', s.favorites.length, tab) +
+        tabBtn('all', 'Alle Sender', allCount || null, tab) +
+        tabBtn('recent', 'Zuletzt gesehen', s.recent.length, tab) +
+      '</div>';
+
+    var body;
+    if (tab === 'all') body = allHead() + '<div class="start-shelf__grid" id="stGrid"></div><div class="start-shelf__more" id="stMore"></div>';
+    else body = listBody(tab);
+
+    return head + body;
+  }
+
+  function listBody(tab) {
+    var s = G.store.state;
     var playing = G.player.channel;
     var list = tab === 'fav' ? s.favorites : s.recent;
 
-    var tabBtn = function (key, icon, label, n) {
-      var on = tab === key;
-      return '<button class="start-shelf__tab' + (on ? ' is-on' : '') + '" data-shelf="' + key + '" role="tab" aria-selected="' + on + '">' +
-        u.icon(icon, 16) + '<span>' + label + '</span><i>' + n + '</i></button>';
-    };
-
-    var body;
     if (!list.length) {
-      body = '<p class="start-shelf__empty">' + (tab === 'fav'
+      return '<p class="start-shelf__empty">' + (tab === 'fav'
         ? 'Markiere Sender mit einem Stern — sie erscheinen dann hier.'
         : 'Noch nichts gesehen — gespielte Sender erscheinen hier.') + '</p>';
-    } else {
-      body = '<div class="start-favs__row' + (list.length > 4 ? ' start-favs__row--two' : '') + '" id="stFavRow">' +
+    }
+    return '<div class="start-shelf__grid">' +
         list.map(function (c) {
           return tile(c, playing && G.m3u.sameSource(playing.url, c.url), tab === 'recent' ? u.relTime(c.at) : '');
         }).join('') +
-      '</div>';
-    }
-
-    return '<div class="card__head start-shelf__head">' +
-        '<div class="start-shelf__tabs" role="tablist">' +
-          tabBtn('fav', 'star', 'Favoriten', s.favorites.length) +
-          tabBtn('recent', 'history', 'Zuletzt gesehen', s.recent.length) +
-        '</div>' +
-        '<span class="spacer"></span>' +
-        '<button class="start-favs__arrow" data-scroll="-1" aria-label="Zurück" title="Zurück">' + u.icon('chevron', 16) + '</button>' +
-        '<button class="start-favs__arrow" data-scroll="1" aria-label="Weiter" title="Weiter">' + u.icon('chevron', 16) + '</button>' +
-        (tab === 'fav'
-          ? '<button class="btn btn--sm" data-go="favorites">Alle</button>'
-          : (s.recent.length ? '<button class="btn btn--sm btn--ghost" id="stClearRecent">Leeren</button>' : '')) +
-      '</div>' + body;
+      '</div>' +
+      (tab === 'recent'
+        ? '<div class="start-shelf__foot"><button class="btn btn--sm btn--ghost" id="stClearRecent">' + u.icon('trash', 14) + ' Verlauf leeren</button></div>'
+        : '');
   }
 
-  function quickCard() {
-    return '<section class="card start-quick">' +
-      '<div class="start-quick__head">' +
-        '<div class="start-quick__title"><span class="start-quick__bolt">ϟ</span><h3>Schnellstart</h3></div>' +
-        '<span class="start-quick__hint">IN WENIGEN SCHRITTEN ZUM FERNSEHEN</span>' +
-      '</div>' +
-      '<div class="start-steps">' +
-        '<button class="start-step" data-go="playlists"><span class="start-step__num">1</span><span class="start-step__icon">' + u.icon('link', 30) + '</span><span class="start-step__label">Playlist hinzufügen</span></button>' +
-        '<span class="start-step__line" aria-hidden="true"></span>' +
-        '<button class="start-step" data-go="live"><span class="start-step__num">2</span><span class="start-step__icon">' + u.icon('grid', 30) + '</span><span class="start-step__label">Sender auswählen</span></button>' +
-        '<span class="start-step__line" aria-hidden="true"></span>' +
-        '<button class="start-step" data-go="live"><span class="start-step__num">3</span><span class="start-step__icon">' + u.icon('live', 30) + '</span><span class="start-step__label">Fernsehen</span></button>' +
-      '</div>' +
-    '</section>';
-  }
-
-  function hintCard() {
+  /** Suche und - bei mehreren Playlisten - Auswahl der Playlist */
+  function allHead() {
     var s = G.store.state;
     if (!s.playlists.length) return '';
-    if (!G.store.storageOk) {
-      return '<div class="note note--warn">' + u.icon('warn', 18) +
-        '<div><b>Kein lokaler Speicher.</b> Der Browser blockiert Website-Daten. G04TV vergisst Playlisten und Favoriten beim Schließen.</div></div>';
+    return '<div class="start-shelf__tools">' +
+        '<div class="search start-shelf__search">' + u.icon('search', 16) +
+          '<input class="input" id="stSearch" type="search" inputmode="search" autocomplete="off" ' +
+          'placeholder="Sender suchen …" value="' + u.esc(allQuery) + '"></div>' +
+        (s.playlists.length > 1
+          ? '<select class="select start-shelf__pick" id="stPick" aria-label="Playlist">' +
+              s.playlists.map(function (p) {
+                return '<option value="' + u.esc(p.id) + '"' + (p.id === s.activeId ? ' selected' : '') + '>' + u.esc(p.name) + '</option>';
+              }).join('') +
+            '</select>'
+          : '') +
+      '</div>';
+  }
+
+  /* ---------- Alle Sender: laden, filtern, stueckweise zeigen ---------- */
+  async function loadAll() {
+    var grid = u.$('#stGrid');
+    var s = G.store.state;
+    if (!grid) return;
+
+    if (!s.playlists.length) {
+      grid.outerHTML = '<div class="start-shelf__none">' +
+        '<p>Noch keine Playlist — trage zuerst eine ein.</p>' +
+        '<button class="btn btn--primary btn--sm" data-go="playlists">' + u.icon('plus', 15) + ' Playlist hinzufügen</button></div>';
+      return;
     }
-    return '<div class="note note--acc">' + u.icon('shield', 18) +
-      '<div><b>Alles bleibt auf dem Gerät.</b> Playlisten, Favoriten und Zugänge werden nur lokal gespeichert. Es gibt kein Konto und keinen Server.</div></div>';
+
+    if (!allPool || allPoolId !== s.activeId) {
+      grid.innerHTML = '<p class="start-shelf__empty">' + tr('Sender werden geladen …') + '</p>';
+      var id = s.activeId;
+      var pool = await G.library.pool(id);
+      if (id !== G.store.state.activeId) return;     // inzwischen umgeschaltet
+      allPool = pool; allPoolId = id;
+    }
+    if (!u.$('#stGrid')) return;                      // Ansicht verlassen
+    applyAll();
+  }
+
+  function applyAll() {
+    allList = G.library.filter(allPool || [], allQuery, '*');
+    allShown = 0;
+    var grid = u.$('#stGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    if (!allList.length) {
+      grid.innerHTML = '<p class="start-shelf__empty">' + tr('Nichts gefunden') + '</p>';
+      paintMore();
+      return;
+    }
+    moreAll();
+  }
+
+  function moreAll() {
+    var grid = u.$('#stGrid');
+    if (!grid) return;
+    var playing = G.player.channel;
+    var next = allList.slice(allShown, allShown + CHUNK);
+    allShown += next.length;
+    grid.insertAdjacentHTML('beforeend', next.map(function (c) {
+      return tile(c, playing && G.m3u.sameSource(playing.url, c.url));
+    }).join(''));
+    paintMore();
+  }
+
+  /** Fusszeile: wie viele gezeigt; ein unsichtbarer Wächter laedt nach. */
+  function paintMore() {
+    var more = u.$('#stMore');
+    if (!more) return;
+    var rest = allList.length - allShown;
+    more.innerHTML = allList.length
+      ? '<span>' + u.fmtInt(allShown) + ' / ' + u.fmtInt(allList.length) + '</span>' +
+        (rest > 0 ? '<button class="btn btn--sm" id="stMoreBtn">' + tr('Weitere laden') + '</button>' : '')
+      : '';
+    var btn = u.$('#stMoreBtn');
+    if (btn) btn.onclick = moreAll;
+
+    if (observer) observer.disconnect();
+    if (rest > 0 && 'IntersectionObserver' in window) {
+      observer = new IntersectionObserver(function (entries) {
+        if (entries.some(function (e) { return e.isIntersecting; })) moreAll();
+      }, { rootMargin: '600px 0px' });
+      observer.observe(more);
+    }
+  }
+
+  /** Alle Sender: zu einer URL das Sender-Objekt finden (fuer data-play) */
+  function findChannel(url) {
+    var s = G.store.state;
+    var lists = [s.favorites, s.recent, s.channels, allPool || []];
+    for (var i = 0; i < lists.length; i++) {
+      for (var j = 0; j < lists[i].length; j++) {
+        if (G.m3u.sameSource(lists[i][j].url, url)) return lists[i][j];
+      }
+    }
+    return null;
   }
 
   function render() {
-    var st = G.store.state;
-    var hasShelf = st.favorites.length > 0 || st.recent.length > 0;
-    var left = hasShelf ? '' : favCard();
-    var right = playlistCard() + hintCard();
     return '<div class="view start-view">' +
       liveCard() +
-      // Mit Favoriten: eigene Reihe ueber die volle Breite. Ohne: die
-      // leere Karte mit Bild wie bisher im Raster.
-      (hasShelf ? shelfCard() : '') +
-      // Bleibt eine Spalte leer (noch kein Verlauf), nimmt die andere die volle Breite.
-      '<div class="start-grid' + (left && right ? '' : ' start-grid--single') + '">' +
-        (left ? '<div class="stack">' + left + '</div>' : '') +
-        (right ? '<div class="stack">' + right + '</div>' : '') +
-      '</div>' +
-      quickCard() +
+      shelfCard() +
     '</div>';
   }
 
@@ -305,72 +328,50 @@
     off.push(function () { document.removeEventListener('g04tv:player', onPlayer); });
 
     u.on(host, 'click', '[data-play]', function (e, t) {
-      var url = t.getAttribute('data-play');
-      var s = G.store.state;
-      var c = s.favorites.concat(s.recent, s.channels)
-        .filter(function (x) { return G.m3u.sameSource(x.url, url); })[0];
+      var c = findChannel(t.getAttribute('data-play'));
       if (!c) return;
       G.views.live.playChannel(c);
       // Das Bild sitzt oben auf der Startseite - dorthin zurueck.
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
-    // Pfeile: um eine knappe Reihenbreite weiter
-    u.on(host, 'click', '[data-scroll]', function (e, t) {
-      var row = u.$('#stFavRow');
-      if (!row) return;
-      row.scrollBy({ left: +t.getAttribute('data-scroll') * row.clientWidth * 0.85, behavior: 'smooth' });
-    });
-
-    // Umschalter Favoriten | Zuletzt gesehen
+    // Umschalter Favoriten | Alle Sender | Zuletzt gesehen
     u.on(host, 'click', '[data-shelf]', function (e, t) {
       var next = t.getAttribute('data-shelf');
-      if (next === shelfTab) return;
+      if (next === currentTab()) return;
       shelfTab = next;
       try { localStorage.setItem(TAB_KEY, next); } catch (err) { /* optional */ }
       paintShelf();
     });
 
-    var onResize = function () { paintArrows(); };
-    window.addEventListener('resize', onResize);
-    off.push(function () { window.removeEventListener('resize', onResize); });
-
-    wireShelf(true);
-    u.on(host, 'click', '[data-open]', function (e, t) {
-      G.store.setActive(t.getAttribute('data-open'));
-      G.app.go('live');
-    });
-
+    off.push(function () { if (observer) { observer.disconnect(); observer = null; } });
+    wireShelf();
   }
 
-  /** Nur die Regal-Kachel neu zeichnen - das Bild oben bleibt unberuehrt. */
+  /** Nur die Sender-Kachel neu zeichnen - das Bild oben bleibt unberuehrt. */
   function paintShelf() {
     var card = u.$('#stShelf');
     if (!card) return;
+    if (observer) { observer.disconnect(); observer = null; }
     card.innerHTML = shelfInner();
-    wireShelf(false);
+    wireShelf();
   }
 
-  function paintArrows() {
-    var row = u.$('#stFavRow');
-    var card = u.$('#stShelf');
-    if (!card) return;
-    var max = row ? row.scrollWidth - row.clientWidth : 0;
-    var prev = u.$('[data-scroll="-1"]', card), next = u.$('[data-scroll="1"]', card);
-    if (prev) prev.disabled = !row || row.scrollLeft <= 2;
-    if (next) next.disabled = !row || row.scrollLeft >= max - 2;
-    card.classList.toggle('is-scrollable', max > 2);
-  }
-
-  function wireShelf(first) {
-    var row = u.$('#stFavRow');
-    if (row) {
-      row.addEventListener('scroll', paintArrows, { passive: true });
-      // Beim Oeffnen: der laufende Sender soll sichtbar sein
-      var on = first && row.querySelector('.ch-tile.is-playing');
-      if (on) row.scrollLeft = Math.max(0, on.offsetLeft - row.offsetLeft - 12);
+  function wireShelf() {
+    if (currentTab() === 'all') {
+      var search = u.$('#stSearch');
+      if (search) search.addEventListener('input', u.debounce(function () {
+        allQuery = search.value.trim();
+        applyAll();
+      }, 200));
+      var pick = u.$('#stPick');
+      if (pick) pick.addEventListener('change', function () {
+        G.store.setActive(pick.value);
+        allQuery = '';
+        paintShelf();
+      });
+      loadAll();
     }
-    paintArrows();
 
     var clear = u.$('#stClearRecent');
     if (clear) clear.onclick = async function () {
@@ -390,6 +391,23 @@
     G.dock.place(null);
   }
 
+  /** Schnellstart - steht jetzt in den Einstellungen */
+  function quickCard() {
+    return '<section class="card start-quick">' +
+      '<div class="start-quick__head">' +
+        '<div class="start-quick__title"><span class="start-quick__bolt">ϟ</span><h3>Schnellstart</h3></div>' +
+        '<span class="start-quick__hint">IN WENIGEN SCHRITTEN ZUM FERNSEHEN</span>' +
+      '</div>' +
+      '<div class="start-steps">' +
+        '<button class="start-step" data-go="playlists"><span class="start-step__num">1</span><span class="start-step__icon">' + u.icon('link', 30) + '</span><span class="start-step__label">Playlist hinzufügen</span></button>' +
+        '<span class="start-step__line" aria-hidden="true"></span>' +
+        '<button class="start-step" data-go="live"><span class="start-step__num">2</span><span class="start-step__icon">' + u.icon('grid', 30) + '</span><span class="start-step__label">Sender auswählen</span></button>' +
+        '<span class="start-step__line" aria-hidden="true"></span>' +
+        '<button class="start-step" data-go="start"><span class="start-step__num">3</span><span class="start-step__icon">' + u.icon('live', 30) + '</span><span class="start-step__label">Fernsehen</span></button>' +
+      '</div>' +
+    '</section>';
+  }
+
   G.views.start = {
     title: 'Start',
     sub: function () {
@@ -400,6 +418,7 @@
     },
     render: render,
     mount: mount,
-    unmount: unmount
+    unmount: unmount,
+    quickCard: quickCard
   };
 })(G04TV);

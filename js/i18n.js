@@ -600,6 +600,12 @@
     , 'Live-TV': 'Live TV'
     , 'AirPlay hier nicht möglich': 'AirPlay not possible here'
     , 'Dieser Sender läuft als MPEG-TS. AirPlay geht mit HLS-Sendern (.m3u8).': 'This channel plays as MPEG-TS. AirPlay works with HLS channels (.m3u8).'
+    // Startseite vereinfacht
+    , 'Alle Sender': 'All channels'
+    , 'Weitere laden': 'Load more'
+    , 'Verlauf leeren': 'Clear history'
+    , 'Noch keine Playlist — trage zuerst eine ein.': 'No playlist yet — add one first.'
+    , 'Sender werden geladen …': 'Loading channels …'
   };
 
 

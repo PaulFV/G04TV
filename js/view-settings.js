@@ -132,6 +132,9 @@
         '<span class="settings-device">' + u.icon('shield', 18) + ' Nur auf diesem Gerät</span>' +
       '</div>' +
 
+      // Schnellstart (frueher auf der Startseite)
+      (G.views.start && G.views.start.quickCard ? G.views.start.quickCard() : '') +
+
       '<section class="card settings-section">' +
         '<div class="settings-section__head">' + u.icon('grid', 22) + '<h3>Sprache &amp; Darstellung</h3></div>' +
         '<div class="settings-grid settings-grid--2">' +
