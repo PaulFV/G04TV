@@ -575,6 +575,20 @@
     , 'Ohne Konto, ohne Server, ohne Tracking. ': 'No account, no server, no tracking. '
     // Regal
     , 'Noch nichts gesehen — gespielte Sender erscheinen hier.': 'Nothing watched yet — channels you play appear here.'
+    // Feedback-Formular
+    , 'Feedback & Ideen': 'Feedback & ideas'
+    , 'Bug gefunden, eine Idee oder ein Wunsch? Schreib mir eine Nachricht — ganz ohne Konto.': 'Found a bug, have an idea or a wish? Send me a message — no account needed.'
+    , 'Deine Nachricht': 'Your message'
+    , 'Deine E-Mail ': 'Your email '
+    , '(optional, für eine Antwort)': '(optional, for a reply)'
+    , 'Was möchtest du loswerden …': 'What would you like to tell me …'
+    , 'du@beispiel.de': 'you@example.com'
+    , 'Senden': 'Send'
+    , 'Die Nachricht wird über formsubmit.co an den Entwickler geschickt.': 'The message is sent to the developer via formsubmit.co.'
+    , 'Wird gesendet …': 'Sending …'
+    , 'Danke! Deine Nachricht ist unterwegs.': 'Thanks! Your message is on its way.'
+    , 'Senden hat nicht geklappt — bitte nochmal versuchen oder direkt an FodorPaul@web.de schreiben.': 'Sending failed — please try again or write directly to FodorPaul@web.de.'
+    , 'Bitte zuerst eine Nachricht schreiben.': 'Please write a message first.'
   };
 
 
@@ -621,7 +635,9 @@
   }
 
   function doAttrs(el) {
-    if (skip(el)) return;
+    // Textfelder selbst bleiben unberuehrt (Eingaben!), ihr Platzhalter
+    // und ihre Beschriftung fuer Vorleser aber nicht.
+    if (el.tagName === 'TEXTAREA' ? skip(el.parentElement) : skip(el)) return;
     var map = srcAttr.get(el) || {};
     ATTRS.forEach(function (a) {
       if (!el.hasAttribute(a)) return;

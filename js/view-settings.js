@@ -115,29 +115,6 @@
         '</div>' +
       '</div>' +
 
-      /* ---- Feedback ---- */
-      '<div class="card">' +
-        '<div class="card__head">' + u.icon('plus', 18) + '<h3>Feedback & Ideen</h3></div>' +
-        '<div class="stack stack--sm">' +
-          '<p class="small muted">Bug gefunden, eine Idee oder Wunsch? Schreib mir eine Nachricht — ganz ohne Konto.</p>' +
-          '<form id="settingsFeedbackForm" class="stack stack--sm">' +
-            '<div class="field">' +
-              '<label for="feedbackMsg">Deine Nachricht <span class="dim">(erforderlich)</span></label>' +
-              '<textarea id="feedbackMsg" name="message" rows="3" maxlength="2000" required placeholder="Was möchtest du loswerden…" style="font-family:inherit;resize:vertical"></textarea>' +
-            '</div>' +
-            '<div class="field">' +
-              '<label for="feedbackEmail">Deine E-Mail <span class="dim">(optional, für Antwort)</span></label>' +
-              '<input id="feedbackEmail" name="_replyto" type="email" maxlength="120" placeholder="you@example.com" style="font-family:inherit">' +
-            '</div>' +
-            '<input type="text" name="_honey" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none" tabindex="-1" autocomplete="off" aria-hidden="true">' +
-            '<div>' +
-              '<button type="submit" id="settingsFeedbackBtn" class="btn" style="margin-top:4px">' + u.icon('upload', 15) + ' Senden</button>' +
-              '<p id="settingsFeedbackStatus" class="tiny dim" style="margin:6px 0 0"></p>' +
-            '</div>' +
-          '</form>' +
-        '</div>' +
-      '</div>' +
-
       '<p class="tiny dim center">' + u.esc(G.NAME) + ' ' + u.esc(G.VERSION) + '</p>' +
     '</div>';
   }
@@ -232,6 +209,27 @@
         '</div>' +
       '</section>' +
 
+      '<section class="card settings-section settings-feedback">' +
+        '<div class="settings-section__head">' + u.icon('edit', 22) + '<h3>Feedback &amp; Ideen</h3></div>' +
+        '<p class="settings-feedback__intro">Bug gefunden, eine Idee oder ein Wunsch? Schreib mir eine Nachricht — ganz ohne Konto.</p>' +
+        '<form id="settingsFeedbackForm" class="settings-feedback__form" novalidate>' +
+          '<div class="field">' +
+            '<label for="feedbackMsg">Deine Nachricht</label>' +
+            '<textarea class="textarea settings-feedback__msg" id="feedbackMsg" name="message" rows="4" maxlength="2000" required placeholder="Was möchtest du loswerden …"></textarea>' +
+          '</div>' +
+          '<div class="field">' +
+            '<label for="feedbackEmail">Deine E-Mail <span class="dim">(optional, für eine Antwort)</span></label>' +
+            '<input class="input" id="feedbackEmail" name="_replyto" type="email" inputmode="email" autocomplete="email" maxlength="120" placeholder="du@beispiel.de">' +
+          '</div>' +
+          '<input type="text" name="_honey" class="settings-feedback__trap" tabindex="-1" autocomplete="off" aria-hidden="true">' +
+          '<div class="settings-feedback__foot">' +
+            '<button type="submit" id="settingsFeedbackBtn" class="btn btn--primary">' + u.icon('upload', 16) + ' Senden</button>' +
+            '<p id="settingsFeedbackStatus" class="settings-feedback__status" role="status" aria-live="polite"></p>' +
+          '</div>' +
+          '<p class="settings-section__foot">Die Nachricht wird über formsubmit.co an den Entwickler geschickt.</p>' +
+        '</form>' +
+      '</section>' +
+
       '<p class="tiny dim center">' + u.esc(G.NAME) + ' ' + u.esc(G.VERSION) + '</p>' +
     '</div>';
   }
@@ -303,12 +301,19 @@
         e.preventDefault();
         if (feedbackForm._honey.value) return;
         var msg = feedbackForm.message.value.trim();
-        if (!msg) return;
+        if (!msg) {
+          var st = u.$('#settingsFeedbackStatus');
+          st.textContent = tr('Bitte zuerst eine Nachricht schreiben.');
+          st.className = 'settings-feedback__status is-err';
+          feedbackForm.message.focus();
+          return;
+        }
 
         var btn = u.$('#settingsFeedbackBtn');
         var status = u.$('#settingsFeedbackStatus');
         btn.disabled = true;
-        status.textContent = 'Wird gesendet…';
+        status.textContent = tr('Wird gesendet …');
+        status.className = 'settings-feedback__status';
 
         fetch('https://formsubmit.co/ajax/FodorPaul@web.de', {
           method: 'POST',
@@ -322,12 +327,12 @@
           })
         }).then(function (res) {
           if (!res.ok) throw new Error('Status ' + res.status);
-          status.textContent = 'Danke! Deine Nachricht ist unterwegs.';
-          status.style.color = 'var(--ok)';
+          status.textContent = tr('Danke! Deine Nachricht ist unterwegs.');
+          status.className = 'settings-feedback__status is-ok';
           feedbackForm.reset();
         }).catch(function (err) {
-          status.textContent = 'Senden hat nicht geklappt — bitte nochmal versuchen oder direkt an FodorPaul@web.de schreiben.';
-          status.style.color = 'var(--err)';
+          status.textContent = tr('Senden hat nicht geklappt — bitte nochmal versuchen oder direkt an FodorPaul@web.de schreiben.');
+          status.className = 'settings-feedback__status is-err';
         }).finally(function () {
           btn.disabled = false;
         });
