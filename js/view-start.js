@@ -88,7 +88,7 @@
           : '<button class="btn btn--primary start-now__main" id="stPlay">' + u.icon('play', 18) +
             (status === 'error' ? ' Nochmal' : ' Abspielen') + '</button>') +
         '<button class="start-now__icon" id="stExt" aria-label="Extern öffnen" title="Extern öffnen">' + u.icon('external', 20) + '</button>' +
-        '<button class="start-now__icon" data-go="live" aria-label="Alle Sender" title="Alle Sender">' + u.icon('grid', 20) + '</button>' +
+        '<button class="start-now__icon" id="stAll" aria-label="Alle Sender" title="Alle Sender">' + u.icon('grid', 20) + '</button>' +
       '</div>';
   }
 
@@ -107,6 +107,15 @@
 
     var ext = u.$('#stExt');
     if (ext) ext.onclick = function () { G.dock.external(); };
+
+    var all = u.$('#stAll');
+    if (all) all.onclick = function () {
+      showAll(false);
+      pendingJump = null;
+      paintShelf();
+      var card = u.$('#stShelf');
+      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
 
     var star = u.$('#stStar');
     if (star) star.onclick = function () {
@@ -229,6 +238,14 @@
       '</div>';
   }
 
+  /* Von aussen: Reiter "Alle" zeigen (statt des frueheren Bereichs Sender) */
+  var pendingJump = null;      // null | 'shelf' | 'search'
+  function showAll(focusSearch) {
+    shelfTab = 'all';
+    try { localStorage.setItem(TAB_KEY, 'all'); } catch (e) { /* optional */ }
+    pendingJump = focusSearch ? 'search' : 'shelf';
+  }
+
   /* ---------- Alle Sender: laden, filtern, stueckweise zeigen ---------- */
   async function loadAll() {
     var grid = u.$('#stGrid');
@@ -247,6 +264,18 @@
       var id = s.activeId;
       var pool = await G.library.pool(id);
       if (id !== G.store.state.activeId) return;     // inzwischen umgeschaltet
+
+      // Eine gemerkte Playlist, deren Sender nicht mehr in der Ablage stehen
+      // (Browserdaten geloescht, Sicherung eingelesen): einmal nachholen.
+      var p = G.store.activePlaylist();
+      if (p && !p.count && p.kind !== 'file' && p.kind !== 'text' && !p.error) {
+        var g = u.$('#stGrid');
+        if (g) g.innerHTML = '<p class="start-shelf__empty">' + tr('Playlist wird geholt …') + '</p>';
+        var res = await G.library.refresh(p.id);
+        if (res.ok) pool = await G.library.pool(p.id);
+        else u.toast(tr('Playlist nicht erreichbar'), res.error, 'warn', 6000);
+        if (id !== G.store.state.activeId) return;
+      }
       allPool = pool; allPoolId = id;
     }
     if (!u.$('#stGrid')) return;                      // Ansicht verlassen
@@ -349,6 +378,17 @@
 
     off.push(function () { if (observer) { observer.disconnect(); observer = null; } });
     wireShelf();
+
+    // Kam man ueber "Alle Sender" (frueher Bereich Sender): zur Kachel
+    // springen, ggf. gleich ins Suchfeld.
+    if (pendingJump) {
+      var jump = pendingJump; pendingJump = null;
+      setTimeout(function () {
+        var card = u.$('#stShelf');
+        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (jump === 'search') { var f = u.$('#stSearch'); if (f) f.focus({ preventScroll: true }); }
+      }, 80);
+    }
   }
 
   /** Nur die Sender-Kachel neu zeichnen - das Bild oben bleibt unberuehrt. */
@@ -422,6 +462,7 @@
     render: render,
     mount: mount,
     unmount: unmount,
-    quickCard: quickCard
+    quickCard: quickCard,
+    showAll: showAll
   };
 })(G04TV);

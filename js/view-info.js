@@ -36,8 +36,7 @@
       '<div class="card">' +
         '<div class="card__head">' + u.icon('playlists', 18) + '<h3>Die Bereiche</h3></div>' +
         '<div class="list">' +
-          [['start', 'Start', 'Was zuletzt lief, Favoriten, Stand der Playlisten'],
-           ['live', 'Sender', 'Senderliste mit Suche und Gruppen, daneben das Bild'],
+          [['start', 'Start', 'Das Bild, darunter Favoriten, alle Sender mit Suche und der Verlauf'],
            ['playlists', 'Playlisten', 'Quellen eintragen, aktualisieren, ersetzen, löschen'],
            ['favorites', 'Favoriten', 'Die markierten Sender, in eigener Reihenfolge'],
            ['settings', 'Einstellungen', 'Wiedergabe, Vermittler, Sicherung und Löschen'],

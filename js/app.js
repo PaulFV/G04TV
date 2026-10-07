@@ -8,7 +8,6 @@
   /* Die sechs Bereiche - wie die Bereichsleiste in Connect+ */
   var NAV = [
     { k: 'start', n: 'Start', ic: 'start', tab: true },
-    { k: 'live', n: 'Sender', ic: 'live', tab: true },
     { k: 'playlists', n: 'Playlisten', ic: 'playlists', tab: true },
     { k: 'favorites', n: 'Favoriten', ic: 'star', tab: true },
     { k: 'settings', n: 'Einstellungen', ic: 'settings', tab: true },
@@ -163,6 +162,12 @@
   }
 
   function go(key, params) {
+    // Den Bereich "Sender" gibt es nicht mehr - die Startseite kann alles,
+    // was er konnte. Wer dorthin wollte, landet bei Start im Reiter "Alle".
+    if (key === 'live') {
+      key = 'start';
+      if (G.views.start && G.views.start.showAll) G.views.start.showAll(params && params.search);
+    }
     if (!G.views[key]) return;
     current = key;
     currentParams = params || null;
@@ -221,7 +226,7 @@
 
     if (typing) return;
 
-    if (e.key === '/') { e.preventDefault(); var s = u.$('#chSearch'); if (s) { go('live'); setTimeout(function () { var f = u.$('#chSearch'); if (f) f.focus(); }, 60); } else go('live'); return; }
+    if (e.key === '/') { e.preventDefault(); go('live', { search: true }); return; }
     if (e.key === 'f' || e.key === 'F') { G.player.fullscreen(); return; }
     if (e.key === 'm' || e.key === 'M') { G.player.toggleMuted(); G.dock.paintMute(); rerender(); return; }
 
