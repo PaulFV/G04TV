@@ -1,6 +1,6 @@
 # Datenschutzerklärung — G04TV
 
-Stand: 12. September 2026
+Stand: 6. Oktober 2026
 
 ## Kurz
 
@@ -8,7 +8,8 @@ G04TV ist eine reine Web-App ohne Betreiber-Backend. Es gibt **kein Benutzerkont
 **keine Werbung**, **keine Analyse** und **kein Tracking**. Alles, was G04TV selbst speichert, bleibt in
 dem Browser, in dem es eingetragen wurde. Ein vom Nutzer selbst eingetragener Vermittler/Proxy ist davon
 zu unterscheiden: An ihn können Playlist- und Stream-Adressen einschließlich eingebetteter Zugangsdaten
-übertragen werden.
+übertragen werden. Ebenso davon zu unterscheiden ist das freiwillige Feedback-Formular: Wer es abschickt,
+überträgt seine Nachricht über den Drittanbieter FormSubmit an den Entwickler (siehe unten).
 
 ## Verantwortlich und Kontakt
 
@@ -48,6 +49,20 @@ G04TV baut nur die Verbindungen auf, die für die Wiedergabe nötig sind:
   Gegenüber deinem Anbieter tritt in diesem Fall der Vermittler an deine Stelle: dessen
   IP-Adresse wird sichtbar, nicht mehr deine.
 
+## Feedback-Formular
+
+Unter *Einstellungen › Feedback & Ideen* kann eine Nachricht an den Entwickler geschickt werden. Übertragen
+wird nur, wenn du selbst auf **Senden** tippst:
+
+* **Was:** der Text der Nachricht, deine E-Mail-Adresse, falls du eine einträgst (freiwillig, nur für eine
+  Antwort), sowie Name und Version der App. Playlisten, Senderlisten, Zugangsdaten oder der Verlauf werden
+  **nicht** gesendet.
+* **An wen:** an den Drittanbieter FormSubmit (`formsubmit.co`), der die Nachricht per E-Mail an den
+  Entwickler weiterleitet. FormSubmit erhält dabei die Anfrage samt IP-Adresse und verarbeitet sie nach
+  eigenen Bedingungen und eigener Datenschutzerklärung.
+* **Wofür und wie lange:** nur um zu antworten und G04TV zu verbessern. Die Nachricht bleibt so lange im
+  Postfach des Entwicklers, wie es dafür nötig ist; eine Löschung kannst du jederzeit verlangen.
+
 Wird G04TV über GitHub Pages aufgerufen, gelten für das Ausliefern der Programmdateien die
 Bedingungen von GitHub; dabei fällt serverseitig die IP-Adresse an. Über `file://` oder einen
 eigenen Webserver entfällt auch das.
@@ -63,7 +78,8 @@ Browser.
 Für eine Veröffentlichung im Google Play Store muss die Data-Safety-Erklärung in der Play Console die
 tatsächlich ausgelieferte Android-Version, die TWA und alle verwendeten Bibliotheken abbilden. Auch wenn
 G04TV kein Konto und kein Tracking hat, können vom Nutzer eingetragene Adressen an den gewählten Anbieter
-oder einen aktivierten Proxy gesendet werden. Die Angaben dürfen deshalb nicht pauschal als „keine
+oder einen aktivierten Proxy gesendet werden, und über das Feedback-Formular freiwillig Nachrichten und
+E-Mail-Adressen an FormSubmit. Die Angaben dürfen deshalb nicht pauschal als „keine
 Datenübertragung“ eingetragen werden.
 
 ## Inhalte
