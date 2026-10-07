@@ -105,7 +105,7 @@
   <div class="stage" id="stage">
     <!-- Kein crossorigin: sonst verlangt der Browser auch beim eingebauten
          Weg CORS-Kopfzeilen, die die wenigsten Anbieter mitschicken. -->
-    <video id="video" playsinline webkit-playsinline preload="none"></video>
+    <video id="video" playsinline webkit-playsinline x-webkit-airplay="allow" preload="none"></video>
 
     <div class="stage__idle" id="stageIdle">
       <span class="stage__mark">
@@ -127,6 +127,7 @@
     </div>
 
     <div class="stage__bar">
+      <button class="icon-btn" id="stageAirplay" aria-label="AirPlay" title="AirPlay" hidden></button>
       <button class="icon-btn" id="stageMute" aria-label="Ton"></button>
       <button class="icon-btn" id="stageFull" aria-label="Vollbild"></button>
     </div>
@@ -167,6 +168,7 @@
 <script src="js/player.js"></script>
 <script src="js/library.js"></script>
 <script src="js/dock.js"></script>
+<script src="js/carplay.js"></script>
 <script src="js/view-start.js"></script>
 <script src="js/view-live.js"></script>
 <script src="js/view-playlists.js"></script>
