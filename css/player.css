@@ -283,3 +283,6 @@
   .stage__idle b{font-size:14.5px}
   .stage__idle p{font-size:12px}
 }
+
+/* AirPlay-Knopf im Bild: leuchtet, solange ueber AirPlay gespielt wird */
+#stageAirplay.is-on{color:var(--acc);border-color:var(--acc-line)}
