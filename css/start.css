@@ -268,3 +268,43 @@
   .start-step__icon svg{width:22px;height:22px}
   .start-step__label{font-size:11.5px;line-height:1.2}
 }
+
+/* ============================================================
+   Startseite (vereinfacht): eine Kachel mit drei Reitern,
+   Sender im Raster nach unten
+   ============================================================ */
+.start-shelf{padding:14px 16px 16px}
+.start-shelf__tabs{display:flex;gap:3px;padding:3px;border-radius:13px;border:1px solid var(--glass-br);background:rgba(0,0,0,.22)}
+.start-shelf .start-shelf__tab{flex:1 1 auto;justify-content:center}
+.start-shelf__grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-top:14px;
+}
+.start-shelf__tools{display:flex;gap:8px;margin-top:12px}
+.start-shelf__search{flex:1;min-width:0}
+.start-shelf__search .input{height:42px}
+.start-shelf__pick{flex:0 1 40%;min-width:0;height:42px}
+.start-shelf__more{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:12px;color:var(--tx-2);font-size:12.5px;min-height:20px}
+.start-shelf__foot{display:flex;justify-content:center;margin-top:12px}
+.start-shelf__none{display:flex;flex-direction:column;align-items:center;gap:10px;margin:18px 0 6px;text-align:center;color:var(--tx-2);font-size:14px}
+.start-shelf__empty{margin:16px 0 6px;color:var(--tx-2);font-size:14px;text-align:center}
+
+@media (max-width:620px){
+  .start-shelf{padding:10px 10px 12px}
+  .start-shelf__tab{height:34px;padding:0 6px;font-size:12.5px}
+  .start-shelf__grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+  .start-shelf__tools{margin-top:10px;gap:6px}
+  .start-shelf__search .input,.start-shelf__pick{height:38px;font-size:14px}
+  .start-shelf__pick{flex-basis:38%}
+}
+/* Kleine iPhones: Zahlen in den Reitern weglassen */
+@media (max-width:400px){
+  .start-shelf__tab i{display:none}
+}
+
+/* Play-Knopf im Ruhebild: etwas groesser */
+.stage__mark{width:62px;height:62px;border-radius:18px}
+.stage__mark svg{width:27px;height:27px}
+@media (max-width:620px){
+  .stage__mark{width:56px;height:56px;border-radius:16px}
+  .stage__mark svg{width:24px;height:24px}
+}
