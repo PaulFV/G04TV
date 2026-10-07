@@ -273,7 +273,7 @@
    Startseite (vereinfacht): eine Kachel mit drei Reitern,
    Sender im Raster nach unten
    ============================================================ */
-.start-shelf{padding:14px 16px 16px}
+.start-shelf{padding:14px 16px 16px;scroll-margin-top:84px}
 .start-shelf__tabs{display:flex;gap:3px;padding:3px;border-radius:13px;border:1px solid var(--glass-br);background:rgba(0,0,0,.22)}
 .start-shelf .start-shelf__tab{flex:1 1 auto;justify-content:center}
 .start-shelf__grid{
