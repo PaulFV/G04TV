@@ -153,3 +153,26 @@
   .settings-platforms{gap:8px;padding:4px 0 6px}
   .settings-platform{padding-bottom:8px}
 }
+
+/* ---------- Feedback & Ideen ---------- */
+.settings-feedback__intro{color:var(--tx-1);font-size:14px;line-height:1.5;margin:-4px 0 12px}
+.settings-feedback__form{display:flex;flex-direction:column;gap:12px}
+.settings-feedback__msg{font-family:var(--font);font-size:15px;line-height:1.5;min-height:110px}
+.settings-feedback__form .input{height:46px}
+.settings-feedback__trap{position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none}
+.settings-feedback__foot{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.settings-feedback__foot .btn{min-height:44px;padding-left:22px;padding-right:22px}
+.settings-feedback__status{margin:0;font-size:13px;color:var(--tx-2)}
+.settings-feedback__status.is-ok{color:#34D399}
+.settings-feedback__status.is-err{color:var(--danger)}
+.settings-feedback .settings-section__foot{margin-top:2px}
+@media (max-width:620px){
+  .settings-feedback__intro{font-size:12.5px;margin:0 0 8px}
+  .settings-feedback__form{gap:8px;padding-bottom:6px}
+  .settings-feedback__form .field > label{font-size:12.5px}
+  .settings-feedback__msg{min-height:84px;font-size:15px}
+  .settings-feedback__form .input{height:40px}
+  .settings-feedback__foot{gap:10px}
+  .settings-feedback__foot .btn{min-height:38px;font-size:13.5px;padding:6px 16px}
+  .settings-feedback__status{font-size:12px}
+}

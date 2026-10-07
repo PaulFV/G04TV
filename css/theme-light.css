@@ -179,3 +179,4 @@
 [data-theme="light"] .start-shelf__tabs{background:rgba(16,44,66,.05)}
 [data-theme="light"] .start-shelf__tab i{background:rgba(16,44,66,.07)}
 [data-theme="light"] .start-shelf__tab.is-on{background:linear-gradient(180deg,rgba(10,143,194,.16),rgba(10,143,194,.08));box-shadow:inset 0 0 0 1px rgba(10,143,194,.45)}
+[data-theme="light"] .settings-feedback__status.is-ok{color:#0F8A5F}
