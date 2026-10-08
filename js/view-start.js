@@ -21,7 +21,10 @@
   // merkt den Sender als Favorit oder nimmt ihn wieder heraus.
   function tile(c, playing, sub) {
     var fav = G.store.isFavorite(c.url);
-    return '<div class="ch-tile ch-tile--star' + (playing ? ' is-playing' : '') + '" role="button" tabindex="0" data-play="' + u.esc(c.url) + '">' +
+    var L = G.lock, withLock = L && L.hasCode();
+    var locked = withLock && L.isLocked(c);
+    return '<div class="ch-tile ch-tile--star' + (playing ? ' is-playing' : '') + (locked ? ' is-locked' : '') + (locked && L.isOpen() ? ' is-open' : '') + '" role="button" tabindex="0" data-play="' + u.esc(c.url) + '">' +
+      (withLock ? lockBtn(c) : '') +
       u.logoHtml(c, 'ch-tile__logo') +
       '<span class="ch-tile__name">' + u.esc(c.name) + '</span>' +
       '<span class="ch-tile__grp">' + u.esc(sub || c.group || '—') + '</span>' +
@@ -29,6 +32,50 @@
         'aria-label="' + (fav ? 'Favorit entfernen' : 'Als Favorit merken') + '" title="Favorit">' +
         u.icon(fav ? 'starFill' : 'star', 15) + '</button>' +
     '</div>';
+  }
+
+  /** Schloss oben links auf der Kachel (nur wenn ein Code festgelegt ist) */
+  function lockBtn(c) {
+    var why = G.lock.reason(c);
+    var own = why === 'channel';
+    var title = own ? 'Sperre aufheben' : why ? 'Gesperrt über Kategorie oder Playlist' : 'Sender sperren';
+    return '<button class="ch-tile__lock' + (own ? ' is-on' : why ? ' is-inherit' : '') + '" type="button" data-lock="' + u.esc(c.url) + '" ' +
+      'aria-label="' + title + '" title="' + title + '">' + u.icon(why ? 'lock' : 'unlock', 14) + '</button>';
+  }
+
+  /** Schloesser und Sperr-Zustand der sichtbaren Kacheln auffrischen (ohne neu zu zeichnen) */
+  function refreshLocks() {
+    var host = u.$('#stShelf');
+    if (!host) return;
+    var L = G.lock, withLock = L && L.hasCode();
+    host.classList.toggle('has-lock', !!withLock);
+    u.$$('.ch-tile[data-play]', host).forEach(function (t) {
+      var c = findChannel(t.getAttribute('data-play'));
+      if (!c) return;
+      var locked = withLock && L.isLocked(c);
+      t.classList.toggle('is-locked', !!locked);
+      t.classList.toggle('is-open', !!locked && L.isOpen());
+      var b = t.querySelector('.ch-tile__lock');
+      if (withLock) {
+        var html = lockBtn(c);
+        if (b) b.outerHTML = html; else t.insertAdjacentHTML('afterbegin', html);
+      } else if (b) b.remove();
+    });
+    u.$$('.start-shelf__cat', host).forEach(function (h) {
+      var name = h.getAttribute('data-cat');
+      var b = h.querySelector('[data-lockcat]');
+      if (withLock) {
+        var html = catLockBtn(name);
+        if (b) b.outerHTML = html; else h.insertAdjacentHTML('beforeend', html);
+      } else if (b) b.remove();
+    });
+  }
+
+  function catLockBtn(name) {
+    var on = G.lock.groupLocked(name);
+    var title = on ? 'Kategorie entsperren' : 'Kategorie sperren';
+    return '<button class="start-shelf__catlock' + (on ? ' is-on' : '') + '" type="button" data-lockcat="' + u.esc(name) + '" aria-label="' + title + '" title="' + title + '">' +
+      u.icon(on ? 'lock' : 'unlock', 14) + '</button>';
   }
 
   /* ------------------------------------------------------------
@@ -179,7 +226,7 @@
   }
 
   function shelfCard() {
-    return '<section class="card start-shelf' + (viewMode() === 'list' ? ' is-list' : '') + '" id="stShelf">' + shelfInner() + '</section>';
+    return '<section class="card start-shelf' + (viewMode() === 'list' ? ' is-list' : '') + (G.lock && G.lock.hasCode() ? ' has-lock' : '') + '" id="stShelf">' + shelfInner() + '</section>';
   }
 
   // Jeder Reiter mit eigenem Zeichen und eigener Farbe (siehe start.css)
@@ -323,6 +370,18 @@
       return;
     }
 
+    // Ganze Playlist gesperrt: erst nach dem Code
+    if (G.lock && G.lock.playlistLocked(s.activeId) && !G.lock.isOpen()) {
+      var cats0 = u.$('#stCats'); if (cats0) { cats0.innerHTML = ''; cats0.hidden = true; }
+      grid.innerHTML = '<div class="start-shelf__none start-shelf__locked">' + u.icon('lock', 30) +
+        '<p>' + tr('Diese Playlist ist gesperrt.') + '</p>' +
+        '<button class="btn btn--primary btn--sm" id="stUnlockPl">' + u.icon('unlock', 15) + ' ' + tr('Entsperren') + '</button></div>';
+      var more0 = u.$('#stMore'); if (more0) more0.innerHTML = '';
+      var ub = u.$('#stUnlockPl');
+      if (ub) ub.onclick = async function () { if (await G.lock.ask()) paintShelf(); };
+      return;
+    }
+
     if (!allPool || allPoolId !== s.activeId) {
       grid.innerHTML = '<p class="start-shelf__empty">' + tr('Sender werden geladen …') + '</p>';
       var id = s.activeId;
@@ -381,7 +440,8 @@
         var g = allGroups.filter(function (x) { return x.name === lastGroup; })[0];
         head = '<div class="start-shelf__cat" data-cat="' + u.esc(lastGroup) + '">' +
           '<span>' + u.esc(groupLabel(lastGroup)) + '</span>' +
-          (g && !allQuery ? '<i>' + u.fmtInt(g.count) + '</i>' : '') + '</div>';
+          (g && !allQuery ? '<i>' + u.fmtInt(g.count) + '</i>' : '') +
+          (G.lock && G.lock.hasCode() ? catLockBtn(lastGroup) : '') + '</div>';
       }
       return head + tile(c, playing && G.m3u.sameSource(playing.url, c.url));
     }).join(''));
@@ -481,6 +541,39 @@
     document.addEventListener('g04tv:airplay', paintNow);
     off.push(function () { document.removeEventListener('g04tv:airplay', paintNow); });
 
+    // Schloss auf einer Kachel: Sender sperren/entsperren (braucht den Code)
+    u.on(host, 'click', '[data-lock]', async function (e, t) {
+      e.stopPropagation();
+      var c = findChannel(t.getAttribute('data-lock'));
+      if (!c) return;
+      var why = G.lock.reason(c);
+      if (why && why !== 'channel') {
+        u.toast(tr('Gesperrt über Kategorie oder Playlist'), tr('Dort lässt sich die Sperre aufheben.'), 'warn', 3500);
+        return;
+      }
+      var on = await G.lock.toggleChannel(c);
+      if (on == null) return;
+      u.toast(on ? tr('Sender gesperrt') : tr('Sperre aufgehoben'), c.name, 'ok', 2000);
+    });
+    // Schloss an einer Kategorie-Ueberschrift
+    u.on(host, 'click', '[data-lockcat]', async function (e, t) {
+      e.stopPropagation();
+      var name = t.getAttribute('data-lockcat');
+      var on = await G.lock.toggleGroup(name);
+      if (on == null) return;
+      u.toast(on ? tr('Kategorie gesperrt') : tr('Sperre aufgehoben'), groupLabel(name), 'ok', 2000);
+    });
+    var onLock = function () {
+      paintNow();
+      // gesperrte Playlist im Reiter "Alle": Platzhalter <-> Liste
+      var s0 = G.store.state;
+      if (currentTab() === 'all' && G.lock.playlistLocked(s0.activeId) !== !!u.$('.start-shelf__locked')
+          || (currentTab() === 'all' && u.$('.start-shelf__locked') && G.lock.isOpen())) { paintShelf(); return; }
+      refreshLocks();
+    };
+    document.addEventListener('g04tv:lock', onLock);
+    off.push(function () { document.removeEventListener('g04tv:lock', onLock); });
+
     // Stern auf einer Kachel: Favorit an/aus - ohne abzuspielen
     u.on(host, 'click', '[data-fav]', function (e, t) {
       e.stopPropagation();
@@ -507,7 +600,7 @@
     });
 
     u.on(host, 'click', '[data-play]', function (e, t) {
-      if (e.target.closest('[data-fav]')) return;
+      if (e.target.closest('[data-fav], [data-lock]')) return;
       var c = findChannel(t.getAttribute('data-play'));
       if (!c) return;
       // Das Bild klebt oben - die Liste bleibt, wo sie ist.
@@ -583,6 +676,7 @@
       });
       var grid = u.$('#stGrid');
       if (grid) grid.addEventListener('click', function (e) {
+        if (e.target.closest('[data-lockcat]')) return;
         var h = e.target.closest('.start-shelf__cat');
         if (!h) return;
         allGroup = h.getAttribute('data-cat');

@@ -37,7 +37,12 @@
     var list = stepList(current);
     if (!list.length) return;
     var i = current ? list.findIndex(function (c) { return G.m3u.sameSource(c.url, current.url); }) : -1;
-    var next = list[(i + dir + list.length) % list.length];
+    // Gesperrte Sender ueberspringen (im Auto gibt es kein Zahlenfeld)
+    var next = null;
+    for (var n = 1; n <= list.length; n++) {
+      var cand = list[(i + dir * n + list.length * n) % list.length];
+      if (!G.lock || !G.lock.isLocked(cand) || G.lock.isOpen()) { next = cand; break; }
+    }
     if (!next) return;
     // Verlauf nicht umsortieren, solange durch ihn geschaltet wird -
     // sonst springt die Reihenfolge bei jedem Druck auf "Weiter".

@@ -36,6 +36,7 @@
     var active = p.id === G.store.state.activeId;
     // Immer maskieren: ein Kennwort steht nicht nur in Xtream-Adressen.
     var source = G.xtream.masked(p.source);
+    var locked = !!(G.lock && G.lock.playlistLocked(p.id));
 
     return '<article class="pl-card' + (active ? ' is-active' : '') + '" data-pl="' + u.esc(p.id) + '">' +
       '<div class="pl-card__head">' +
@@ -51,6 +52,7 @@
         '<span class="pill">' + u.fmtInt(p.count) + ' Sender</span>' +
         '<span class="pill pill--muted">' + u.icon('clock', 12) + ' ' + u.esc(u.relTime(p.updatedAt)) + '</span>' +
         (p.volatile ? '<span class="pill pill--gold">nur im Arbeitsspeicher</span>' : '') +
+        (locked ? '<span class="pill pill--lock">' + u.icon('lock', 12) + ' Gesperrt</span>' : '') +
       '</div>' +
 
       (p.error
@@ -66,6 +68,9 @@
           ? '<button class="btn btn--sm" data-act="replace">' + u.icon('upload', 14) + ' Ersetzen</button>'
           : '<button class="btn btn--sm" data-act="refresh"' + (busy[p.id] ? ' disabled' : '') + '>' +
             u.icon('refresh', 14) + ' Aktualisieren</button>') +
+        (G.lock && G.lock.hasCode()
+          ? '<button class="btn btn--sm pl-card__lock' + (locked ? ' is-on' : '') + '" data-act="lock" title="' + (locked ? 'Sperre aufheben' : 'Playlist sperren') + '" aria-label="' + (locked ? 'Sperre aufheben' : 'Playlist sperren') + '">' + u.icon(locked ? 'lock' : 'unlock', 14) + '</button>'
+          : '') +
         '<button class="btn btn--sm" data-act="rename">' + u.icon('edit', 14) + '</button>' +
         '<button class="btn btn--sm btn--danger" data-act="delete">' + u.icon('trash', 14) + '</button>' +
       '</div>' +
@@ -428,6 +433,14 @@
   async function action(act, id) {
     var p = G.store.playlist(id);
     if (!p) return;
+
+    if (act === 'lock') {
+      var on = await G.lock.togglePlaylist(id);
+      if (on === null) return;
+      u.toast(on ? 'Playlist gesperrt' : 'Sperre aufgehoben', p.name, 'ok', 2400);
+      G.app.rerender();
+      return;
+    }
 
     if (act === 'open') {
       G.store.setActive(id);

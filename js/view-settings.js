@@ -122,6 +122,43 @@
   /** Auswahllisten werden von i18n.js nicht angefasst - hier selbst uebersetzen. */
   function tr(text) { return G.i18n ? G.i18n.t(text) : text; }
 
+  /* ------------------------------------------------------------
+     Sperre (Jugendschutz)
+     ------------------------------------------------------------ */
+  function lockSection() {
+    var L = G.lock;
+    if (!L) return '';
+    var head = '<div class="settings-section__head">' + u.icon('lock', 22) + '<h3>Sperre (Jugendschutz)</h3></div>';
+    if (!L.hasCode()) {
+      return '<section class="card settings-section settings-lock">' + head +
+        '<p class="settings-lock__intro">Mit einem 4-stelligen Code lassen sich Playlisten, Kategorien und einzelne Sender sperren. Gesperrte Sender laufen erst nach Eingabe des Codes.</p>' +
+        '<div class="settings-actions"><button class="btn btn--primary" id="lockSet">' + u.icon('lock', 16) + ' Code festlegen</button></div>' +
+      '</section>';
+    }
+    var n = L.counts();
+    var open = L.isOpen();
+    var left = Math.max(1, Math.ceil(L.openLeft() / 60000));
+    return '<section class="card settings-section settings-lock">' + head +
+      '<div class="settings-lock__state' + (open ? ' is-open' : '') + '">' +
+        u.icon(open ? 'unlock' : 'lock', 20) +
+        '<div><b>' + (open ? 'Entsperrt' : 'Code aktiv') + '</b>' +
+        '<span>' + (open ? 'Wieder gesperrt in ' + left + ' Min.' : 'Gesperrte Inhalte brauchen den Code.') + '</span></div>' +
+      '</div>' +
+      '<div class="settings-lock__counts">' +
+        '<div><span class="stat__v">' + n.playlists + '</span><span class="stat__d">Playlisten</span></div>' +
+        '<div><span class="stat__v">' + n.groups + '</span><span class="stat__d">Kategorien</span></div>' +
+        '<div><span class="stat__v">' + n.channels + '</span><span class="stat__d">Sender</span></div>' +
+      '</div>' +
+      '<p class="settings-lock__hint">' + u.icon('info', 15) + '<span>Sperren setzt du mit dem Schloss: an den Sendern auf der Startseite, an den Kategorien unter „Alle“ und an den Playlisten.</span></p>' +
+      '<div class="settings-actions">' +
+        (open ? '<button class="btn" id="lockNow">' + u.icon('lock', 16) + ' Jetzt sperren</button>' : '') +
+        '<button class="btn" id="lockChange">' + u.icon('key', 16) + ' Code ändern</button>' +
+        '<button class="btn btn--danger" id="lockRemove">' + u.icon('unlock', 16) + ' Sperre aufheben</button>' +
+      '</div>' +
+      '<p class="settings-section__foot">Der Code gilt nur auf diesem Gerät. Wer die Website-Daten im Browser löscht, löscht auch die Sperre.</p>' +
+    '</section>';
+  }
+
   function renderModern() {
     var s = G.store.state.settings;
     var lang = G.i18n ? G.i18n.language : 'de';
@@ -172,6 +209,8 @@
           '</div>' +
         '</div>' +
       '</section>' +
+
+      lockSection() +
 
       '<section class="card settings-section">' +
         '<div class="settings-section__head">' + u.icon('link', 22) + '<h3>Playlisten aus dem Netz</h3></div>' +
@@ -278,6 +317,22 @@
     if (proxy) proxy.onchange = function () {
       G.store.setSetting('proxy', proxy.value.trim());
       u.toast('Gespeichert', 'Der Vermittler wird beim nächsten Abruf verwendet.', 'ok', 2600);
+    };
+
+    /* Sperre */
+    var lockSet = u.$('#lockSet');
+    if (lockSet) lockSet.onclick = async function () {
+      if (await G.lock.setCode()) u.toast('Code festgelegt', 'Jetzt mit dem Schloss Sender, Kategorien oder Playlisten sperren.', 'ok', 4000);
+    };
+    var lockNow = u.$('#lockNow');
+    if (lockNow) lockNow.onclick = function () { G.lock.relock(); u.toast('Gesperrt', 'Gesperrte Inhalte brauchen wieder den Code.', 'ok', 2600); };
+    var lockChange = u.$('#lockChange');
+    if (lockChange) lockChange.onclick = async function () {
+      if (await G.lock.changeCode()) u.toast('Code geändert', '', 'ok', 2600);
+    };
+    var lockRemove = u.$('#lockRemove');
+    if (lockRemove) lockRemove.onclick = async function () {
+      if (await G.lock.removeCode()) u.toast('Sperre aufgehoben', 'Code und alle Sperren sind gelöscht.', 'ok', 3200);
     };
 
     /* Sicherung */

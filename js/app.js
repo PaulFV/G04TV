@@ -195,6 +195,11 @@
     render(afterFn);
   }
 
+  // Sperre geaendert (Code, Sperren, 15 Minuten offen): Seiten mit Sperr-Knoepfen nachziehen
+  document.addEventListener('g04tv:lock', function () {
+    if (current === 'settings' || current === 'playlists') rerender();
+  });
+
   /* ------------------------------------------------------------
      Navigation auf dem Handy
      ------------------------------------------------------------ */
@@ -317,8 +322,11 @@
     });
 
     // Weitersehen, wenn es gewuenscht ist
+    // (ein gesperrter Sender wird nicht ungefragt gestartet)
     if (s.settings.resume && s.last) {
-      G.player.play(s.last);
+      G.lock.ready.then(function () {
+        if (!G.lock.isLocked(s.last) || G.lock.isOpen()) G.player.play(s.last);
+      });
     }
   }
 
