@@ -17,12 +17,18 @@
     return 'Guten Abend';
   }
 
+  // Kachel mit Stern oben rechts: Antippen der Kachel spielt, der Stern
+  // merkt den Sender als Favorit oder nimmt ihn wieder heraus.
   function tile(c, playing, sub) {
-    return '<button class="ch-tile' + (playing ? ' is-playing' : '') + '" data-play="' + u.esc(c.url) + '">' +
+    var fav = G.store.isFavorite(c.url);
+    return '<div class="ch-tile ch-tile--star' + (playing ? ' is-playing' : '') + '" role="button" tabindex="0" data-play="' + u.esc(c.url) + '">' +
       u.logoHtml(c, 'ch-tile__logo') +
       '<span class="ch-tile__name">' + u.esc(c.name) + '</span>' +
       '<span class="ch-tile__grp">' + u.esc(sub || c.group || '—') + '</span>' +
-    '</button>';
+      '<button class="ch-tile__fav' + (fav ? ' is-on' : '') + '" type="button" data-fav="' + u.esc(c.url) + '" ' +
+        'aria-label="' + (fav ? 'Favorit entfernen' : 'Als Favorit merken') + '" title="Favorit">' +
+        u.icon(fav ? 'starFill' : 'star', 15) + '</button>' +
+    '</div>';
   }
 
   /* ------------------------------------------------------------
@@ -93,7 +99,8 @@
       if (!c) return;
       var on = G.store.toggleFavorite(c);
       u.toast(on ? 'Als Favorit gemerkt' : 'Favorit entfernt', c.name, 'ok', 2200);
-      G.app.rerender();
+      paintNow();
+      paintShelf();
     };
   }
 
@@ -341,7 +348,33 @@
     document.addEventListener('g04tv:player', onPlayer);
     off.push(function () { document.removeEventListener('g04tv:player', onPlayer); });
 
+    // Stern auf einer Kachel: Favorit an/aus - ohne abzuspielen
+    u.on(host, 'click', '[data-fav]', function (e, t) {
+      e.stopPropagation();
+      var c = findChannel(t.getAttribute('data-fav'));
+      if (!c) return;
+      var on = G.store.toggleFavorite(c);
+      u.toast(on ? 'Als Favorit gemerkt' : 'Favorit entfernt', c.name, 'ok', 1800);
+      if (currentTab() === 'fav') { paintShelf(); }
+      else {
+        // nur Sterne und Zaehler auffrischen, Liste und Scrollstelle bleiben
+        u.$$('[data-fav]', host).forEach(function (b) {
+          if (!G.m3u.sameSource(b.getAttribute('data-fav'), c.url)) return;
+          b.classList.toggle('is-on', on);
+          b.innerHTML = u.icon(on ? 'starFill' : 'star', 15);
+          b.setAttribute('aria-label', on ? 'Favorit entfernen' : 'Als Favorit merken');
+        });
+        var n = u.$('[data-shelf="fav"] i', host);
+        if (n) n.textContent = u.fmtInt(G.store.state.favorites.length);
+      }
+      paintNow();
+    });
+    u.on(host, 'keydown', '[data-play]', function (e, t) {
+      if ((e.key === 'Enter' || e.key === ' ') && e.target === t) { e.preventDefault(); t.click(); }
+    });
+
     u.on(host, 'click', '[data-play]', function (e, t) {
+      if (e.target.closest('[data-fav]')) return;
       var c = findChannel(t.getAttribute('data-play'));
       if (!c) return;
       // Das Bild klebt oben - die Liste bleibt, wo sie ist.
