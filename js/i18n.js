@@ -610,6 +610,9 @@
     , 'Verlauf': 'Recent'
     // Info: Bereiche
     , 'Das Bild, darunter Favoriten, alle Sender mit Suche und der Verlauf': 'The player, below it favorites, all channels with search and your history'
+    // Kategorien
+    , 'Ohne Kategorie': 'No category'
+    , 'Eigene Sender': 'Own channels'
   };
 
 

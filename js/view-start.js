@@ -151,9 +151,12 @@
   var allPool = null;          // Sender der aktiven Playlist (geladen)
   var allPoolId = null;        // ... fuer welche Playlist
   var allQuery = '';
+  var allGroup = '*';          // gewaehlte Kategorie ('*' = alle)
+  var allGroups = [];          // Kategorien in der Reihenfolge der Playlist
   var allList = [];            // nach Suche gefiltert
   var allShown = 0;
   var observer = null;
+  var lastGroup = null;        // Kategorie der zuletzt gezeigten Kachel
 
   function tr(text) { return G.i18n ? G.i18n.t(text) : text; }
 
@@ -234,7 +237,39 @@
               }).join('') +
             '</select>'
           : '') +
-      '</div>';
+      '</div>' +
+      '<div class="chips chips--scroll start-shelf__cats" id="stCats"></div>';
+  }
+
+  /** Kategorien wie in der Playlist: Reihenfolge des ersten Auftretens */
+  function groupsInOrder(list) {
+    var seen = {}, out = [];
+    list.forEach(function (c) {
+      var g = c.group || '';
+      if (!(g in seen)) { seen[g] = out.length; out.push({ name: g, count: 0 }); }
+      out[seen[g]].count++;
+    });
+    return out;
+  }
+
+  function groupLabel(g) { return g || tr('Ohne Kategorie'); }
+
+  function paintCats() {
+    var host = u.$('#stCats');
+    if (!host) return;
+    // eine einzige Kategorie (oder keine) - dann braucht es keine Leiste
+    if (allGroups.length < 2) { host.innerHTML = ''; host.hidden = true; return; }
+    host.hidden = false;
+    var total = allGroups.reduce(function (n, g) { return n + g.count; }, 0);
+    host.innerHTML =
+      '<button class="chip' + (allGroup === '*' ? ' is-on' : '') + '" data-cat="*">' + tr('Alle') +
+        '<span class="chip__n">' + u.fmtInt(total) + '</span></button>' +
+      allGroups.map(function (g) {
+        return '<button class="chip' + (allGroup === g.name ? ' is-on' : '') + '" data-cat="' + u.esc(g.name) + '">' +
+          u.esc(groupLabel(g.name)) + '<span class="chip__n">' + u.fmtInt(g.count) + '</span></button>';
+      }).join('');
+    var on = host.querySelector('.chip.is-on');
+    if (on && on.scrollIntoView) host.scrollLeft = Math.max(0, on.offsetLeft - 12);
   }
 
   /* Von aussen: Reiter "Alle" zeigen (statt des frueheren Bereichs Sender) */
@@ -243,6 +278,21 @@
     shelfTab = 'all';
     try { localStorage.setItem(TAB_KEY, 'all'); } catch (e) { /* optional */ }
     pendingJump = focusSearch ? 'search' : 'shelf';
+  }
+
+  /** Sender der Playlist in ihrer Reihenfolge, dahinter die eigenen Sender. */
+  async function playlistChannels(id) {
+    var seen = {}, out = [];
+    var add = function (c, fallbackGroup) {
+      var key = String(c.url || '').trim().toLowerCase();
+      if (!key || seen[key]) return;
+      seen[key] = true;
+      out.push({ name: c.name || G.m3u.nameFromSource(c.url), url: c.url,
+        group: c.group || fallbackGroup || '', logo: c.logo || '' });
+    };
+    (await G.library.channelsOf(id)).forEach(function (c) { add(c); });
+    G.store.state.channels.forEach(function (c) { add(c, tr('Eigene Sender')); });
+    return out;
   }
 
   /* ---------- Alle Sender: laden, filtern, stueckweise zeigen ---------- */
@@ -261,7 +311,7 @@
     if (!allPool || allPoolId !== s.activeId) {
       grid.innerHTML = '<p class="start-shelf__empty">' + tr('Sender werden geladen …') + '</p>';
       var id = s.activeId;
-      var pool = await G.library.pool(id);
+      var pool = await playlistChannels(id);
       if (id !== G.store.state.activeId) return;     // inzwischen umgeschaltet
 
       // Eine gemerkte Playlist, deren Sender nicht mehr in der Ablage stehen
@@ -271,18 +321,24 @@
         var g = u.$('#stGrid');
         if (g) g.innerHTML = '<p class="start-shelf__empty">' + tr('Playlist wird geholt …') + '</p>';
         var res = await G.library.refresh(p.id);
-        if (res.ok) pool = await G.library.pool(p.id);
+        if (res.ok) pool = await playlistChannels(p.id);
         else u.toast(tr('Playlist nicht erreichbar'), res.error, 'warn', 6000);
         if (id !== G.store.state.activeId) return;
       }
       allPool = pool; allPoolId = id;
+      allGroups = groupsInOrder(pool);
+      if (allGroup !== '*' && !allGroups.some(function (g) { return g.name === allGroup; })) allGroup = '*';
     }
+    paintCats();
     if (!u.$('#stGrid')) return;                      // Ansicht verlassen
     applyAll();
   }
 
   function applyAll() {
-    allList = G.library.filter(allPool || [], allQuery, '*');
+    var base = allGroup === '*' ? (allPool || [])
+      : (allPool || []).filter(function (c) { return (c.group || '') === allGroup; });
+    allList = G.library.filter(base, allQuery, '*');
+    lastGroup = null;
     allShown = 0;
     var grid = u.$('#stGrid');
     if (!grid) return;
@@ -301,8 +357,18 @@
     var playing = G.player.channel;
     var next = allList.slice(allShown, allShown + CHUNK);
     allShown += next.length;
+    // Ueberschrift, wo eine neue Kategorie beginnt (nur bei "Alle Kategorien")
+    var showHeads = allGroup === '*' && allGroups.length > 1;
     grid.insertAdjacentHTML('beforeend', next.map(function (c) {
-      return tile(c, playing && G.m3u.sameSource(playing.url, c.url));
+      var head = '';
+      if (showHeads && (c.group || '') !== lastGroup) {
+        lastGroup = c.group || '';
+        var g = allGroups.filter(function (x) { return x.name === lastGroup; })[0];
+        head = '<div class="start-shelf__cat" data-cat="' + u.esc(lastGroup) + '">' +
+          '<span>' + u.esc(groupLabel(lastGroup)) + '</span>' +
+          (g && !allQuery ? '<i>' + u.fmtInt(g.count) + '</i>' : '') + '</div>';
+      }
+      return head + tile(c, playing && G.m3u.sameSource(playing.url, c.url));
     }).join(''));
     paintMore();
   }
@@ -454,10 +520,29 @@
         allQuery = search.value.trim();
         applyAll();
       }, 200));
+      var cats = u.$('#stCats');
+      if (cats) cats.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-cat]');
+        if (!b) return;
+        allGroup = b.getAttribute('data-cat');
+        paintCats();
+        applyAll();
+        scrollToShelf();
+      });
+      var grid = u.$('#stGrid');
+      if (grid) grid.addEventListener('click', function (e) {
+        var h = e.target.closest('.start-shelf__cat');
+        if (!h) return;
+        allGroup = h.getAttribute('data-cat');
+        paintCats();
+        applyAll();
+        scrollToShelf();
+      });
       var pick = u.$('#stPick');
       if (pick) pick.addEventListener('change', function () {
         G.store.setActive(pick.value);
         allQuery = '';
+        allGroup = '*';
         paintShelf();
       });
       loadAll();
