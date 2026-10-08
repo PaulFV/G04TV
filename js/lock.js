@@ -24,6 +24,7 @@
   var MAX_TRIES = 5;
 
   var data = null;            // {algo, salt, hash, channels:[], groups:[], playlists:[]}
+  var editUntil = 0;          // Sperren setzen/aufheben ohne erneute Code-Eingabe
   var openUntil = 0;          // nur im Speicher: Schliessen der App sperrt wieder
   var members = {};           // urlKey -> true fuer Sender gesperrter Playlisten
   var readyResolve;
@@ -224,8 +225,9 @@
      ------------------------------------------------------------ */
 
   /** Code abfragen (falls noetig) und die 15 Minuten oeffnen. */
-  async function ask(text) {
+  async function ask(text, forEdit) {
     if (!hasCode() || isOpen()) return true;
+    if (forEdit && Date.now() < editUntil) return true;
     var pin = await pad({
       title: 'Gesperrt',
       text: text || 'Code eingeben, um fortzufahren.',
@@ -233,7 +235,8 @@
     });
     if (pin == null) return false;
     setTries({ n: 0, until: 0, round: 0 });
-    openUntil = Date.now() + OPEN_MS;
+    editUntil = Date.now() + OPEN_MS;
+    if (!forEdit) openUntil = editUntil;   // nur zum Ansehen wird freigegeben
     document.dispatchEvent(new CustomEvent('g04tv:lock'));
     return true;
   }
@@ -269,7 +272,8 @@
     data = { algo: algo, salt: salt, hash: await digest(pin, salt, algo),
       channels: keep.channels, groups: keep.groups, playlists: keep.playlists };
     setTries({ n: 0, until: 0, round: 0 });
-    openUntil = Date.now() + OPEN_MS;
+    openUntil = 0;
+    editUntil = Date.now() + OPEN_MS;
     save();
     return true;
   }
@@ -287,12 +291,12 @@
     var ok = await pad({ title: 'Sperre aufheben', text: 'Code eingeben. Danach ist nichts mehr gesperrt.',
       verify: async function (p) { return (await check(p)) || false; } });
     if (ok == null) return false;
-    data = null; openUntil = 0; members = {};
+    data = null; openUntil = 0; editUntil = 0; members = {};
     save();
     return true;
   }
 
-  function relock() { openUntil = 0; document.dispatchEvent(new CustomEvent('g04tv:lock')); }
+  function relock() { openUntil = 0; editUntil = 0; document.dispatchEvent(new CustomEvent('g04tv:lock')); }
 
   /* ---------- Sperren an/aus (braucht den Code) ---------- */
   async function needCode() {
@@ -300,22 +304,29 @@
       u.toast(tr('Erst einen Code festlegen'), tr('Einstellungen › Sperre'), 'warn', 3500);
       return false;
     }
-    return ask('Code eingeben, um Sperren zu ändern.');
+    return ask('Code eingeben, um Sperren zu ändern.', true);
+  }
+  /** Neue Sperre gilt sofort: Freigabe beenden, gesperrten Sender anhalten. */
+  function lockedNow(hits) {
+    openUntil = 0;
+    var c = G.player.channel;
+    if (c && hits(c)) G.player.stop();
   }
   function flip(arr, v) { var i = arr.indexOf(v); if (i >= 0) { arr.splice(i, 1); return false; } arr.push(v); return true; }
 
   async function toggleChannel(c) {
     if (!(await needCode())) return null;
-    var on = flip(data.channels, keyOf(c.url)); save(); return on;
+    var on = flip(data.channels, keyOf(c.url)); if (on) lockedNow(function (x) { return keyOf(x.url) === keyOf(c.url); }); save(); return on;
   }
   async function toggleGroup(name) {
     if (!(await needCode())) return null;
-    var on = flip(data.groups, name); save(); return on;
+    var on = flip(data.groups, name); if (on) lockedNow(function (x) { return x.group === name; }); save(); return on;
   }
   async function togglePlaylist(id) {
     if (!(await needCode())) return null;
     var on = flip(data.playlists, id);
     await rebuildMembers();
+    if (on) lockedNow(function (x) { return !!members[keyOf(x.url)]; });
     save(); return on;
   }
 
@@ -353,6 +364,6 @@
     toggleChannel: toggleChannel, toggleGroup: toggleGroup, togglePlaylist: togglePlaylist,
     counts: counts, openMinutes: OPEN_MS / 60000,
     openLeft: function () { return Math.max(0, openUntil - Date.now()); },
-    forget: function () { data = null; openUntil = 0; members = {}; try { localStorage.removeItem(KEY); localStorage.removeItem(TRIES_KEY); } catch (e) { /* optional */ } }
+    forget: function () { data = null; openUntil = 0; editUntil = 0; members = {}; try { localStorage.removeItem(KEY); localStorage.removeItem(TRIES_KEY); } catch (e) { /* optional */ } }
   };
 })(G04TV);
