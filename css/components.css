@@ -293,3 +293,16 @@
   .ch-tile__name{font-size:12px}
   .ch-tile__grp{font-size:10.5px}
 }
+
+/* Felder mit fester Hoehe: kein Innenabstand oben/unten, sonst schneidet
+   die Schrift unten ab (iPhone zeigt Eingaben mit 16px). Lange Namen
+   enden mit "…". */
+.start-shelf__pick,.start-shelf__search .input,
+.settings-panel__language .select,.settings-proxy__field .input,.settings-feedback__form .input{
+  padding-top:0;padding-bottom:0;line-height:1.25;
+  text-overflow:ellipsis;white-space:nowrap;overflow:hidden;
+}
+@media (max-width:980px){
+  /* 16px - darunter zoomt das iPhone beim Antippen hinein */
+  .start-shelf__pick,.start-shelf__search .input,.settings-panel__language .select{font-size:16px !important}
+}
