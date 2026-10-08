@@ -365,3 +365,18 @@
 /* Startseite: Kopfzeile deckend, damit oberhalb des klebenden Bildes
    nichts von der Liste durchschimmert */
 body[data-view="start"] .topbar{background:var(--bg-0)}
+
+/* ---------- Stern auf jeder Kachel ---------- */
+.ch-tile--star{position:relative}
+.ch-tile__fav{
+  position:absolute;top:6px;right:6px;width:30px;height:30px;border-radius:9px;
+  display:grid;place-items:center;cursor:pointer;
+  border:1px solid rgba(255,255,255,.14);background:rgba(6,10,16,.6);color:rgba(255,255,255,.75);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+}
+.ch-tile__fav:hover{color:#FFC93C;border-color:rgba(255,201,60,.5)}
+.ch-tile__fav.is-on{color:#FFC93C;border-color:rgba(255,201,60,.55);background:rgba(40,30,4,.7)}
+@media (max-width:620px){
+  .ch-tile__fav{top:4px;right:4px;width:26px;height:26px;border-radius:8px}
+  .ch-tile__fav svg{width:13px;height:13px}
+}
