@@ -187,3 +187,5 @@
 [data-theme="light"] .start-shelf__tab--recent{--tab:#7C5CE0;--tab-bg:rgba(124,92,224,.12);--tab-line:rgba(124,92,224,.45)}
 [data-theme="light"] .start-shelf .start-shelf__tab.is-on{background:var(--tab-bg);box-shadow:inset 0 0 0 1px var(--tab-line)}
 [data-theme="light"] .start-now .start-now__main.btn--primary{background:var(--acc-dim);color:var(--acc);border-color:var(--acc-line);box-shadow:none}
+
+@media (max-width:620px){ [data-theme="light"] .start-live{background:#F4F8FB} }

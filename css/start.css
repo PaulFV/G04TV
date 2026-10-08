@@ -273,7 +273,7 @@
    Startseite (vereinfacht): eine Kachel mit drei Reitern,
    Sender im Raster nach unten
    ============================================================ */
-.start-shelf{padding:14px 16px 16px;scroll-margin-top:84px}
+.start-shelf{padding:14px 16px 16px}
 .start-shelf__tabs{display:flex;gap:3px;padding:3px;border-radius:13px;border:1px solid var(--glass-br);background:rgba(0,0,0,.22)}
 .start-shelf .start-shelf__tab{flex:1 1 auto;justify-content:center}
 .start-shelf__grid{
@@ -349,3 +349,19 @@
   .start-now__actions .start-now__icon{width:36px;height:36px;border-radius:11px}
   .start-now__actions .start-now__icon svg{width:17px;height:17px}
 }
+
+/* ---------- Bild bleibt oben stehen ----------
+   Der Bildblock klebt unter der Kopfzeile; die Senderliste scrollt
+   darunter durch. --topbar-h setzt app.js, --live-h view-start.js. */
+.start-live{
+  position:sticky;top:var(--topbar-h,72px);z-index:20;
+}
+.start-shelf{scroll-margin-top:calc(var(--topbar-h,72px) + var(--live-h,0px) + 8px)}
+@media (max-width:620px){
+  /* deckender Grund, damit die Kacheln nicht durchscheinen */
+  .start-live{background:linear-gradient(180deg,#07111C,#060D16)}
+}
+
+/* Startseite: Kopfzeile deckend, damit oberhalb des klebenden Bildes
+   nichts von der Liste durchschimmert */
+body[data-view="start"] .topbar{background:var(--bg-0)}

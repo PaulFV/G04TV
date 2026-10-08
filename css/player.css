@@ -286,3 +286,30 @@
 
 /* AirPlay-Knopf im Bild: leuchtet, solange ueber AirPlay gespielt wird */
 #stageAirplay.is-on{color:var(--acc);border-color:var(--acc-line)}
+
+/* ---------- Bild als Bedienung: Stopp-Knopf in der Mitte ----------
+   Antippen des laufenden Bildes blendet ihn 3 s ein (dock.js),
+   mit der Maus erscheint er beim Darueberfahren. */
+.stage__ctl{
+  position:absolute;left:50%;top:50%;z-index:4;
+  width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;
+  display:grid;place-items:center;cursor:pointer;
+  border:1px solid rgba(255,255,255,.22);background:rgba(6,10,16,.62);color:#fff;
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  box-shadow:0 8px 28px rgba(0,0,0,.45);
+  opacity:0;pointer-events:none;transform:scale(.9);
+  transition:opacity .2s var(--ease),transform .2s var(--ease);
+}
+.stage__ctl:active{transform:scale(.94)}
+.stage.is-running.is-ctl .stage__ctl{opacity:1;pointer-events:auto;transform:none}
+@media (hover:hover) and (pointer:fine){
+  .stage.is-running:hover .stage__ctl{opacity:1;pointer-events:auto;transform:none}
+}
+/* Im kleinen Fenster unten rechts etwas kleiner */
+.pdock:not(.is-inline) .stage__ctl{width:46px;height:46px;margin:-23px 0 0 -23px}
+.pdock:not(.is-inline) .stage__ctl svg{width:18px;height:18px}
+@media (max-width:620px){
+  .stage__ctl{width:56px;height:56px;margin:-28px 0 0 -28px}
+}
+/* Startseite: ohne Knopfzeile etwas weniger Abstand unter dem Namen */
+.start-now{gap:8px}
