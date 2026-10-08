@@ -179,7 +179,7 @@
 
 /* ---------- Sperre (Jugendschutz) ---------- */
 .settings-lock__intro{color:var(--tx-2);font-size:14px;line-height:1.5;margin:0 0 12px}
-.settings-lock__state{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;background:rgba(255,200,87,.08);border:1px solid rgba(255,200,87,.25);color:var(--gold,#FFC857)}
+.settings-lock__state{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;background:rgba(255,77,79,.08);border:1px solid rgba(255,77,79,.3);color:#FF4D4F}
 .settings-lock__state.is-open{background:rgba(80,220,140,.08);border-color:rgba(80,220,140,.3);color:#5BDC9A}
 .settings-lock__state div{display:flex;flex-direction:column;gap:2px}
 .settings-lock__state b{color:var(--tx-0);font-size:14.5px}

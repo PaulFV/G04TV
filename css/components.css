@@ -321,7 +321,7 @@
 }
 .pin__box.is-shake{animation:pinShake .38s}
 @keyframes pinShake{20%,60%{transform:translateX(-9px)}40%,80%{transform:translateX(9px)}}
-.pin__ic{width:48px;height:48px;margin:0 auto 10px;border-radius:15px;display:grid;place-items:center;color:var(--gold,#FFC857);background:rgba(255,200,87,.12);border:1px solid rgba(255,200,87,.3)}
+.pin__ic{width:48px;height:48px;margin:0 auto 10px;border-radius:15px;display:grid;place-items:center;color:#FF4D4F;background:rgba(255,77,79,.12);border:1px solid rgba(255,77,79,.35)}
 .pin__title{margin:0;font-size:18px}
 .pin__text{margin:6px 0 0;color:var(--tx-2);font-size:13.5px;line-height:1.4;min-height:19px}
 .pin__dots{display:flex;justify-content:center;gap:14px;margin:18px 0 8px}
@@ -340,5 +340,5 @@
 .pin__keys button:disabled{opacity:.35;cursor:not-allowed}
 
 /* Playlist-Karte */
-.pill--lock{border-color:rgba(255,120,90,.4);background:rgba(255,120,90,.12);color:#FF9A7A}
-.pl-card__lock.is-on{color:var(--gold,#FFC857);border-color:rgba(255,200,87,.5)}
+.pill--lock{border-color:rgba(255,77,79,.45);background:rgba(255,77,79,.12);color:#FF6B6D}
+.pl-card__lock.is-on{color:#FF4D4F;border-color:rgba(255,77,79,.55);background:rgba(255,77,79,.1)}
