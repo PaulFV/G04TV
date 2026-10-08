@@ -192,3 +192,5 @@
 
 [data-theme="light"] .ch-tile__fav{background:rgba(255,255,255,.88);border-color:rgba(16,44,66,.15);color:#677A89}
 [data-theme="light"] .ch-tile__fav.is-on{color:#C98A00;background:#FFF7E0;border-color:rgba(201,138,0,.45)}
+
+[data-theme="light"] .start-shelf__mode{background:rgba(16,44,66,.05)}

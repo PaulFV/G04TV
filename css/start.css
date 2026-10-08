@@ -410,3 +410,34 @@ body[data-view="start"] .topbar{background:var(--bg-0)}
   .start-shelf__cats .chip{font-size:12.5px;padding:6px 11px}
   .start-shelf__cat{font-size:13px;margin-top:6px}
 }
+
+/* ---------- Kacheln | Liste ---------- */
+.start-shelf__top{display:flex;gap:8px;align-items:stretch}
+.start-shelf__top .start-shelf__tabs{flex:1;min-width:0}
+.start-shelf__mode{display:flex;gap:2px;padding:3px;border-radius:13px;border:1px solid var(--glass-br);background:rgba(0,0,0,.22);flex:none}
+.start-shelf__mode button{width:34px;border:0;border-radius:10px;background:none;color:var(--tx-2);cursor:pointer;display:grid;place-items:center}
+.start-shelf__mode button.is-on{color:var(--acc);background:var(--acc-dim);box-shadow:inset 0 0 0 1px var(--acc-line)}
+
+/* Liste: eine Zeile je Sender - Logo, Name, Gruppe, Stern */
+.start-shelf.is-list .start-shelf__grid{grid-template-columns:1fr;gap:6px}
+.start-shelf.is-list .ch-tile{
+  display:grid;grid-template-columns:52px minmax(0,1fr) 34px;grid-template-rows:auto auto;
+  column-gap:12px;row-gap:1px;align-items:center;padding:7px 8px;border-radius:12px;
+}
+.start-shelf.is-list .ch-tile__logo{grid-row:1 / span 2;height:36px;width:52px;border-radius:8px}
+.start-shelf.is-list .ch-tile__name{grid-column:2;align-self:end;font-size:14px}
+.start-shelf.is-list .ch-tile__grp{grid-column:2;align-self:start}
+.start-shelf.is-list .ch-tile__fav{position:static;grid-column:3;grid-row:1 / span 2;width:32px;height:32px}
+.start-shelf.is-list .ch-tile:hover{transform:none}
+@media (max-width:620px){
+  .start-shelf__mode button{width:30px}
+  .start-shelf__top{gap:6px}
+  .start-shelf.is-list .ch-tile{grid-template-columns:46px minmax(0,1fr) 30px;column-gap:10px;padding:6px 7px}
+  .start-shelf.is-list .ch-tile__logo{width:46px;height:32px}
+  .start-shelf.is-list .ch-tile__name{font-size:13.5px}
+  .start-shelf.is-list .ch-tile__fav{width:28px;height:28px}
+}
+@media (max-width:620px){
+  /* Reiter so breit wie ihr Text - "Alle" ist kurz, "Favoriten" bekommt mehr */
+  .start-shelf .start-shelf__tab{flex:1 1 auto;padding:0 5px;gap:4px}
+}
