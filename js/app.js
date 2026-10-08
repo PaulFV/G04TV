@@ -257,6 +257,8 @@
     if (G.i18n) G.i18n.useState(s.settings);
 
     if (s.settings.reduceMotion) document.body.classList.add('no-motion');
+    // Aeltere Einstellungen kennen den Schalter noch nicht: dann sichtbar
+    if (s.settings.showTabbar === false) document.body.classList.add('no-tabbar');
 
     G.dock.init();
     initLangSwitch();

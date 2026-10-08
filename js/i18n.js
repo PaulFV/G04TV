@@ -619,6 +619,9 @@
     , 'Kacheln': 'Tiles'
     , 'Liste': 'List'
     , 'Ansicht': 'View'
+    // Untere Leiste
+    , 'Untere Leiste anzeigen': 'Show bottom bar'
+    , 'Aus: mehr Platz für die Sender. Die Bereiche erreichst du dann über das Menü oben links.': 'Off: more room for channels. Reach the sections via the menu at the top left.'
   };
 
 

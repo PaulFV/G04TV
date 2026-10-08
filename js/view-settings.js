@@ -154,6 +154,7 @@
                 '<option value="light"' + (s.theme === 'light' ? ' selected' : '') + '>' + tr('Hell') + '</option>' +
               '</select></div>' +
           '</div>' +
+          '<div class="settings-panel settings-panel--wide">' + sw('showTabbar', 'Untere Leiste anzeigen', 'Aus: mehr Platz für die Sender. Die Bereiche erreichst du dann über das Menü oben links.') + '</div>' +
           '<div class="settings-panel settings-panel--wide">' + sw('reduceMotion', 'Bewegung reduzieren', 'Animationen und Hintergrundschein abschalten.') + '</div>' +
         '</div>' +
       '</section>' +
@@ -253,6 +254,7 @@
       G.store.setSetting(key, t.checked);
 
       if (key === 'reduceMotion') document.body.classList.toggle('no-motion', t.checked);
+      if (key === 'showTabbar') document.body.classList.toggle('no-tabbar', !t.checked);
       if (key === 'resume' && t.checked) {
         u.toast('Gemerkt', 'Beim nächsten Start wird der letzte Sender vorbereitet.', 'ok', 2600);
       }
