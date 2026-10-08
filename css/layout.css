@@ -275,3 +275,13 @@
   body.no-tabbar .pdock:not(.is-inline){bottom:calc(env(safe-area-inset-bottom) + 12px)}
   body.no-tabbar .toasts{bottom:calc(env(safe-area-inset-bottom) + 16px)}
 }
+
+/* ---------- X "Schliessen" ohne untere Leiste ----------
+   Nur auf Handy/Tablet, nur wenn die Leiste ausgeblendet ist und nicht
+   auf der Startseite. Es nimmt den Platz von DE/EN ein (Sprache gibt es
+   in den Einstellungen). */
+.view-close{display:none !important}
+@media (max-width:980px){
+  body.no-tabbar:not([data-view="start"]) .view-close{display:grid !important;color:var(--tx-0);order:10}
+  body.no-tabbar:not([data-view="start"]) .lang-switch{display:none}
+}
