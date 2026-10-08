@@ -129,9 +129,11 @@
     video.setAttribute('x-webkit-airplay', 'allow');
     video.addEventListener('webkitplaybacktargetavailabilitychanged', function (e) {
       btn.hidden = e.availability !== 'available';
+      document.dispatchEvent(new CustomEvent('g04tv:airplay'));
     });
     video.addEventListener('webkitcurrentplaybacktargetiswirelesschanged', function () {
       btn.classList.toggle('is-on', !!video.webkitCurrentPlaybackTargetIsWireless);
+      document.dispatchEvent(new CustomEvent('g04tv:airplay'));
     });
 
     btn.addEventListener('click', function () {

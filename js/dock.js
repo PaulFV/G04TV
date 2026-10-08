@@ -212,6 +212,8 @@
     var b = u.$('#stageFull');
     if (!b) return;
     var full = G.player.isFull();
+    // Im Vollbild zeigt das Bild seine Knoepfe wieder (siehe start.css)
+    stage.classList.toggle('is-fs', full);
     b.innerHTML = u.icon(full ? 'fullExit' : 'full', 18);
     b.title = full ? 'Vollbild verlassen' : 'Vollbild';
     b.setAttribute('aria-label', b.title);

@@ -82,16 +82,38 @@
           '<b class="start-now__name" title="' + u.esc(c.name) + '">' + u.esc(c.name) + '</b>' +
           '<span class="start-now__sub">' + u.esc(c.group || G.player.kindOf(c.url).toUpperCase()) + '</span>' +
         '</span>' +
+        // Ton, Vollbild (und AirPlay) - frueher oben im Bild
+        stageButtons() +
         '<button class="start-now__icon' + (fav ? ' is-on' : '') + '" id="stStar" ' +
           'aria-label="' + (fav ? 'Favorit entfernen' : 'Als Favorit merken') + '" title="Favorit">' +
           u.icon(fav ? 'starFill' : 'star', 20) + '</button>' +
       '</div>';
   }
 
+  function stageButtons() {
+    var st = G.store.state.settings;
+    var muted = st.muted || st.volume <= 0;
+    var air = u.$('#stageAirplay');
+    var airOn = air && !air.hidden;
+    return (airOn
+        ? '<button class="start-now__icon start-now__icon--sm' + (air.classList.contains('is-on') ? ' is-acc' : '') + '" id="stAir" aria-label="AirPlay" title="AirPlay">' + air.innerHTML + '</button>'
+        : '') +
+      '<button class="start-now__icon start-now__icon--sm" id="stMute" aria-label="' + (muted ? 'Ton an' : 'Ton aus') + '" title="' + (muted ? 'Ton an' : 'Ton aus') + '">' +
+        u.icon(muted ? 'muted' : 'volume', 18) + '</button>' +
+      '<button class="start-now__icon start-now__icon--sm" id="stFull" aria-label="Vollbild" title="Vollbild">' + u.icon('full', 18) + '</button>';
+  }
+
   function paintNow() {
     var host = u.$('#stNow');
     if (!host) return;
     host.innerHTML = nowHtml();
+
+    var mute = u.$('#stMute');
+    if (mute) mute.onclick = function () { G.player.toggleMuted(); G.dock.paintMute(); paintNow(); };
+    var full = u.$('#stFull');
+    if (full) full.onclick = function () { G.player.fullscreen(true); };
+    var air = u.$('#stAir');
+    if (air) air.onclick = function () { var b = u.$('#stageAirplay'); if (b) b.click(); };
 
     var star = u.$('#stStar');
     if (star) star.onclick = function () {
@@ -347,6 +369,8 @@
     var onPlayer = function () { paintNow(); paintPlaying(); };
     document.addEventListener('g04tv:player', onPlayer);
     off.push(function () { document.removeEventListener('g04tv:player', onPlayer); });
+    document.addEventListener('g04tv:airplay', paintNow);
+    off.push(function () { document.removeEventListener('g04tv:airplay', paintNow); });
 
     // Stern auf einer Kachel: Favorit an/aus - ohne abzuspielen
     u.on(host, 'click', '[data-fav]', function (e, t) {
