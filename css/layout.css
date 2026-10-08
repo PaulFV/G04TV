@@ -267,3 +267,11 @@
   .tabbar__item{font-size:10.5px !important;padding-left:2px !important;padding-right:2px !important;min-width:0}
   .tabbar__item span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 }
+
+/* ---------- Untere Leiste ausgeblendet (Einstellungen) ---------- */
+@media (max-width:980px){
+  body.no-tabbar .tabbar{display:none !important}
+  body.no-tabbar .main{padding-bottom:calc(env(safe-area-inset-bottom) + 24px)}
+  body.no-tabbar .pdock:not(.is-inline){bottom:calc(env(safe-area-inset-bottom) + 12px)}
+  body.no-tabbar .toasts{bottom:calc(env(safe-area-inset-bottom) + 16px)}
+}
