@@ -392,3 +392,21 @@ body[data-view="start"] .topbar{background:var(--bg-0)}
   .start-now__head .start-now__icon--sm svg{width:16px;height:16px}
   .start-now__head{gap:6px}
 }
+
+/* ---------- Kategorien in "Alle" ---------- */
+.start-shelf__cats{margin-top:10px;padding-bottom:2px}
+.start-shelf__cats .chip{flex:none;white-space:nowrap}
+.start-shelf__cat{
+  grid-column:1 / -1;display:flex;align-items:center;gap:8px;cursor:pointer;
+  margin:10px 2px 0;padding:6px 2px 4px;border-bottom:1px solid var(--glass-br);
+  font-size:14px;font-weight:700;color:var(--tx-0);
+}
+.start-shelf__cat:first-child{margin-top:0}
+.start-shelf__cat::before{content:"";width:4px;height:16px;border-radius:2px;background:var(--acc);box-shadow:0 0 8px var(--acc-line)}
+.start-shelf__cat i{font-style:normal;font-size:11.5px;font-weight:700;color:var(--tx-2);padding:1px 7px;border-radius:99px;background:rgba(255,255,255,.06)}
+.start-shelf__cat span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:620px){
+  .start-shelf__cats{margin-top:8px}
+  .start-shelf__cats .chip{font-size:12.5px;padding:6px 11px}
+  .start-shelf__cat{font-size:13px;margin-top:6px}
+}
