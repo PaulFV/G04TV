@@ -229,7 +229,7 @@
     return '<div class="start-shelf__tools">' +
         '<div class="search start-shelf__search">' + u.icon('search', 16) +
           '<input class="input" id="stSearch" type="search" inputmode="search" autocomplete="off" ' +
-          'placeholder="Sender suchen …" value="' + u.esc(allQuery) + '"></div>' +
+          'placeholder="Suchen …" value="' + u.esc(allQuery) + '"></div>' +
         (s.playlists.length > 1
           ? '<select class="select start-shelf__pick" id="stPick" aria-label="Playlist">' +
               s.playlists.map(function (p) {

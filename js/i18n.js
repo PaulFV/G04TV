@@ -613,6 +613,8 @@
     // Kategorien
     , 'Ohne Kategorie': 'No category'
     , 'Eigene Sender': 'Own channels'
+    // Suchfeld
+    , 'Suchen …': 'Search …'
   };
 
 
