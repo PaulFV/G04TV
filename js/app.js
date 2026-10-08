@@ -152,7 +152,7 @@
       document.documentElement.style.setProperty('--topbar-h', bar.getBoundingClientRect().height + 'px');
     };
     set();
-    if ('ResizeObserver' in window) new ResizeObserver(set).observe(bar);
+    if ('ResizeObserver' in window) new ResizeObserver(set).observe(bar, { box: 'border-box' });
     else window.addEventListener('resize', set);
   }
 

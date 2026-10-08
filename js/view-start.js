@@ -435,14 +435,42 @@
     if (slot) G.dock.place(slot);
     paintNow();
 
-    // --live-h: Hoehe des klebenden Bildblocks - Sprungziele darunter
-    // (scroll-margin) sollen nicht hinter dem Bild verschwinden.
+    // Bild genau unter die Kopfzeile setzen - gemessen auf dem Geraet selbst.
+    // (Auf dem iPhone ist die Kopfzeile wegen der Statusleiste hoeher, als
+    // CSS allein es sicher weiss; dann rutschte das Bild darunter.)
     var live = u.$('.start-live');
     if (live) {
-      var setH = function () { document.documentElement.style.setProperty('--live-h', live.getBoundingClientRect().height + 'px'); };
-      setH();
+      var place = function () {
+        // Verzögerte Aufrufe einer frueheren Startseite nicht mehr ausfuehren
+        if (!live.isConnected) return;
+        var bar = u.$('.topbar');
+        var fixedMode = getComputedStyle(live).position === 'fixed';
+        if (bar && fixedMode) {
+          var top = Math.max(0, bar.getBoundingClientRect().bottom);
+          live.style.top = top + 'px';
+        } else {
+          live.style.top = '';
+        }
+        // Platz fuer das feste Bild und Sprungziele (scroll-margin)
+        document.documentElement.style.setProperty('--live-h', live.getBoundingClientRect().height + 'px');
+      };
+      place();
+      // nach dem Laden von Schrift und Logos noch einmal nachmessen
+      [60, 300, 1000, 2500].forEach(function (ms) { setTimeout(place, ms); });
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
+      window.addEventListener('resize', place);
+      window.addEventListener('orientationchange', place);
+      if (window.visualViewport) window.visualViewport.addEventListener('resize', place);
+      off.push(function () {
+        window.removeEventListener('resize', place);
+        window.removeEventListener('orientationchange', place);
+        if (window.visualViewport) window.visualViewport.removeEventListener('resize', place);
+        live.style.top = '';
+      });
       if ('ResizeObserver' in window) {
-        var ro = new ResizeObserver(setH); ro.observe(live);
+        var ro = new ResizeObserver(place);
+        ro.observe(live, { box: 'border-box' });
+        var bar0 = u.$('.topbar'); if (bar0) ro.observe(bar0, { box: 'border-box' });
         off.push(function () { ro.disconnect(); });
       }
     }
