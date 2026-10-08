@@ -171,8 +171,15 @@
     return s.favorites.length ? 'fav' : 'all';
   }
 
+  var VIEW_KEY = 'g04tv.startView';
+  function viewMode() {
+    var m = null;
+    try { m = localStorage.getItem(VIEW_KEY); } catch (e) { /* optional */ }
+    return m === 'list' ? 'list' : 'tiles';
+  }
+
   function shelfCard() {
-    return '<section class="card start-shelf" id="stShelf">' + shelfInner() + '</section>';
+    return '<section class="card start-shelf' + (viewMode() === 'list' ? ' is-list' : '') + '" id="stShelf">' + shelfInner() + '</section>';
   }
 
   // Jeder Reiter mit eigenem Zeichen und eigener Farbe (siehe start.css)
@@ -189,11 +196,19 @@
     var tab = currentTab();
     var allCount = (G.store.activePlaylist() || {}).count;
 
-    var head = '<div class="start-shelf__tabs" role="tablist">' +
+    var mode = viewMode();
+    var head = '<div class="start-shelf__top">' +
+      '<div class="start-shelf__tabs" role="tablist">' +
         tabBtn('fav', 'Favoriten', s.favorites.length, tab) +
         tabBtn('all', 'Alle', allCount || null, tab) +
         tabBtn('recent', 'Verlauf', s.recent.length, tab) +
-      '</div>';
+      '</div>' +
+      // Ansicht wie im Bereich Favoriten: Kacheln oder Liste
+      '<div class="start-shelf__mode" role="group" aria-label="Ansicht">' +
+        '<button class="' + (mode === 'tiles' ? 'is-on' : '') + '" data-view="tiles" aria-label="Kacheln" title="Kacheln">' + u.icon('grid', 16) + '</button>' +
+        '<button class="' + (mode === 'list' ? 'is-on' : '') + '" data-view="list" aria-label="Liste" title="Liste">' + u.icon('playlists', 16) + '</button>' +
+      '</div>' +
+    '</div>';
 
     var body;
     if (tab === 'all') body = allHead() + '<div class="start-shelf__grid" id="stGrid"></div><div class="start-shelf__more" id="stMore"></div>';
@@ -469,6 +484,15 @@
       if (!c) return;
       // Das Bild klebt oben - die Liste bleibt, wo sie ist.
       G.views.live.playChannel(c);
+    });
+
+    // Kacheln | Liste - nur die Darstellung wechselt, Liste und Scrollstelle bleiben
+    u.on(host, 'click', '[data-view]', function (e, t) {
+      var m = t.getAttribute('data-view');
+      try { localStorage.setItem(VIEW_KEY, m); } catch (err) { /* optional */ }
+      var card = u.$('#stShelf');
+      if (card) card.classList.toggle('is-list', m === 'list');
+      u.$$('[data-view]', host).forEach(function (b) { b.classList.toggle('is-on', b.getAttribute('data-view') === m); });
     });
 
     // Umschalter Favoriten | Alle Sender | Zuletzt gesehen

@@ -615,6 +615,10 @@
     , 'Eigene Sender': 'Own channels'
     // Suchfeld
     , 'Suchen …': 'Search …'
+    // Ansicht
+    , 'Kacheln': 'Tiles'
+    , 'Liste': 'List'
+    , 'Ansicht': 'View'
   };
 
 
