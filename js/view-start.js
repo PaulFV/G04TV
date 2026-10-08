@@ -43,8 +43,6 @@
     var s = G.store.state;
     var c = G.player.channel || s.last;
     var status = G.player.status;
-    var running = status === 'playing' || status === 'loading';
-
     if (!c) {
       return '<div class="start-now__head">' +
           '<span class="start-now__logo start-now__logo--empty">' + u.icon('live', 20) + '</span>' +
@@ -56,11 +54,11 @@
               : 'Trage zuerst eine Playlist ein.') + '</span>' +
           '</span>' +
         '</div>' +
-        '<div class="start-now__actions">' +
-          (s.playlists.length
-            ? '<button class="btn btn--primary start-now__main" data-go="live">' + u.icon('grid', 18) + ' Zu den Sendern</button>'
-            : '<button class="btn btn--primary start-now__main" data-go="playlists">' + u.icon('plus', 18) + ' Playlist hinzufügen</button>') +
-        '</div>';
+        // Ohne Playlist bleibt der eine Knopf, der weiterhilft
+        (s.playlists.length ? '' :
+          '<div class="start-now__actions">' +
+            '<button class="btn btn--primary start-now__main" data-go="playlists">' + u.icon('plus', 18) + ' Playlist hinzufügen</button>' +
+          '</div>');
     }
 
     var fav = G.store.isFavorite(c.url);
@@ -81,14 +79,6 @@
         '<button class="start-now__icon' + (fav ? ' is-on' : '') + '" id="stStar" ' +
           'aria-label="' + (fav ? 'Favorit entfernen' : 'Als Favorit merken') + '" title="Favorit">' +
           u.icon(fav ? 'starFill' : 'star', 20) + '</button>' +
-      '</div>' +
-      '<div class="start-now__actions">' +
-        (running
-          ? '<button class="btn start-now__main" id="stStop">' + u.icon('stop', 18) + ' Anhalten</button>'
-          : '<button class="btn btn--primary start-now__main" id="stPlay">' + u.icon('play', 18) +
-            (status === 'error' ? ' Nochmal' : ' Abspielen') + '</button>') +
-        '<button class="start-now__icon" id="stExt" aria-label="Extern öffnen" title="Extern öffnen">' + u.icon('external', 20) + '</button>' +
-        '<button class="start-now__icon" id="stAll" aria-label="Alle Sender" title="Alle Sender">' + u.icon('grid', 20) + '</button>' +
       '</div>';
   }
 
@@ -96,26 +86,6 @@
     var host = u.$('#stNow');
     if (!host) return;
     host.innerHTML = nowHtml();
-
-    var play = u.$('#stPlay');
-    if (play) play.onclick = function () {
-      var c = G.player.channel || G.store.state.last;
-      if (c) G.player.play(c);
-    };
-    var stop = u.$('#stStop');
-    if (stop) stop.onclick = function () { G.player.stop(); };
-
-    var ext = u.$('#stExt');
-    if (ext) ext.onclick = function () { G.dock.external(); };
-
-    var all = u.$('#stAll');
-    if (all) all.onclick = function () {
-      showAll(false);
-      pendingJump = null;
-      paintShelf();
-      var card = u.$('#stShelf');
-      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    };
 
     var star = u.$('#stStar');
     if (star) star.onclick = function () {
@@ -355,6 +325,18 @@
     if (slot) G.dock.place(slot);
     paintNow();
 
+    // --live-h: Hoehe des klebenden Bildblocks - Sprungziele darunter
+    // (scroll-margin) sollen nicht hinter dem Bild verschwinden.
+    var live = u.$('.start-live');
+    if (live) {
+      var setH = function () { document.documentElement.style.setProperty('--live-h', live.offsetHeight + 'px'); };
+      setH();
+      if ('ResizeObserver' in window) {
+        var ro = new ResizeObserver(setH); ro.observe(live);
+        off.push(function () { ro.disconnect(); });
+      }
+    }
+
     var onPlayer = function () { paintNow(); paintPlaying(); };
     document.addEventListener('g04tv:player', onPlayer);
     off.push(function () { document.removeEventListener('g04tv:player', onPlayer); });
@@ -362,9 +344,8 @@
     u.on(host, 'click', '[data-play]', function (e, t) {
       var c = findChannel(t.getAttribute('data-play'));
       if (!c) return;
+      // Das Bild klebt oben - die Liste bleibt, wo sie ist.
       G.views.live.playChannel(c);
-      // Das Bild sitzt oben auf der Startseite - dorthin zurueck.
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
     // Umschalter Favoriten | Alle Sender | Zuletzt gesehen
@@ -384,11 +365,20 @@
     if (pendingJump) {
       var jump = pendingJump; pendingJump = null;
       setTimeout(function () {
-        var card = u.$('#stShelf');
-        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        scrollToShelf();
         if (jump === 'search') { var f = u.$('#stSearch'); if (f) f.focus({ preventScroll: true }); }
       }, 80);
     }
+  }
+
+  /** Zur Sender-Kachel scrollen - genau unter das oben klebende Bild. */
+  function scrollToShelf() {
+    var card = u.$('#stShelf');
+    if (!card) return;
+    var live = u.$('.start-live');
+    var under = live ? live.getBoundingClientRect().bottom : 0;
+    var y = card.getBoundingClientRect().top + window.scrollY - under - 10;
+    window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
   }
 
   /** Nur die Sender-Kachel neu zeichnen - das Bild oben bleibt unberuehrt. */

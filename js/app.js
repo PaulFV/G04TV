@@ -74,6 +74,7 @@
     // weil die Reaktion der Favoriten-Ansicht noch mitlief.
     var old = u.$('#viewHost');
     var host = old.cloneNode(false);
+    document.body.setAttribute('data-view', current);
     old.parentNode.replaceChild(host, old);
     host.innerHTML = view.render(currentParams) || '';
 
@@ -141,6 +142,18 @@
     applyTheme(s.theme);
     // Die Einstellungen zeigen das Farbschema als Auswahl - mitziehen.
     if (current === 'settings') rerender();
+  }
+
+  /** --topbar-h: Hoehe der festen Kopfzeile, damit das Bild darunter kleben kann. */
+  function trackTopbar() {
+    var bar = u.$('.topbar');
+    if (!bar) return;
+    var set = function () {
+      document.documentElement.style.setProperty('--topbar-h', bar.offsetHeight + 'px');
+    };
+    set();
+    if ('ResizeObserver' in window) new ResizeObserver(set).observe(bar);
+    else window.addEventListener('resize', set);
   }
 
   function initLangSwitch() {
@@ -248,6 +261,7 @@
     G.dock.init();
     initLangSwitch();
     initTheme();
+    trackTopbar();
 
     document.addEventListener('click', function (e) {
       var nav = e.target.closest('[data-nav]');

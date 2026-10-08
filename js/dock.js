@@ -49,6 +49,21 @@
     // Doppelklick ins Bild schaltet das Vollbild - wie in Connect+.
     stage.addEventListener('dblclick', function () { G.player.fullscreen(); });
 
+    // Laufendes Bild antippen: Stopp-Knopf fuer ein paar Sekunden zeigen.
+    // Erst ein zweites Antippen haelt an - eine versehentliche Beruehrung nicht.
+    var ctl = u.$('#stageCtl');
+    stage.addEventListener('click', function (e) {
+      if (e.target.closest('.stage__bar, .stage__err, .stage__idle, #stageCtl')) return;
+      var st = G.player.status;
+      if (st !== 'playing' && st !== 'loading') return;
+      showCtl();
+    });
+    if (ctl) ctl.addEventListener('click', function (e) {
+      e.stopPropagation();
+      hideCtl();
+      G.player.stop();
+    });
+
     document.addEventListener('fullscreenchange', paintFull);
     document.addEventListener('webkitfullscreenchange', paintFull);
 
@@ -59,6 +74,17 @@
     document.addEventListener('g04tv:language', function () {
       paint(G.player.status, G.player.message, G.player.channel);
     });
+  }
+
+  var ctlTimer = null;
+  function showCtl() {
+    stage.classList.add('is-ctl');
+    clearTimeout(ctlTimer);
+    ctlTimer = setTimeout(hideCtl, 3000);
+  }
+  function hideCtl() {
+    clearTimeout(ctlTimer);
+    if (stage) stage.classList.remove('is-ctl');
   }
 
   /* ------------------------------------------------------------
@@ -123,6 +149,8 @@
     busy.classList.toggle('is-on', status === 'loading');
     err.classList.toggle('is-on', status === 'error');
     video.classList.toggle('is-off', !running);
+    stage.classList.toggle('is-running', running);
+    if (!running) hideCtl();
 
     if (status === 'error') errText.textContent = message || '';
 
