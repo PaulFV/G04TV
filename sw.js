@@ -6,7 +6,7 @@
    ausschließlich die eigenen Programmdateien — keine Playlisten,
    keine Streams, keine Anfragen an fremde Server.
    ============================================================ */
-var CACHE = 'g04tv-v1.0.43';
+var CACHE = 'g04tv-v1.0.45';
 
 var ASSETS = [
   './',
