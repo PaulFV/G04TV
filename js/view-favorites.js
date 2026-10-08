@@ -18,8 +18,8 @@
     if (!s.favorites.length) {
       return '<div class="view"><div class="card"><div class="empty">' + u.icon('star', 42) +
         '<b>Noch keine Favoriten</b>' +
-        '<p>Tippe im Bereich Sender auf den Stern neben einem Sender. Er steht dann hier ' +
-        'und ganz oben in der Senderliste — unabhängig davon, aus welcher Playlist er stammt.</p>' +
+        '<p>Tippe auf der Startseite unter „Alle“ auf den Stern einer Sender-Kachel. ' +
+        'Der Sender steht dann hier — unabhängig davon, aus welcher Playlist er stammt.</p>' +
         '<div class="btn-row"><button class="btn btn--primary" data-go="live">' +
         u.icon('live', 16) + ' Zu den Sendern</button></div>' +
         '</div></div></div>';

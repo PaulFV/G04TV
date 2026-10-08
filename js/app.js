@@ -270,6 +270,7 @@
       if (nav) go(nav.getAttribute('data-nav'));
     });
 
+    u.$('#viewClose').addEventListener('click', function () { go('start'); });
     u.$('#mobileMenuBtn').addEventListener('click', function () {
       if (u.$('.sidebar').classList.contains('is-open')) closeMobileNav(); else openMobileNav();
     });

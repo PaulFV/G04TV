@@ -622,6 +622,9 @@
     // Untere Leiste
     , 'Untere Leiste anzeigen': 'Show bottom bar'
     , 'Aus: mehr Platz für die Sender. Die Bereiche erreichst du dann über das Menü oben links.': 'Off: more room for channels. Reach the sections via the menu at the top left.'
+    // Favoriten leer
+    , 'Tippe auf der Startseite unter „Alle“ auf den Stern einer Sender-Kachel. ': 'On the start page under “All”, tap the star on a channel tile. '
+    , 'Der Sender steht dann hier — unabhängig davon, aus welcher Playlist er stammt.': 'The channel then appears here — no matter which playlist it comes from.'
   };
 
 
