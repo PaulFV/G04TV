@@ -149,7 +149,7 @@
     var bar = u.$('.topbar');
     if (!bar) return;
     var set = function () {
-      document.documentElement.style.setProperty('--topbar-h', bar.offsetHeight + 'px');
+      document.documentElement.style.setProperty('--topbar-h', bar.getBoundingClientRect().height + 'px');
     };
     set();
     if ('ResizeObserver' in window) new ResizeObserver(set).observe(bar);

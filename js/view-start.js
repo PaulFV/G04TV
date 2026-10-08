@@ -439,7 +439,7 @@
     // (scroll-margin) sollen nicht hinter dem Bild verschwinden.
     var live = u.$('.start-live');
     if (live) {
-      var setH = function () { document.documentElement.style.setProperty('--live-h', live.offsetHeight + 'px'); };
+      var setH = function () { document.documentElement.style.setProperty('--live-h', live.getBoundingClientRect().height + 'px'); };
       setH();
       if ('ResizeObserver' in window) {
         var ro = new ResizeObserver(setH); ro.observe(live);
