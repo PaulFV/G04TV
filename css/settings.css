@@ -176,3 +176,15 @@
   .settings-feedback__foot .btn{min-height:38px;font-size:13.5px;padding:6px 16px}
   .settings-feedback__status{font-size:12px}
 }
+
+/* ---------- Sperre (Jugendschutz) ---------- */
+.settings-lock__intro{color:var(--tx-2);font-size:14px;line-height:1.5;margin:0 0 12px}
+.settings-lock__state{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;background:rgba(255,200,87,.08);border:1px solid rgba(255,200,87,.25);color:var(--gold,#FFC857)}
+.settings-lock__state.is-open{background:rgba(80,220,140,.08);border-color:rgba(80,220,140,.3);color:#5BDC9A}
+.settings-lock__state div{display:flex;flex-direction:column;gap:2px}
+.settings-lock__state b{color:var(--tx-0);font-size:14.5px}
+.settings-lock__state span{color:var(--tx-2);font-size:12.5px}
+.settings-lock__counts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.settings-lock__counts div{display:flex;flex-direction:column;align-items:center;padding:10px 6px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)}
+.settings-lock__hint{display:flex;gap:8px;align-items:flex-start;color:var(--tx-2);font-size:12.5px;line-height:1.45;margin:0 0 12px}
+.settings-lock__hint svg{flex:none;margin-top:1px}

@@ -481,3 +481,33 @@ body[data-view="start"] .topbar{background:var(--bg-0)}
   body[data-view="start"] .main{padding-top:0}
   body[data-view="start"] .start-view{padding-top:calc(var(--topbar-h,66px) + var(--live-h,0px) + 4px)}
 }
+
+/* ---------- Sperre: Schloss auf Kachel und Kategorie ---------- */
+.ch-tile__lock{
+  position:absolute;top:6px;left:6px;width:30px;height:30px;border-radius:9px;z-index:2;
+  display:grid;place-items:center;cursor:pointer;
+  border:1px solid rgba(255,255,255,.14);background:rgba(6,10,16,.6);color:rgba(255,255,255,.6);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+}
+.ch-tile__lock.is-on{color:var(--gold,#FFC857);border-color:rgba(255,200,87,.55);background:rgba(40,30,4,.75)}
+.ch-tile__lock.is-inherit{color:var(--gold,#FFC857);opacity:.6}
+.ch-tile.is-locked .ch-tile__logo{filter:blur(4px) grayscale(.7);opacity:.45}
+.ch-tile.is-locked.is-open .ch-tile__logo{filter:none;opacity:.85}
+@media (max-width:620px){
+  .ch-tile__lock{top:4px;left:4px;width:26px;height:26px;border-radius:8px}
+  .ch-tile__lock svg{width:13px;height:13px}
+}
+.start-shelf.is-list.has-lock .ch-tile{grid-template-columns:52px minmax(0,1fr) 34px 34px}
+.start-shelf.is-list .ch-tile__lock{position:static;grid-column:3;grid-row:1 / span 2;width:32px;height:32px}
+.start-shelf.is-list.has-lock .ch-tile__fav{grid-column:4}
+.start-shelf.is-list .ch-tile__logo{grid-column:1}
+@media (max-width:620px){
+  .start-shelf.is-list.has-lock .ch-tile{grid-template-columns:46px minmax(0,1fr) 30px 30px}
+  .start-shelf.is-list .ch-tile__lock{width:28px;height:28px}
+}
+.start-shelf__catlock{
+  margin-left:auto;flex:none;width:30px;height:28px;border-radius:9px;display:grid;place-items:center;cursor:pointer;
+  border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--tx-2);
+}
+.start-shelf__catlock.is-on{color:var(--gold,#FFC857);border-color:rgba(255,200,87,.5);background:rgba(255,200,87,.1)}
+.start-shelf__locked svg{color:var(--gold,#FFC857)}

@@ -194,3 +194,20 @@
 [data-theme="light"] .ch-tile__fav.is-on{color:#C98A00;background:#FFF7E0;border-color:rgba(201,138,0,.45)}
 
 [data-theme="light"] .start-shelf__mode{background:rgba(16,44,66,.05)}
+
+/* Sperre */
+[data-theme="light"] .pin{background:rgba(220,230,240,.6)}
+[data-theme="light"] .pin__box{background:#fff;border-color:rgba(16,44,66,.12);box-shadow:0 24px 60px rgba(16,44,66,.25)}
+[data-theme="light"] .pin__dots i{border-color:rgba(16,44,66,.3)}
+[data-theme="light"] .pin__keys button{background:#F1F5F9;border-color:rgba(16,44,66,.1);color:#10202E}
+[data-theme="light"] .pin__keys button[data-k="x"],[data-theme="light"] .pin__keys button[data-k="b"]{background:transparent;color:#56697A}
+[data-theme="light"] .pin__ic,[data-theme="light"] .ch-tile__lock.is-on,[data-theme="light"] .start-shelf__catlock.is-on{color:#C98A00}
+[data-theme="light"] .ch-tile__lock{background:rgba(255,255,255,.88);border-color:rgba(16,44,66,.15);color:#677A89}
+[data-theme="light"] .ch-tile__lock.is-on{background:#FFF7E0;border-color:rgba(201,138,0,.45)}
+[data-theme="light"] .ch-tile__lock.is-inherit{color:#C98A00}
+[data-theme="light"] .start-shelf__catlock{background:#fff;border-color:rgba(16,44,66,.14);color:#677A89}
+[data-theme="light"] .settings-lock__state{color:#B07800;background:#FFF7E0;border-color:rgba(201,138,0,.35)}
+[data-theme="light"] .settings-lock__state.is-open{color:#1E9A5A;background:#E9F8F0;border-color:rgba(30,154,90,.3)}
+[data-theme="light"] .settings-lock__state b{color:#10202E}
+[data-theme="light"] .settings-lock__counts div{background:#F6F9FB;border-color:rgba(16,44,66,.08)}
+[data-theme="light"] .pill--lock{color:#C2482A;background:#FDECE7;border-color:rgba(194,72,42,.3)}
