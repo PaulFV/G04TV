@@ -511,3 +511,21 @@ body[data-view="start"] .topbar{background:var(--bg-0)}
 }
 .start-shelf__catlock.is-on{color:#FF4D4F;border-color:rgba(255,77,79,.55);background:rgba(255,77,79,.12)}
 .start-shelf__locked svg{color:#FF4D4F}
+
+/* ---------- Favoriten: Reihenfolge ändern (Pfeile nur in der Liste) ---------- */
+.ch-tile__mv{display:none}
+.start-shelf.is-list .ch-tile--ord{grid-template-columns:52px minmax(0,1fr) 34px auto}
+.start-shelf.is-list.has-lock .ch-tile--ord{grid-template-columns:52px minmax(0,1fr) 34px 34px auto}
+.start-shelf.is-list .ch-tile__mv{display:flex;gap:4px;grid-column:4;grid-row:1 / span 2}
+.start-shelf.is-list.has-lock .ch-tile__mv{grid-column:5}
+.ch-tile__mv button{
+  width:32px;height:32px;display:grid;place-items:center;cursor:pointer;font-size:12px;line-height:1;
+  border-radius:9px;border:1px solid var(--glass-br);background:var(--glass-bg);color:var(--tx-1);
+}
+.ch-tile__mv button:hover:not(:disabled){color:var(--acc);border-color:var(--acc-line);background:var(--acc-dim)}
+.ch-tile__mv button:disabled{opacity:.3;cursor:default}
+@media (max-width:620px){
+  .start-shelf.is-list .ch-tile--ord{grid-template-columns:46px minmax(0,1fr) 30px auto}
+  .start-shelf.is-list.has-lock .ch-tile--ord{grid-template-columns:46px minmax(0,1fr) 30px 30px auto}
+  .ch-tile__mv button{width:30px;height:30px}
+}

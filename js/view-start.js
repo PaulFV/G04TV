@@ -19,12 +19,18 @@
 
   // Kachel mit Stern oben rechts: Antippen der Kachel spielt, der Stern
   // merkt den Sender als Favorit oder nimmt ihn wieder heraus.
-  function tile(c, playing, sub) {
+  // ord = { i, n }: Platz in den Favoriten - dann kommen Pfeile zum Verschieben
+  // dazu (sichtbar nur in der Listenansicht, siehe start.css).
+  function tile(c, playing, sub, ord) {
     var fav = G.store.isFavorite(c.url);
     var L = G.lock, withLock = L && L.hasCode();
     var locked = withLock && L.isLocked(c);
-    return '<div class="ch-tile ch-tile--star' + (playing ? ' is-playing' : '') + (locked ? ' is-locked' : '') + (locked && L.isOpen() ? ' is-open' : '') + '" role="button" tabindex="0" data-play="' + u.esc(c.url) + '">' +
+    return '<div class="ch-tile ch-tile--star' + (ord ? ' ch-tile--ord' : '') + (playing ? ' is-playing' : '') + (locked ? ' is-locked' : '') + (locked && L.isOpen() ? ' is-open' : '') + '" role="button" tabindex="0" data-play="' + u.esc(c.url) + '">' +
       (withLock ? lockBtn(c) : '') +
+      (ord ? '<span class="ch-tile__mv">' +
+        '<button type="button" data-mv="' + u.esc(c.url) + '" data-dir="-1" aria-label="Nach oben" title="Nach oben"' + (ord.i === 0 ? ' disabled' : '') + '>▲</button>' +
+        '<button type="button" data-mv="' + u.esc(c.url) + '" data-dir="1" aria-label="Nach unten" title="Nach unten"' + (ord.i === ord.n - 1 ? ' disabled' : '') + '>▼</button>' +
+      '</span>' : '') +
       u.logoHtml(c, 'ch-tile__logo') +
       '<span class="ch-tile__name">' + u.esc(c.name) + '</span>' +
       '<span class="ch-tile__grp">' + u.esc(sub || c.group || '—') + '</span>' +
@@ -275,13 +281,14 @@
         : 'Noch nichts gesehen — gespielte Sender erscheinen hier.') + '</p>';
     }
     return '<div class="start-shelf__grid">' +
-        list.map(function (c) {
-          return tile(c, playing && G.m3u.sameSource(playing.url, c.url), tab === 'recent' ? u.relTime(c.at) : '');
+        list.map(function (c, i) {
+          return tile(c, playing && G.m3u.sameSource(playing.url, c.url), tab === 'recent' ? u.relTime(c.at) : '',
+            tab === 'fav' ? { i: i, n: list.length } : null);
         }).join('') +
       '</div>' +
       (tab === 'recent'
         ? '<div class="start-shelf__foot"><button class="btn btn--sm btn--ghost" id="stClearRecent">' + u.icon('trash', 14) + ' Verlauf leeren</button></div>'
-        : '');
+        : '<div class="start-shelf__foot"><button class="btn btn--sm btn--ghost" id="stFavExport">' + u.icon('download', 14) + ' Als M3U</button></div>');
   }
 
   /** Suche und - bei mehreren Playlisten - Auswahl der Playlist */
@@ -599,8 +606,15 @@
       if ((e.key === 'Enter' || e.key === ' ') && e.target === t) { e.preventDefault(); t.click(); }
     });
 
+    // Pfeile in der Favoritenliste: Sender nach oben oder unten schieben
+    u.on(host, 'click', '[data-mv]', function (e, t) {
+      e.stopPropagation();
+      G.store.moveFavorite(t.getAttribute('data-mv'), +t.getAttribute('data-dir'));
+      paintShelf();
+    });
+
     u.on(host, 'click', '[data-play]', function (e, t) {
-      if (e.target.closest('[data-fav], [data-lock]')) return;
+      if (e.target.closest('[data-fav], [data-lock], [data-mv]')) return;
       var c = findChannel(t.getAttribute('data-play'));
       if (!c) return;
       // Das Bild klebt oben - die Liste bleibt, wo sie ist.
@@ -693,6 +707,20 @@
       });
       loadAll();
     }
+
+    var exp = u.$('#stFavExport');
+    if (exp) exp.onclick = function () {
+      var favs = G.store.state.favorites;
+      var lines = ['#EXTM3U'];
+      favs.forEach(function (c) {
+        lines.push('#EXTINF:-1 tvg-logo="' + (c.logo || '') + '" group-title="' + (c.group || 'Favoriten') + '",' + c.name);
+        lines.push(c.url);
+      });
+      var ok = u.download('G04TV-Favoriten.m3u', lines.join('\n'), 'audio/x-mpegurl');
+      u.toast(ok ? 'Datei erstellt' : 'Ging nicht',
+        ok ? favs.length + ' Sender als M3U gespeichert.' : 'Der Browser hat den Download verhindert.',
+        ok ? 'ok' : 'warn');
+    };
 
     var clear = u.$('#stClearRecent');
     if (clear) clear.onclick = async function () {

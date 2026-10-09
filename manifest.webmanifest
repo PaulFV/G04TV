@@ -22,7 +22,6 @@
   ],
   "shortcuts": [
     { "name": "Sender", "short_name": "Sender", "url": "./index.html#live" },
-    { "name": "Favoriten", "short_name": "Favoriten", "url": "./index.html#favorites" },
     { "name": "Playlisten", "short_name": "Playlisten", "url": "./index.html#playlists" }
   ]
 }

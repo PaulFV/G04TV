@@ -1,5 +1,5 @@
 /* ============================================================
-   G04TV v1.0.57 — Anwendung, Navigation, Start
+   G04TV v1.0.58 — Anwendung, Navigation, Start
    ============================================================ */
 (function (G) {
   'use strict';
@@ -9,7 +9,6 @@
   var NAV = [
     { k: 'start', n: 'Start', ic: 'start', tab: true },
     { k: 'playlists', n: 'Playlisten', ic: 'playlists', tab: true },
-    { k: 'favorites', n: 'Favoriten', ic: 'star', tab: true },
     { k: 'settings', n: 'Einstellungen', ic: 'settings', tab: true },
     { k: 'info', n: 'Info', ic: 'info' }
   ];
@@ -27,7 +26,6 @@
 
     u.$('#nav').innerHTML = NAV.map(function (v) {
       var badge = '';
-      if (v.k === 'favorites' && s.favorites.length) badge = '<span class="nav__badge">' + s.favorites.length + '</span>';
       if (v.k === 'playlists') {
         var bad = s.playlists.filter(function (p) { return !!p.error; }).length;
         if (bad) badge = '<span class="nav__badge">' + bad + '</span>';

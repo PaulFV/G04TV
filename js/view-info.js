@@ -18,7 +18,7 @@
     ['M', 'Ton aus und an'],
     ['↑ ↓', 'In der Senderliste blättern'],
     ['/', 'In das Suchfeld springen'],
-    ['1 – 6', 'Bereich wechseln']
+    ['1 – 4', 'Bereich wechseln']
   ];
 
   function infoTab() {
@@ -38,7 +38,6 @@
         '<div class="list">' +
           [['start', 'Start', 'Das Bild, darunter Favoriten, alle Sender mit Suche und der Verlauf'],
            ['playlists', 'Playlisten', 'Quellen eintragen, aktualisieren, ersetzen, löschen'],
-           ['favorites', 'Favoriten', 'Die markierten Sender, in eigener Reihenfolge'],
            ['settings', 'Einstellungen', 'Wiedergabe, Vermittler, Sicherung und Löschen'],
            ['info', 'Info', 'Dieser Bereich']].map(function (r) {
             return '<div class="list__row"><span class="list__ic">' +

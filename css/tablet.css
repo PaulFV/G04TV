@@ -92,7 +92,7 @@
     position:sticky;top:-14px;z-index:3;margin:-14px -16px 0;padding:14px 16px 8px;
     background:var(--bg-1);
   }
-  .start-view:has(> .start-shelf) .start-shelf__grid{grid-template-columns:repeat(auto-fill,minmax(116px,1fr));gap:10px}
+  .start-view:has(> .start-shelf:not(.is-list)) .start-shelf__grid{grid-template-columns:repeat(auto-fill,minmax(116px,1fr));gap:10px}
 
   .start-view:has(> .start-shelf) .start-shelf__tab svg{display:none}
   .start-view:has(> .start-shelf) .start-shelf__tab{padding:0 7px;font-size:13px;gap:4px}
