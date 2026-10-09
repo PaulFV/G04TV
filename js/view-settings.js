@@ -165,6 +165,8 @@
     '</section>';
   }
 
+  var fbOpen = false;     // Feedback bleibt aufgeklappt, wenn die Einstellungen neu gezeichnet werden
+
   function renderModern() {
     var s = G.store.state.settings;
     var lang = G.i18n ? G.i18n.language : 'de';
@@ -175,10 +177,7 @@
         '<span class="settings-device">' + u.icon('shield', 18) + ' Nur auf diesem Gerät</span>' +
       '</div>' +
 
-      // Schnellstart (frueher auf der Startseite)
-      (G.views.start && G.views.start.quickCard ? G.views.start.quickCard() : '') +
-
-      '<section class="card settings-section">' +
+      '<section class="card settings-section sec-lang">' +
         '<div class="settings-section__head">' + u.icon('grid', 22) + '<h3>Sprache &amp; Darstellung</h3></div>' +
         '<div class="settings-grid settings-grid--2">' +
           '<div class="settings-panel settings-panel__language">' +
@@ -197,12 +196,12 @@
                 '<option value="light"' + (s.theme === 'light' ? ' selected' : '') + '>' + tr('Hell') + '</option>' +
               '</select></div>' +
           '</div>' +
-          '<div class="settings-panel settings-panel--wide">' + sw('showTabbar', 'Untere Leiste anzeigen', 'Aus: mehr Platz für die Sender. Die Bereiche erreichst du dann über das Menü oben links.') + '</div>' +
-          '<div class="settings-panel settings-panel--wide">' + sw('reduceMotion', 'Bewegung reduzieren', 'Animationen und Hintergrundschein abschalten.') + '</div>' +
+          '<div class="settings-panel">' + sw('showTabbar', 'Untere Leiste anzeigen', 'Aus: mehr Platz für die Sender. Die Bereiche erreichst du dann über das Menü oben links.') + '</div>' +
+          '<div class="settings-panel">' + sw('reduceMotion', 'Bewegung reduzieren', 'Animationen und Hintergrundschein abschalten.') + '</div>' +
         '</div>' +
       '</section>' +
 
-      '<section class="card settings-section">' +
+      '<section class="card settings-section sec-play">' +
         '<div class="settings-section__head">' + u.icon('play', 22) + '<h3>Wiedergabe</h3></div>' +
         '<div class="settings-grid settings-grid--2">' +
           '<div class="settings-panel">' + sw('autoplay', 'Sofort abspielen', 'Sender beim Antippen direkt starten.') + '</div>' +
@@ -226,7 +225,7 @@
 
       lockSection() +
 
-      '<section class="card settings-section">' +
+      '<section class="card settings-section sec-net">' +
         '<div class="settings-section__head">' + u.icon('link', 22) + '<h3>Playlisten aus dem Netz</h3></div>' +
         '<div class="settings-proxy__intro">' + u.icon('shield', 17) + '<div>Der Vermittler ist optional. Er holt eine blockierte Playlist stellvertretend — trage nur eine Adresse ein, der du selbst vertraust.</div></div>' +
         '<div class="settings-panel">' + sw('proxyOn', 'Vermittler verwenden', 'Direkt versuchen; nur bei Bedarf über den Vermittler laden.') + '</div>' +
@@ -240,7 +239,7 @@
           : '') +
       '</section>' +
 
-      '<section class="card settings-section">' +
+      '<section class="card settings-section sec-data">' +
         '<div class="settings-section__head">' + u.icon('shield', 22) + '<h3>Daten auf diesem Gerät</h3></div>' +
         '<div class="settings-data">' +
           '<div class="settings-stat">' + u.icon('playlists', 30) + '<div class="settings-stat__main"><span class="stat__v">' + G.store.state.playlists.length + '</span><span class="stat__d">Playlisten</span></div></div>' +
@@ -254,7 +253,7 @@
         '<p class="settings-section__foot">Die Sicherung enthält Einstellungen und Listen, nicht die Senderlisten selbst.</p>' +
       '</section>' +
 
-      '<section class="card settings-section">' +
+      '<section class="card settings-section sec-app">' +
         '<div class="settings-section__head">' + u.icon('live', 22) + '<h3>Als App installieren</h3></div>' +
         '<div class="settings-install">' +
           '<div class="settings-install__art">' + u.icon('live', 22) + '</div>' +
@@ -266,8 +265,8 @@
         '</div>' +
       '</section>' +
 
-      '<section class="card settings-section settings-feedback">' +
-        '<div class="settings-section__head">' + u.icon('edit', 22) + '<h3>Feedback &amp; Ideen</h3></div>' +
+      '<details class="card settings-section settings-fold settings-feedback sec-fb" id="fbBox"' + (fbOpen ? ' open' : '') + '>' +
+        '<summary class="settings-section__head">' + u.icon('edit', 22) + '<h3>Feedback &amp; Ideen</h3></summary>' +
         '<p class="settings-feedback__intro">Bug gefunden, eine Idee oder ein Wunsch? Schreib mir eine Nachricht — ganz ohne Konto.</p>' +
         '<form id="settingsFeedbackForm" class="settings-feedback__form" novalidate>' +
           '<div class="field">' +
@@ -285,7 +284,7 @@
           '</div>' +
           '<p class="settings-section__foot">Die Nachricht wird über formsubmit.co an den Entwickler geschickt.</p>' +
         '</form>' +
-      '</section>' +
+      '</details>' +
 
       (G.info ? G.info.html() : '') +
 
@@ -298,6 +297,8 @@
      ------------------------------------------------------------ */
   function mount(host) {
     if (G.info) G.info.mount();
+    var fbBox = u.$('#fbBox');
+    if (fbBox) fbBox.addEventListener('toggle', function () { fbOpen = fbBox.open; });
 
     /* Sprache und Farbschema - dieselben Wege wie die Knoepfe in der Kopfzeile */
     var language = u.$('#setLanguage');

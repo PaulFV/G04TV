@@ -902,23 +902,6 @@
     G.dock.place(null);
   }
 
-  /** Schnellstart - steht jetzt in den Einstellungen */
-  function quickCard() {
-    return '<section class="card start-quick">' +
-      '<div class="start-quick__head">' +
-        '<div class="start-quick__title"><span class="start-quick__bolt">ϟ</span><h3>Schnellstart</h3></div>' +
-        '<span class="start-quick__hint">IN WENIGEN SCHRITTEN ZUM FERNSEHEN</span>' +
-      '</div>' +
-      '<div class="start-steps">' +
-        '<button class="start-step" data-go="playlists"><span class="start-step__num">1</span><span class="start-step__icon">' + u.icon('link', 30) + '</span><span class="start-step__label">Playlist hinzufügen</span></button>' +
-        '<span class="start-step__line" aria-hidden="true"></span>' +
-        '<button class="start-step" data-go="live"><span class="start-step__num">2</span><span class="start-step__icon">' + u.icon('grid', 30) + '</span><span class="start-step__label">Sender auswählen</span></button>' +
-        '<span class="start-step__line" aria-hidden="true"></span>' +
-        '<button class="start-step" data-go="start"><span class="start-step__num">3</span><span class="start-step__icon">' + u.icon('live', 30) + '</span><span class="start-step__label">Fernsehen</span></button>' +
-      '</div>' +
-    '</section>';
-  }
-
   G.views.start = {
     title: 'Start',
     sub: function () {
@@ -930,7 +913,6 @@
     render: render,
     mount: mount,
     unmount: unmount,
-    quickCard: quickCard,
     showAll: showAll
   };
 })(G04TV);

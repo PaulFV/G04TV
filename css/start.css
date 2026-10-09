@@ -77,21 +77,6 @@
 .start-card:not(.start-card--empty){min-height:0}
 .start-card:not(.start-card--empty) .grid--tiles{margin-top:18px}
 
-/* ---------- Schnellstart ---------- */
-.start-quick{padding:20px 25px 24px;border-color:rgba(49,216,255,.35);background:linear-gradient(100deg,rgba(8,24,39,.9),rgba(7,14,27,.82))}
-.start-quick__head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px}
-.start-quick__title{display:flex;align-items:center;gap:11px}
-.start-quick__title h3{font-size:21px;letter-spacing:-.025em}
-.start-quick__bolt{font-size:30px;line-height:1;color:var(--acc);text-shadow:0 0 16px rgba(49,216,255,.8);transform:skew(-8deg)}
-.start-quick__hint{color:var(--tx-2);font-size:10px;letter-spacing:.27em;font-weight:700;text-align:right}
-.start-steps{display:grid;grid-template-columns:1fr 54px 1fr 54px 1fr;align-items:center}
-.start-step{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0;border:0;background:none;color:var(--tx-1);cursor:pointer;font:inherit}
-.start-step__num{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--acc-line);border-radius:50%;color:var(--tx-0);background:rgba(6,31,51,.86);box-shadow:0 0 14px rgba(49,216,255,.18);font-size:17px;font-weight:700}
-.start-step__icon{width:62px;height:62px;display:grid;place-items:center;border:1px solid rgba(49,216,255,.34);border-radius:14px;background:linear-gradient(145deg,rgba(28,86,127,.6),rgba(6,24,42,.9));color:var(--acc);box-shadow:0 10px 24px rgba(0,0,0,.25),0 0 20px rgba(49,216,255,.12)}
-.start-step__icon svg{width:30px;height:30px;filter:drop-shadow(0 0 7px rgba(49,216,255,.6))}
-.start-step__label{font-size:15px;font-weight:650;color:var(--tx-0);text-align:center}
-.start-step__line{height:1px;background:linear-gradient(90deg,transparent,var(--acc),transparent);box-shadow:0 0 8px rgba(49,216,255,.55)}
-
 /* ---------- Kopfzeile auf kleinen Geräten ---------- */
 .topbar__brand,.topbar__divider{display:none}
 
@@ -106,7 +91,6 @@
   .start-grid{grid-template-columns:minmax(0,1fr)}
   .start-grid > .stack{min-width:0}
   .start-card{min-height:340px}
-  .start-quick__hint{font-size:9px;letter-spacing:.18em}
 
   .tabbar{
     left:50%;right:auto;bottom:max(0px,calc(env(safe-area-inset-bottom) - 12px));
@@ -149,12 +133,6 @@
   .start-card__visual{height:170px}
   .start-card__copy b{font-size:19px}
   .start-card__copy p{font-size:14px}
-  .start-quick{padding:17px 14px 19px}
-  .start-quick__head{align-items:flex-start;flex-direction:column;gap:4px}
-  .start-quick__hint{align-self:flex-end;margin-top:-25px}
-  .start-steps{grid-template-columns:1fr 22px 1fr 22px 1fr;gap:0}
-  .start-step__icon{width:52px;height:52px}
-  .start-step__label{font-size:12px;line-height:1.25}
 }
 
 /* ---------- Favoriten-Reihe (alle, zum Wischen) ---------- */
@@ -223,7 +201,7 @@
   .start-shelf__tab svg{display:none}
 }
 
-/* ---------- Handy: Playlisten-Kachel und Schnellstart kompakt ---------- */
+/* ---------- Handy: Playlisten-Kachel kompakt ---------- */
 @media (max-width:620px){
   /* Leere Kacheln (keine Playlist / keine Favoriten): Bild klein links,
      Text und Knopf rechts - statt grossem Bild oben */
@@ -253,20 +231,6 @@
   /* Hinweis "Alles bleibt auf dem Geraet" */
   .start-view > .start-grid .note{font-size:12px;padding:10px 12px;gap:8px}
 
-  /* Schnellstart: eine flache Zeile mit drei Schritten */
-  .start-quick{padding:12px 12px 14px}
-  .start-quick__head{flex-direction:row;align-items:center;margin-bottom:10px}
-  .start-quick__title{gap:8px}
-  .start-quick__title h3{font-size:17px}
-  .start-quick__bolt{font-size:22px}
-  .start-quick__hint{display:none}
-  .start-steps{grid-template-columns:1fr 14px 1fr 14px 1fr;align-items:start}
-  .start-step__line{margin-top:22px}
-  .start-step{gap:5px;position:relative}
-  .start-step__num{position:absolute;top:-6px;left:calc(50% + 12px);width:20px;height:20px;font-size:11px;z-index:1}
-  .start-step__icon{width:44px;height:44px;border-radius:12px}
-  .start-step__icon svg{width:22px;height:22px}
-  .start-step__label{font-size:11.5px;line-height:1.2}
 }
 
 /* ============================================================

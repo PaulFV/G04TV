@@ -120,16 +120,11 @@
   box-shadow:var(--sh-1);
 }
 [data-theme="light"] .start-card,
-[data-theme="light"] .start-quick{background:var(--card-bg);border-color:var(--card-br)}
 [data-theme="light"] .start-now__icon{background:#fff;color:var(--tx-1)}
 [data-theme="light"] .start-now__icon:hover{background:var(--acc-dim);color:var(--acc)}
 [data-theme="light"] .start-now__icon.is-on{color:#C98A00;background:rgba(255,201,60,.16);border-color:rgba(201,138,0,.4)}
 [data-theme="light"] .start-now__state.is-live{color:var(--live)}
 [data-theme="light"] .start-now__state.is-live i{background:var(--live);box-shadow:0 0 8px var(--live)}
-[data-theme="light"] .start-step__num{background:#fff;box-shadow:0 2px 10px rgba(10,143,194,.15)}
-[data-theme="light"] .start-step__icon{background:linear-gradient(145deg,#E4F5FC,#fff);border-color:var(--acc-line);box-shadow:0 8px 20px rgba(22,52,82,.1)}
-[data-theme="light"] .start-step__icon svg{filter:none}
-[data-theme="light"] .start-quick__bolt{text-shadow:0 0 10px rgba(10,143,194,.4)}
 
 /* Die Illustrationen sind auf schwarzem Grund gemalt und werden im
    dunklen Modus per "screen" freigestellt. Auf hellem Grund wuerden sie
@@ -161,6 +156,16 @@
 /* ---------- Einstellungen ---------- */
 [data-theme="light"] .settings-device{background:var(--acc-dim)}
 [data-theme="light"] .settings-section{background:var(--card-bg);border-color:var(--card-br)}
+/* Abschnittsfarben: im hellen Schema etwas dunkler, sonst zu blass auf Weiß */
+[data-theme="light"] .sec-lang{--sec:#7C5CE0;--sec-rgb:124,92,224}
+[data-theme="light"] .sec-play{--sec:#0A8FC2;--sec-rgb:10,143,194}
+[data-theme="light"] .settings-lock{--sec:#D92D20;--sec-rgb:217,45,32}
+[data-theme="light"] .sec-net{--sec:#B7791F;--sec-rgb:183,121,31}
+[data-theme="light"] .sec-data{--sec:#0F8A5F;--sec-rgb:15,138,95}
+[data-theme="light"] .sec-app{--sec:#2563EB;--sec-rgb:37,99,235}
+[data-theme="light"] .sec-fb{--sec:#D9650F;--sec-rgb:217,101,15}
+[data-theme="light"] .sec-info{--sec:#0F9488;--sec-rgb:15,148,136}
+[data-theme="light"] .settings-section{background:linear-gradient(120deg,rgba(var(--sec-rgb),.10),#F8FBFD 60%);border-color:rgba(var(--sec-rgb),.38);box-shadow:inset 3px 0 0 rgba(var(--sec-rgb),.9),0 8px 22px rgba(22,52,82,.08)}
 [data-theme="light"] .settings-panel,
 [data-theme="light"] .settings-stat{background:#fff;border-color:rgba(10,143,194,.2)}
 [data-theme="light"] .settings-platform{border-bottom-color:rgba(16,44,66,.08)}

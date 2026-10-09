@@ -186,7 +186,7 @@
 
   /** Der Abschnitt für die Einstellungen: zugeklappt zeigt er nur die Überschrift. */
   function html() {
-    return '<details class="card settings-section settings-info" id="infoBox"' + (isOpen ? ' open' : '') + '>' +
+    return '<details class="card settings-section settings-fold settings-info sec-info" id="infoBox"' + (isOpen ? ' open' : '') + '>' +
       '<summary class="settings-section__head">' + u.icon('info', 22) + '<h3>Info</h3>' +
         '<span class="settings-info__ver">' + u.esc(G.NAME + ' ' + G.VERSION) + '</span></summary>' +
       '<div class="settings-info__body">' +
