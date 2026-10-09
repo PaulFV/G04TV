@@ -1,0 +1,108 @@
+/* ============================================================
+   G04TV — Tablet und iPad
+   Wird zuletzt geladen. Drei Dinge:
+   1. Hochkant (621–980 px): Bild und Infos nebeneinander statt ein
+      Bild über die ganze Breite, schmalere Leiste, mittiges Blatt.
+   2. Quer (981–1366 px): Das Menü klappt ein wie auf dem Handy und
+      gibt dem Inhalt die ganze Breite; die Startseite teilt sich in
+      Bild links und Senderliste rechts, jede Seite für sich scrollbar.
+   3. Berührung: größere Tippflächen.
+   ============================================================ */
+
+/* ---------- 1. Hochkant ---------- */
+@media (min-width:621px) and (max-width:980px){
+  /* Das feste Bild nimmt sonst fast die halbe Höhe. Daneben die Infos. */
+  .start-live{
+    grid-template-columns:minmax(0,1.7fr) minmax(220px,1fr);
+    gap:20px;align-items:center;padding:12px max(16px,env(safe-area-inset-right)) 12px max(16px,env(safe-area-inset-left));
+  }
+  body[data-view="start"] .start-now{padding:0 4px 0 0}
+  .start-now__name{font-size:19px}
+  .start-now__sub{font-size:13.5px}
+
+  .tabbar{width:min(560px,calc(100% - 48px))}
+  .tabbar__item{font-size:12px}
+
+  /* Blatt: mittig statt über die ganze Breite */
+  .sheet{
+    left:0;right:0;margin:0 auto;width:min(680px,100%);height:min(86vh,100%);
+  }
+  .toasts{left:auto;right:20px;max-width:min(420px,calc(100% - 40px))}
+
+  .grid--tiles{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+}
+
+/* ---------- 2. Quer ---------- */
+@media (min-width:981px) and (max-width:1366px) and (orientation:landscape){
+  /* Menü als Schublade, genau wie auf dem Handy */
+  :root{--sidebar-w:0px}
+  .only-mobile{display:flex}
+  .icon-btn.only-mobile{display:grid}
+  .tabbar.only-mobile{display:none}
+  .shell{grid-template-columns:1fr}
+  .sidebar{
+    position:fixed;left:0;top:0;width:min(300px,50vw);z-index:65;
+    transform:translateX(-100%);transition:transform .38s var(--ease);
+    border-radius:0 var(--r-xl) var(--r-xl) 0;border-width:0 1px 0 0;
+    background:var(--bg-1);-webkit-backdrop-filter:none;backdrop-filter:none;
+    box-shadow:18px 0 48px rgba(0,0,0,.36);
+  }
+  .sidebar.is-open{transform:none}
+  [data-theme="light"] .sidebar{background:var(--bg-1)}
+  .nav__item{padding:13px 14px;font-size:15.5px}
+
+  /* Kopfzeile: Menüknopf, Marke und Titel nebeneinander */
+  .topbar{
+    padding-left:max(clamp(16px,3vw,32px),env(safe-area-inset-left));
+    padding-right:max(clamp(16px,3vw,32px),env(safe-area-inset-right));
+  }
+  .topbar__brand{display:flex;align-items:center;gap:8px;flex:none;padding:0}
+  .topbar__brand .brand__mark{width:32px;height:32px;border-radius:10px}
+  .topbar__divider{display:block;width:1px;height:26px;background:var(--glass-br);flex:none}
+  .view-host{
+    padding-left:max(clamp(16px,3vw,32px),env(safe-area-inset-left));
+    padding-right:max(clamp(16px,3vw,32px),env(safe-area-inset-right));
+  }
+
+  /* Startseite mit Senderliste: zwei Spalten, jede mit eigener Höhe */
+  body[data-view="start"] .main{padding-bottom:0}
+  .start-view:has(> .start-shelf){
+    display:grid;grid-template-columns:minmax(0,1.25fr) minmax(400px,1fr);
+    gap:18px;align-items:start;padding-bottom:0;
+    height:calc(100vh - var(--topbar-h,76px) - 16px);
+    height:calc(100dvh - var(--topbar-h,76px) - 16px);
+  }
+  .start-view:has(> .start-shelf) > .start-live{
+    grid-template-columns:minmax(0,1fr);gap:14px;padding:12px;align-self:start;
+  }
+  .start-view:has(> .start-shelf) .start-now{padding:2px 6px 4px}
+  .start-view:has(> .start-shelf) .start-now__name{font-size:19px}
+  .start-view:has(> .start-shelf) > .start-shelf{
+    height:100%;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+  }
+  .start-shelf__top{
+    position:sticky;top:-14px;z-index:3;margin:-14px -16px 0;padding:14px 16px 8px;
+    background:var(--bg-1);
+  }
+  .start-view:has(> .start-shelf) .start-shelf__grid{grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:10px}
+
+  .start-view:has(> .start-shelf) .start-shelf__tab svg{display:none}
+  .start-view:has(> .start-shelf) .start-shelf__tab{padding:0 10px;font-size:13.5px}
+  .start-view:has(> .start-shelf) .start-shelf__tab i{display:none}
+  .sheet{width:min(560px,60vw)}
+}
+
+/* ---------- 3. Berührung ---------- */
+@media (pointer:coarse){
+  .icon-btn{width:44px;height:44px;border-radius:13px}
+  .lang-switch button{min-width:40px;min-height:36px}
+  .btn{min-height:44px}
+  .btn--sm{min-height:40px}
+  .chip{min-height:38px}
+  .search__clear{width:36px;height:36px}
+  .ch-tile__fav{width:34px;height:34px}
+  .start-shelf__tab{height:40px}
+  .start-shelf__mode button{min-width:40px;min-height:36px}
+  .nav__item{min-height:46px}
+}
