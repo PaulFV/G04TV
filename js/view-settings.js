@@ -134,17 +134,18 @@
   function lockSection() {
     var L = G.lock;
     if (!L) return '';
-    var head = '<div class="settings-section__head">' + u.icon('lock', 22) + '<h3>Sperre (Jugendschutz)</h3></div>';
+    var head = '<summary class="settings-section__head">' + u.icon('lock', 22) + '<h3>Sperre (Jugendschutz)</h3></summary>';
+    var tag = '<details class="card settings-section settings-fold settings-lock sec-lock" id="fold-lock"' + (folds.lock ? ' open' : '') + '>';
     if (!L.hasCode()) {
-      return '<section class="card settings-section settings-lock">' + head +
+      return tag + head +
         '<p class="settings-lock__intro">Mit einem 4-stelligen Code lassen sich Playlisten, Kategorien und einzelne Sender sperren. Gesperrte Sender laufen erst nach Eingabe des Codes.</p>' +
         '<div class="settings-actions"><button class="btn btn--primary" id="lockSet">' + u.icon('lock', 16) + ' Code festlegen</button></div>' +
-      '</section>';
+      '</details>';
     }
     var n = L.counts();
     var open = L.isOpen();
     var left = Math.max(1, Math.ceil(L.openLeft() / 60000));
-    return '<section class="card settings-section settings-lock">' + head +
+    return tag + head +
       '<div class="settings-lock__state' + (open ? ' is-open' : '') + '">' +
         u.icon(open ? 'unlock' : 'lock', 20) +
         '<div><b>' + (open ? 'Entsperrt' : 'Code aktiv') + '</b>' +
@@ -162,11 +163,11 @@
         '<button class="btn btn--danger" id="lockRemove">' + u.icon('unlock', 16) + ' Sperre aufheben</button>' +
       '</div>' +
       '<p class="settings-section__foot">Der Code gilt nur auf diesem Gerät. Wer die Website-Daten im Browser löscht, löscht auch die Sperre.</p>' +
-    '</section>';
+    '</details>';
   }
 
   // Welche ausklappbaren Abschnitte offen sind - bleibt, wenn die Einstellungen neu gezeichnet werden
-  var folds = { net: false, data: false, app: false, fb: false };
+  var folds = { lang: false, play: false, lock: false, net: false, data: false, app: false, fb: false };
 
   function renderModern() {
     var s = G.store.state.settings;
@@ -178,8 +179,8 @@
         '<span class="settings-device">' + u.icon('shield', 18) + ' Nur auf diesem Gerät</span>' +
       '</div>' +
 
-      '<section class="card settings-section sec-lang">' +
-        '<div class="settings-section__head">' + u.icon('grid', 22) + '<h3>Sprache &amp; Darstellung</h3></div>' +
+      '<details class="card settings-section settings-fold sec-lang" id="fold-lang"' + (folds.lang ? ' open' : '') + '>' +
+        '<summary class="settings-section__head">' + u.icon('grid', 22) + '<h3>Sprache &amp; Darstellung</h3></summary>' +
         '<div class="settings-grid settings-grid--2">' +
           '<div class="settings-panel settings-panel__language">' +
             u.icon('grid', 22) +
@@ -200,10 +201,10 @@
           '<div class="settings-panel">' + sw('showTabbar', 'Untere Leiste anzeigen', 'Aus: mehr Platz für die Sender. Die Bereiche erreichst du dann über das Menü oben links.') + '</div>' +
           '<div class="settings-panel">' + sw('reduceMotion', 'Bewegung reduzieren', 'Animationen und Hintergrundschein abschalten.') + '</div>' +
         '</div>' +
-      '</section>' +
+      '</details>' +
 
-      '<section class="card settings-section sec-play">' +
-        '<div class="settings-section__head">' + u.icon('play', 22) + '<h3>Wiedergabe</h3></div>' +
+      '<details class="card settings-section settings-fold sec-play" id="fold-play"' + (folds.play ? ' open' : '') + '>' +
+        '<summary class="settings-section__head">' + u.icon('play', 22) + '<h3>Wiedergabe</h3></summary>' +
         '<div class="settings-grid settings-grid--2">' +
           '<div class="settings-panel">' + sw('autoplay', 'Sofort abspielen', 'Sender beim Antippen direkt starten.') + '</div>' +
           '<div class="settings-panel">' + sw('resume', 'Letzten Sender beim Start laden', 'Zuletzt gesehenen Sender vorbereiten.') + '</div>' +
@@ -222,7 +223,7 @@
               'bei HLS auf iPhone und iPad bestimmt das System den Puffer selbst.</p>' +
           '</div>' +
         '</div>' +
-      '</section>' +
+      '</details>' +
 
       lockSection() +
 
@@ -298,7 +299,7 @@
      ------------------------------------------------------------ */
   function mount(host) {
     if (G.info) G.info.mount();
-    ['net', 'data', 'app', 'fb'].forEach(function (id) {
+    ['lang', 'play', 'lock', 'net', 'data', 'app', 'fb'].forEach(function (id) {
       var box = u.$(id === 'fb' ? '#fbBox' : '#fold-' + id);
       if (box) box.addEventListener('toggle', function () { folds[id] = box.open; });
     });
