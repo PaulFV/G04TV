@@ -77,32 +77,6 @@
     '</article>';
   }
 
-  function ownChannels() {
-    var s = G.store.state;
-
-    return '<section class="card pl-own">' +
-      '<div class="pl-own__head">' +
-        '<div class="pl-own__title">' + u.icon('live', 22) + '<div><h3>Einzelne Sender</h3>' +
-        '<p>Ein einzelner Stream ohne Playlist — etwa ein Radiosender oder eine feste Adresse.</p></div></div>' +
-        '<button class="btn" id="plAddChannel">' + u.icon('plus', 16) + ' Sender</button>' +
-      '</div>' +
-      (s.channels.length
-        ? '<div class="list">' + s.channels.map(function (c) {
-            return '<div class="list__row">' +
-              u.logoHtml(c, 'ch-row__logo') +
-              '<span class="list__main"><b>' + u.esc(c.name) + '</b>' +
-              '<span title="' + u.esc(c.url) + '">' + u.esc(u.shorten(c.url, 44)) + '</span></span>' +
-              '<span class="list__end">' +
-                '<button class="icon-btn" data-play-own="' + u.esc(c.url) + '" title="Abspielen" ' +
-                'style="width:32px;height:32px;border-radius:9px">' + u.icon('play', 14) + '</button>' +
-                '<button class="icon-btn" data-del-own="' + u.esc(c.url) + '" title="Entfernen" ' +
-                'style="width:32px;height:32px;border-radius:9px">' + u.icon('trash', 14) + '</button>' +
-              '</span></div>';
-          }).join('') + '</div>'
-        : '<div class="pl-own__empty"><img src="art/playlist-channel.png" alt=""><b>Keine eigenen Sender</b></div>') +
-    '</section>';
-  }
-
   function render() {
     var s = G.store.state;
 
@@ -136,8 +110,6 @@
             '<p>G04TV bringt keine Sender mit — du trägst deine eigene Quelle ein.</p>' +
             '<button class="btn btn--primary" id="plAdd2">' + u.icon('plus', 17) + ' Jetzt hinzufügen</button></div>' +
           '</section>') +
-
-      ownChannels() +
 
       '<button class="card pl-help" id="plHelp" type="button">' + u.icon('info', 18) +
         '<span class="pl-help__main"><b>Probleme beim Laden einer Adresse?</b><span>CORS, Anbieterfreigaben und Vermittler prüfen</span></span>' +
@@ -350,41 +322,6 @@
   }
 
   /* ------------------------------------------------------------
-     Einzelne Sender
-     ------------------------------------------------------------ */
-  function channelSheet() {
-    var defaultGroup = G.i18n && G.i18n.language === 'en' ? 'Individual channels' : 'Eigene Sender';
-    u.openSheet('Einzelnen Sender eintragen',
-      '<div class="stack">' +
-        '<div class="field"><label for="cName">Name</label>' +
-        '<input class="input" id="cName" placeholder="z. B. NDR 2" autocomplete="off"></div>' +
-        '<div class="field"><label for="cUrl">Adresse des Streams</label>' +
-        '<input class="input" id="cUrl" type="url" inputmode="url" spellcheck="false" autocomplete="off" ' +
-        'placeholder="https://…/stream.m3u8"></div>' +
-        '<div class="field"><label for="cGroup">Gruppe</label>' +
-        '<input class="input" id="cGroup" value="' + u.esc(defaultGroup) + '" autocomplete="off"></div>' +
-        '<button class="btn btn--primary btn--block" id="cSave">' + u.icon('check', 16) + ' Eintragen</button>' +
-      '</div>',
-      function (body) {
-        body.querySelector('#cSave').onclick = function () {
-          var url = body.querySelector('#cUrl').value.trim();
-          if (!url) { u.toast('Adresse fehlt', 'Ohne Adresse geht es nicht.', 'warn'); return; }
-
-          var added = G.store.addChannel({
-            name: body.querySelector('#cName').value.trim(),
-            url: url,
-            group: body.querySelector('#cGroup').value.trim() || 'Eigene Sender'
-          });
-
-          u.closeSheet();
-          G.app.rerender();
-          u.toast(added ? 'Sender eingetragen' : 'Schon vorhanden',
-            added ? added.name : 'Dieser Stream steht bereits in der Liste.', added ? 'ok' : 'warn');
-        };
-      });
-  }
-
-  /* ------------------------------------------------------------
      Einhaengen
      ------------------------------------------------------------ */
   function mount(host) {
@@ -400,33 +337,10 @@
     var all = u.$('#plRefreshAll');
     if (all) all.onclick = refreshAll;
 
-    var addCh = u.$('#plAddChannel');
-    if (addCh) addCh.onclick = channelSheet;
-
     u.on(host, 'click', '[data-act]', function (e, t) {
       var card = t.closest('[data-pl]');
       if (!card) return;
       action(t.getAttribute('data-act'), card.getAttribute('data-pl'));
-    });
-
-    u.on(host, 'click', '[data-play-own]', function (e, t) {
-      var url = t.getAttribute('data-play-own');
-      var c = G.store.state.channels.filter(function (x) { return G.m3u.sameSource(x.url, url); })[0];
-      if (!c) return;
-      G.views.live.playChannel(c);
-      G.app.go('live');
-    });
-
-    u.on(host, 'click', '[data-del-own]', async function (e, t) {
-      var url = t.getAttribute('data-del-own');
-      var ok = await u.confirmSheet({
-        title: 'Sender entfernen',
-        body: 'Der eingetragene Sender wird aus der Liste genommen.',
-        ok: 'Entfernen'
-      });
-      if (!ok) return;
-      G.store.removeChannel(url);
-      G.app.rerender();
     });
   }
 

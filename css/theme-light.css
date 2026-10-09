@@ -131,26 +131,21 @@
    verblassen - darum hier als dunkle Bildflaeche mit runden Ecken. */
 [data-theme="light"] .start-card__visual img,
 [data-theme="light"] .pl-import-option__art img,
-[data-theme="light"] .pl-empty__art img,
-[data-theme="light"] .pl-own__empty img{mix-blend-mode:normal}
+[data-theme="light"] .pl-empty__art img{mix-blend-mode:normal}
 [data-theme="light"] .start-card__visual,
 [data-theme="light"] .pl-import-option__art,
-[data-theme="light"] .pl-empty__art,
-[data-theme="light"] .pl-own__empty img{background:#0B1622;border-radius:14px}
+[data-theme="light"] .pl-empty__art{background:#0B1622;border-radius:14px}
 [data-theme="light"] .pl-empty__art{margin:14px;border-radius:18px}
 
 /* ---------- Playlisten ---------- */
 [data-theme="light"] .pl-import,
 [data-theme="light"] .pl-empty,
-[data-theme="light"] .pl-own,
 [data-theme="light"] .pl-help{background:var(--card-bg);border-color:var(--card-br)}
 [data-theme="light"] .pl-import__badge{background:var(--acc-dim);border-color:var(--acc-line)}
 [data-theme="light"] .pl-import-option{background:#fff;border-color:rgba(10,143,194,.22)}
 [data-theme="light"] .pl-import-option:hover{box-shadow:0 8px 22px rgba(10,143,194,.16)}
-[data-theme="light"] .pl-own__empty{background:rgba(10,143,194,.05);border-color:rgba(10,143,194,.18)}
 [data-theme="light"] .pl-help > svg{color:var(--acc);filter:none}
 [data-theme="light"] .pl-import__title > svg,
-[data-theme="light"] .pl-own__title > svg,
 [data-theme="light"] .start-card .card__head svg{filter:none}
 
 /* ---------- Einstellungen ---------- */

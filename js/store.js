@@ -251,30 +251,6 @@
     commit('active');
   }
 
-  /* ---------- Einzelne Sender ---------- */
-  function addChannel(channel) {
-    var item = {
-      name: channel.name || G.m3u.nameFromSource(channel.url),
-      url: String(channel.url || '').trim(),
-      group: channel.group || 'Eigene Sender',
-      logo: channel.logo || '',
-      addedAt: new Date().toISOString()
-    };
-    if (!item.url) return null;
-
-    // Was schon dasteht, kommt nicht zweimal vor.
-    if (state.channels.some(function (c) { return G.m3u.sameSource(c.url, item.url); })) return null;
-
-    state.channels.push(item);
-    commit('channels');
-    return item;
-  }
-
-  function removeChannel(url) {
-    state.channels = state.channels.filter(function (c) { return !G.m3u.sameSource(c.url, url); });
-    commit('channels');
-  }
-
   /* ---------- Favoriten ---------- */
   function isFavorite(url) {
     return state.favorites.some(function (f) { return G.m3u.sameSource(f.url, url); });
@@ -491,9 +467,6 @@
     renamePlaylist: renamePlaylist,
     removePlaylist: removePlaylist,
     setActive: setActive,
-
-    addChannel: addChannel,
-    removeChannel: removeChannel,
 
     isFavorite: isFavorite,
     toggleFavorite: toggleFavorite,
