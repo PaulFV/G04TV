@@ -75,18 +75,15 @@
   .start-view:has(> .start-shelf){
     --avail:calc(100vh - var(--topbar-h,76px) - 16px);
     --avail:calc(100dvh - var(--topbar-h,76px) - 16px);
-    /* Linke Spalte: so breit, dass Bild (16:10) und Infozeile genau in die
+    /* Linke Spalte: so breit, dass Bild (16:9) und Infozeile genau in die
        Höhe passen - was darüber hinaus bleibt, bekommt die Senderliste. */
-    display:grid;grid-template-columns:minmax(0,calc((var(--avail) - 140px) * 16 / 10 + 26px)) minmax(360px,1fr);
+    display:grid;grid-template-columns:minmax(0,calc((var(--avail) - 205px) * 16 / 9 + 26px)) minmax(390px,1fr);
     gap:18px;align-items:start;padding-bottom:0;
     height:var(--avail);
   }
   .start-view:has(> .start-shelf) > .start-live{
     grid-template-columns:minmax(0,1fr);gap:14px;padding:12px;align-self:stretch;align-content:center;
   }
-  /* Das Bild füllt den freien Platz oben: etwas höher als 16:9 (das Video bleibt
-     unverzerrt, oben und unten kommen schmale schwarze Streifen). */
-  .start-view:has(> .start-shelf) .start-live .pdock.is-inline .stage:not(.is-full){aspect-ratio:16/10}
   .start-view:has(> .start-shelf) .start-now{padding:2px 6px 4px}
   .start-view:has(> .start-shelf) .start-now__name{font-size:19px}
   .start-view:has(> .start-shelf) > .start-shelf{
@@ -152,7 +149,7 @@
   /* Vollbild: Knopf oben rechts auf dem Bild statt in der Knopfreihe */
   .start-live__full{
     display:grid;position:absolute;top:10px;right:max(10px,env(safe-area-inset-right));z-index:5;margin:0;
-    width:48px;height:48px;border-radius:14px;background:rgba(6,8,12,.72);border-color:rgba(255,255,255,.16);
+    width:48px;height:48px;border:0;border-radius:14px;background:rgba(6,8,12,.72);
   }
   .start-live__full svg{width:24px;height:24px}
   .start-now__head #stFull{display:none}
