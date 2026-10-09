@@ -445,19 +445,26 @@ body[data-view="start"] .topbar{background:var(--bg-0)}
 }
 
 /* ---------- Reiter bleiben stehen ----------
-   Favoriten | Alle | Verlauf und die Ansicht-Umschalter kleben unter dem festen Bild,
-   die Sender scrollen darunter durch. Die Karte darf dafür nicht beschneiden
-   (overflow), sonst haftet nichts. */
+   Favoriten | Alle | Verlauf und die Ansicht-Umschalter hängen wie das Bild fest unter
+   der Kopfzeile (position:fixed, nicht sticky: auf dem iPhone rutschte die Leiste beim
+   Scrollen hinter dem Bild nach). Ihre Oberkante ist die gemessene Unterkante des Bildes
+   (--live-bottom, gesetzt in view-start.js); die Karte lässt oben Platz dafür. */
+:root{--bar-h:56px}
 @media (max-width:980px){
-  body[data-view="start"] .start-shelf{overflow:visible}
+  /* backdrop-filter würde die Karte zum Bezugspunkt für "fixed" machen */
+  body[data-view="start"] .start-shelf{overflow:visible;padding-top:var(--bar-h);-webkit-backdrop-filter:none;backdrop-filter:none}
   body[data-view="start"] .start-shelf__top{
-    position:sticky;top:calc(var(--topbar-h,66px) + var(--live-h,0px));z-index:6;
-    margin:-14px -16px 0;padding:14px 16px 8px;background:var(--bg-1);
-    border-radius:var(--r-lg) var(--r-lg) 0 0;
+    position:fixed;left:0;right:0;z-index:6;box-sizing:border-box;height:var(--bar-h);margin:0;
+    top:var(--live-bottom,calc(var(--topbar-h,66px) + var(--live-h,0px)));
+    padding:8px calc(max(16px,env(safe-area-inset-right)) + 16px) 8px calc(max(16px,env(safe-area-inset-left)) + 16px);
+    background:var(--bg-1);border-radius:0;
   }
 }
 @media (max-width:620px){
-  body[data-view="start"] .start-shelf__top{margin:-10px -10px 0;padding:10px 10px 8px}
+  body[data-view="start"] .start-shelf__top{
+    padding-left:calc(max(16px,env(safe-area-inset-left)) + 10px);
+    padding-right:calc(max(16px,env(safe-area-inset-right)) + 10px);
+  }
 }
 
 /* ---------- Play-Zeichen im Bild: ohne Rahmen, groesser ---------- */

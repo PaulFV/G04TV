@@ -730,6 +730,8 @@
         }
         // Platz fuer das feste Bild und Sprungziele (scroll-margin)
         document.documentElement.style.setProperty('--live-h', live.getBoundingClientRect().height + 'px');
+        // Unterkante des Bildes, gemessen - die Reiter hängen genau dort
+        document.documentElement.style.setProperty('--live-bottom', live.getBoundingClientRect().bottom + 'px');
       };
       place();
       // nach dem Laden von Schrift und Logos noch einmal nachmessen
