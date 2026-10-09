@@ -204,6 +204,7 @@
   var allPool = null;          // Sender der aktiven Playlist (geladen)
   var allPoolId = null;        // ... fuer welche Playlist
   var allQuery = '';
+  var listQuery = { fav: '', recent: '' };   // Suche in Favoriten und Verlauf
   var allGroup = '*';          // gewaehlte Kategorie ('*' = alle)
   var allGroups = [];          // Kategorien in der Reihenfolge der Playlist
   var allList = [];            // nach Suche gefiltert
@@ -274,9 +275,27 @@
     return head + body;
   }
 
-  function listBody(tab) {
+  /** Die Kacheln von Favoriten oder Verlauf, nach der Suche des Reiters gefiltert. */
+  function listItems(tab) {
     var s = G.store.state;
     var playing = G.player.channel;
+    var all = tab === 'fav' ? s.favorites : s.recent;
+    var q = listQuery[tab];
+    var list = q ? G.library.filter(all, q, '*') : all;
+
+    if (!list.length) return '<p class="start-shelf__empty">' + tr('Nichts gefunden') + '</p>';
+
+    // Die Pfeile gelten für die ganze Liste - in einer Suche wären sie irreführend.
+    return '<div class="start-shelf__grid">' +
+      list.map(function (c, i) {
+        return tile(c, playing && G.m3u.sameSource(playing.url, c.url), tab === 'recent' ? u.relTime(c.at) : '',
+          tab === 'fav' && !q ? { i: i, n: list.length } : null);
+      }).join('') +
+    '</div>';
+  }
+
+  function listBody(tab) {
+    var s = G.store.state;
     var list = tab === 'fav' ? s.favorites : s.recent;
 
     if (!list.length) {
@@ -284,12 +303,12 @@
         ? 'Markiere Sender mit einem Stern — sie erscheinen dann hier.'
         : 'Noch nichts gesehen — gespielte Sender erscheinen hier.') + '</p>';
     }
-    return '<div class="start-shelf__grid">' +
-        list.map(function (c, i) {
-          return tile(c, playing && G.m3u.sameSource(playing.url, c.url), tab === 'recent' ? u.relTime(c.at) : '',
-            tab === 'fav' ? { i: i, n: list.length } : null);
-        }).join('') +
+    return '<div class="start-shelf__tools">' +
+        '<div class="search start-shelf__search">' + u.icon('search', 16) +
+          '<input class="input" id="stListSearch" type="search" inputmode="search" autocomplete="off" ' +
+          'placeholder="Suchen …" value="' + u.esc(listQuery[tab]) + '"></div>' +
       '</div>' +
+      '<div id="stListBody">' + listItems(tab) + '</div>' +
       (tab === 'recent'
         ? '<div class="start-shelf__foot"><button class="btn btn--sm btn--ghost" id="stClearRecent">' + u.icon('trash', 14) + ' Verlauf leeren</button></div>'
         : '<div class="start-shelf__foot"><button class="btn btn--sm btn--ghost" data-fav-export type="button">' + u.icon('download', 14) + ' Als M3U</button></div>');
@@ -782,6 +801,14 @@
       });
       loadAll();
     }
+
+    var listSearch = u.$('#stListSearch');
+    if (listSearch) listSearch.addEventListener('input', u.debounce(function () {
+      var tab = currentTab();
+      listQuery[tab] = listSearch.value.trim();
+      var body = u.$('#stListBody');
+      if (body) body.innerHTML = listItems(tab);
+    }, 150));
 
     // Oben der kleine Knopf, unten unter der Liste der beschriftete - beide sichern
     u.$$('[data-fav-export]').forEach(function (exp) { exp.onclick = function () {
