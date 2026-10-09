@@ -67,13 +67,16 @@
   /* Startseite mit Senderliste: zwei Spalten, jede mit eigener Höhe */
   body[data-view="start"] .main{padding-bottom:0}
   .start-view:has(> .start-shelf){
-    display:grid;grid-template-columns:minmax(0,1.25fr) minmax(400px,1fr);
+    --avail:calc(100vh - var(--topbar-h,76px) - 16px);
+    --avail:calc(100dvh - var(--topbar-h,76px) - 16px);
+    /* Linke Spalte: so breit, dass Bild (16:9) und Infozeile genau in die
+       Höhe passen - was darüber hinaus bleibt, bekommt die Senderliste. */
+    display:grid;grid-template-columns:minmax(0,calc((var(--avail) - 112px) * 16 / 9 + 26px)) minmax(390px,1fr);
     gap:18px;align-items:start;padding-bottom:0;
-    height:calc(100vh - var(--topbar-h,76px) - 16px);
-    height:calc(100dvh - var(--topbar-h,76px) - 16px);
+    height:var(--avail);
   }
   .start-view:has(> .start-shelf) > .start-live{
-    grid-template-columns:minmax(0,1fr);gap:14px;padding:12px;align-self:start;
+    grid-template-columns:minmax(0,1fr);gap:14px;padding:12px;align-self:stretch;align-content:center;
   }
   .start-view:has(> .start-shelf) .start-now{padding:2px 6px 4px}
   .start-view:has(> .start-shelf) .start-now__name{font-size:19px}
@@ -88,7 +91,9 @@
   .start-view:has(> .start-shelf) .start-shelf__grid{grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:10px}
 
   .start-view:has(> .start-shelf) .start-shelf__tab svg{display:none}
-  .start-view:has(> .start-shelf) .start-shelf__tab{padding:0 10px;font-size:13.5px}
+  .start-view:has(> .start-shelf) .start-shelf__tab{padding:0 7px;font-size:13px;gap:4px}
+  .start-view:has(> .start-shelf) .start-shelf__tab span{overflow:visible;text-overflow:clip}
+  .start-view:has(> .start-shelf) .start-shelf__top{gap:6px}
   .start-view:has(> .start-shelf) .start-shelf__tab i{display:none}
   .sheet{width:min(560px,60vw)}
 }
@@ -105,4 +110,9 @@
   .start-shelf__tab{height:40px}
   .start-shelf__mode button{min-width:40px;min-height:36px}
   .nav__item{min-height:46px}
+}
+
+/* Handy: kein Platz in der Kopfzeile - der Vollbild-Knopf der App entfällt */
+@media (max-width:620px){
+  #appFull{display:none !important}
 }

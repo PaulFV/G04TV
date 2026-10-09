@@ -206,11 +206,13 @@
     applyVolume();
 
     video.addEventListener('playing', function () {
+      if (!started && current) note('Läuft: ' + (current.name || '') + ' · ' + describe(snapshot()));
       started = true;
       progressAt = playingSince = Date.now();
       set('playing');
     });
     video.addEventListener('timeupdate', function () { progressAt = Date.now(); });
+    video.addEventListener('waiting', logWaiting);
     setInterval(watchStalls, 1000);
     // Kurze Aussetzer (Bruchteile einer Sekunde) nicht gleich mit der
     // Ladeanzeige quittieren - das Aufblitzen wirkte selbst wie Stottern.
@@ -253,6 +255,50 @@
     journal.push(new Date().toTimeString().slice(0, 8) + ' ' + text);
     if (journal.length > 40) journal.shift();
     try { console.info('[G04TV] ' + text); } catch (e) { }
+  }
+
+  /** Womit gerade gespielt wird und wie voll der Puffer ist - fürs Protokoll. */
+  function snapshot() {
+    var engine = hls ? 'hls.js' : ts ? 'mpegts.js' : (video && video.currentSrc ? 'System (nativ)' : '-');
+    var ahead = null;
+    if (video && video.buffered) {
+      for (var i = 0; i < video.buffered.length; i++) {
+        if (video.currentTime >= video.buffered.start(i) - 0.1 && video.currentTime <= video.buffered.end(i)) {
+          ahead = video.buffered.end(i) - video.currentTime;
+        }
+      }
+    }
+    var q = video && video.getVideoPlaybackQuality ? video.getVideoPlaybackQuality() : null;
+    var level = hls && hls.levels && hls.levels[hls.currentLevel];
+    return {
+      engine: engine,
+      ahead: ahead,                                   // Sekunden Vorrat, null = keiner
+      ready: video ? video.readyState : -1,
+      dropped: q ? q.droppedVideoFrames : null,
+      frames: q ? q.totalVideoFrames : null,
+      height: video ? video.videoHeight : 0,
+      kbps: hls && hls.bandwidthEstimate ? Math.round(hls.bandwidthEstimate / 1000) : null,
+      level: level ? Math.round(level.bitrate / 1000) : null,
+      stalls: stalls,
+      status: status
+    };
+  }
+
+  function describe(s) {
+    return s.engine + ' · Vorrat ' + (s.ahead == null ? 'keiner' : s.ahead.toFixed(1) + ' s') +
+      ' · Bild ' + (s.height || '?') + 'p' +
+      (s.dropped != null ? ' · verworfen ' + s.dropped + '/' + s.frames : '') +
+      (s.kbps != null ? ' · Netz ' + s.kbps + ' kbit/s' : '') +
+      (s.level != null ? ' · Stufe ' + s.level + ' kbit/s' : '');
+  }
+
+  var lastWait = 0;
+  function logWaiting() {
+    if (!current || !started || video.paused) return;
+    var now = Date.now();
+    if (now - lastWait < 2000) return;
+    lastWait = now;
+    note('Aussetzer: ' + describe(snapshot()));
   }
 
   function attempt(step) {
@@ -642,7 +688,10 @@
      Bereiche - dort geht nur das Videofeld selbst.
      ------------------------------------------------------------ */
   function isFull() {
-    return !!(document.fullscreenElement || document.webkitFullscreenElement) ||
+    // Nur das Bild zaehlt - die ganze App im Vollbild (Knopf in der Kopfzeile)
+    // ist etwas anderes.
+    var fe = document.fullscreenElement || document.webkitFullscreenElement;
+    return !!(fe && (fe === stage || fe === video || (stage && stage.contains(fe)))) ||
       (stage && stage.classList.contains('is-full'));
   }
 
@@ -676,6 +725,8 @@
     stop: stop,
     on: on,
     log: function () { return journal.slice(); },
+    clearLog: function () { journal = []; },
+    stats: function () { var s = snapshot(); s.text = describe(s); return s; },
     setVolume: setVolume,
     toggleMuted: toggleMuted,
     applyVolume: applyVolume,

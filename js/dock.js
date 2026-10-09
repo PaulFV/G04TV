@@ -217,7 +217,8 @@
     b.innerHTML = u.icon(full ? 'fullExit' : 'full', 18);
     b.title = full ? 'Vollbild verlassen' : 'Vollbild';
     b.setAttribute('aria-label', b.title);
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) stage.classList.remove('is-full');
+    var fe = document.fullscreenElement || document.webkitFullscreenElement;
+    if (!fe || !stage.contains(fe)) stage.classList.remove('is-full');
   }
 
   /* ------------------------------------------------------------

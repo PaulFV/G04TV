@@ -143,18 +143,61 @@
     '</div>';
   }
 
+  /* Wiedergabe-Protokoll: wie oft und warum es hängt. Bleibt auf dem Gerät;
+     nur wer „Kopieren“ tippt, nimmt den Text mit. Adressen stehen nicht darin. */
+  function diagText() {
+    var P = G.player, s = P.stats();
+    var net = navigator.connection || {};
+    return [
+      G.NAME + ' ' + G.VERSION + ' · ' + (navigator.userAgent.match(/\(([^)]+)\)/) || ['', '?'])[1],
+      'Netz: ' + (net.effectiveType || '?') + (net.downlink ? ' · ' + net.downlink + ' Mbit/s' : '') +
+        ' · Vermittler für Streams: ' + (G.store.state.settings.proxyStreams ? 'an' : 'aus'),
+      'Jetzt: ' + (P.channel ? (P.channel.name || '') + ' · Art ' + P.kindOf(P.channel.url) : 'nichts') +
+        ' · ' + s.status,
+      s.text,
+      '',
+    ].concat(P.log().length ? P.log() : ['(noch keine Ereignisse)']).join('\n');
+  }
+
+  function diagTab() {
+    return '<div class="stack">' +
+      '<div class="card">' +
+        '<div class="card__head">' + u.icon('live', 18) + '<h3>Wiedergabe-Protokoll</h3></div>' +
+        '<p class="small muted">Hängt oder ruckelt ein Sender, steht hier, womit er lief und wie voll der Puffer war. ' +
+        'Das bleibt auf diesem Gerät. Adressen und Zugangsdaten stehen nicht darin.</p>' +
+        '<pre class="diag" id="diagText" style="white-space:pre-wrap;word-break:break-word;font:12px/1.5 var(--mono);margin:12px 0;padding:12px;border-radius:12px;background:rgba(0,0,0,.28);border:1px solid var(--glass-br);max-height:46vh;overflow:auto">' +
+          u.esc(diagText()) + '</pre>' +
+        '<div class="btn-row">' +
+          '<button class="btn btn--primary" id="diagCopy">' + u.icon('file', 16) + ' Kopieren</button>' +
+          '<button class="btn" id="diagRefresh">Aktualisieren</button>' +
+          '<button class="btn btn--ghost" id="diagClear">Leeren</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+
   function render() {
     return '<div class="view stack">' +
       '<div class="tabs" id="infoTabs">' +
         '<button class="tabs__b' + (tab === 'info' ? ' is-on' : '') + '" data-tab="info">Über</button>' +
         '<button class="tabs__b' + (tab === 'keys' ? ' is-on' : '') + '" data-tab="keys">Bedienung</button>' +
+        '<button class="tabs__b' + (tab === 'diag' ? ' is-on' : '') + '" data-tab="diag">Wiedergabe</button>' +
         '<button class="tabs__b' + (tab === 'privacy' ? ' is-on' : '') + '" data-tab="privacy">Daten &amp; Recht</button>' +
       '</div>' +
-      (tab === 'info' ? infoTab() : tab === 'keys' ? keysTab() : privacyTab()) +
+      (tab === 'info' ? infoTab() : tab === 'keys' ? keysTab() : tab === 'diag' ? diagTab() : privacyTab()) +
     '</div>';
   }
 
   function mount(host) {
+    var paintDiag = function () { var el = u.$('#diagText'); if (el) el.textContent = diagText(); };
+    u.on(host, 'click', '#diagRefresh', paintDiag);
+    u.on(host, 'click', '#diagClear', function () { G.player.clearLog(); paintDiag(); });
+    u.on(host, 'click', '#diagCopy', function () {
+      var text = diagText();
+      var done = function () { u.toast('Kopiert', 'Das Protokoll liegt in der Zwischenablage.', 'ok'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, function () { });
+      else { var el = u.$('#diagText'); if (el) { var r = document.createRange(); r.selectNodeContents(el); var sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); } }
+    });
     u.on(host, 'click', '[data-tab]', function (e, t) {
       tab = t.getAttribute('data-tab');
       G.app.rerender();

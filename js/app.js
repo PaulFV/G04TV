@@ -1,5 +1,5 @@
 /* ============================================================
-   G04TV v1.0.52 — Anwendung, Navigation, Start
+   G04TV v1.0.54 — Anwendung, Navigation, Start
    ============================================================ */
 (function (G) {
   'use strict';
@@ -124,6 +124,41 @@
       b.setAttribute('aria-label', label);
       b.setAttribute('aria-pressed', light ? 'true' : 'false');
     }
+  }
+
+  /**
+   * Läuft die App im Browser (Adressleiste sichtbar), gibt es einen Knopf,
+   * der die ganze Seite in den Vollbildmodus schaltet. Als installierte App
+   * ist er überflüssig und bleibt verborgen; ebenso auf dem iPhone, wo
+   * Safari das für Seiten nicht kennt.
+   */
+  function initAppFull() {
+    var b = u.$('#appFull');
+    if (!b) return;
+    var root = document.documentElement;
+    var request = root.requestFullscreen || root.webkitRequestFullscreen;
+    var installed = (window.matchMedia && (matchMedia('(display-mode: standalone)').matches ||
+      matchMedia('(display-mode: fullscreen)').matches)) || navigator.standalone;
+    if (!request || installed) return;
+
+    var isFull = function () { return !!(document.fullscreenElement || document.webkitFullscreenElement); };
+    var paint = function () {
+      var on = isFull();
+      b.innerHTML = u.icon(on ? 'fullExit' : 'full', 20);
+      b.title = on ? 'Vollbild verlassen' : 'App im Vollbild';
+      b.setAttribute('aria-label', b.title);
+      b.classList.toggle('is-on', on);
+    };
+    b.hidden = false;
+    paint();
+    b.addEventListener('click', function () {
+      try {
+        if (isFull()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+        else request.call(root);
+      } catch (e) { /* abgelehnt */ }
+    });
+    document.addEventListener('fullscreenchange', paint);
+    document.addEventListener('webkitfullscreenchange', paint);
   }
 
   function initTheme() {
@@ -268,6 +303,7 @@
     G.dock.init();
     initLangSwitch();
     initTheme();
+    initAppFull();
     trackTopbar();
 
     document.addEventListener('click', function (e) {
