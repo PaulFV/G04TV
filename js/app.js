@@ -1,5 +1,5 @@
 /* ============================================================
-   G04TV v1.0.97 — Anwendung, Navigation, Start
+   G04TV v1.0.98 — Anwendung, Navigation, Start
    ============================================================ */
 (function (G) {
   'use strict';

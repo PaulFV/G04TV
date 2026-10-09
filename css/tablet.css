@@ -174,4 +174,6 @@
   .start-now__head .start-now__meta{max-width:calc(100% - 112px);overflow:hidden}
   .start-now__break{display:block;flex:0 0 100%;height:0}
   .start-now__head #stStar + .start-now__break + *{margin-left:0}
+  /* Das Bild ist hier nicht festgenagelt: die Reiter kleben direkt unter der Kopfzeile */
+  body[data-view="start"] .start-shelf__top{top:var(--topbar-h,66px)}
 }
