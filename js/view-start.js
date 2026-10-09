@@ -261,6 +261,10 @@
         '<button class="' + (mode === 'tiles' ? 'is-on' : '') + '" data-view="tiles" aria-label="Kacheln" title="Kacheln">' + u.icon('grid', 16) + '</button>' +
         '<button class="' + (mode === 'list' ? 'is-on' : '') + '" data-view="list" aria-label="Liste" title="Liste">' + u.icon('playlists', 16) + '</button>' +
       '</div>' +
+      // Favoriten als M3U-Datei sichern - nur im Reiter Favoriten, solange es welche gibt
+      (tab === 'fav' && s.favorites.length
+        ? '<button class="start-shelf__export" id="stFavExport" type="button" aria-label="Als M3U speichern" title="Als M3U speichern">' + u.icon('download', 16) + '</button>'
+        : '') +
     '</div>';
 
     var body;
@@ -288,7 +292,7 @@
       '</div>' +
       (tab === 'recent'
         ? '<div class="start-shelf__foot"><button class="btn btn--sm btn--ghost" id="stClearRecent">' + u.icon('trash', 14) + ' Verlauf leeren</button></div>'
-        : '<div class="start-shelf__foot"><button class="btn btn--sm btn--ghost" id="stFavExport">' + u.icon('download', 14) + ' Als M3U</button></div>');
+        : '');
   }
 
   /** Suche und - bei mehreren Playlisten - Auswahl der Playlist */

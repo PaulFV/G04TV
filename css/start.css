@@ -529,3 +529,23 @@ body[data-view="start"] .topbar{background:var(--bg-0)}
   .start-shelf.is-list.has-lock .ch-tile--ord{grid-template-columns:46px minmax(0,1fr) 30px 30px auto}
   .ch-tile__mv button{width:30px;height:30px}
 }
+
+/* Favoriten sichern: kleiner Knopf neben den Ansicht-Umschaltern */
+.start-shelf__export{
+  flex:none;width:40px;display:grid;place-items:center;cursor:pointer;
+  border-radius:13px;border:1px solid var(--glass-br);background:rgba(0,0,0,.22);color:var(--tx-1);
+  transition:color .2s,border-color .2s,background .2s;
+}
+.start-shelf__export:hover{color:var(--acc);border-color:var(--acc-line);background:var(--acc-dim)}
+@media (max-width:620px){ .start-shelf__export{width:36px} }
+/* Schmale Handys: mit dem Sichern-Knopf alle drei Reiter ohne Kürzung */
+@media (max-width:400px){
+  .start-shelf__export{width:32px}
+  .start-shelf__mode button{width:26px}
+  .start-shelf__top{gap:4px}
+  .start-shelf .start-shelf__tab{padding:0 4px;gap:3px;font-size:12px}
+  .start-shelf__tab i{display:none}
+}
+@media (max-width:400px){
+  .start-shelf .start-shelf__tab svg,.start-shelf .start-shelf__tab i{display:none !important}
+}

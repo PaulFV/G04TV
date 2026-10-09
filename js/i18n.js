@@ -283,6 +283,7 @@
     , 'Stand ': 'Updated '
     , 'Kacheln': 'Tiles'
     , 'Als M3U': 'As M3U'
+    , 'Als M3U speichern': 'Save as M3U'
     , 'Nach oben': 'Move up'
     , 'Nach unten': 'Move down'
     , 'Stern entfernen': 'Remove favorite'
