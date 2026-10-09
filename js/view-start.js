@@ -263,7 +263,7 @@
       '</div>' +
       // Favoriten als M3U-Datei sichern - nur im Reiter Favoriten, solange es welche gibt
       (tab === 'fav' && s.favorites.length
-        ? '<button class="start-shelf__export" id="stFavExport" type="button" aria-label="Als M3U speichern" title="Als M3U speichern">' + u.icon('download', 16) + '</button>'
+        ? '<button class="start-shelf__export" data-fav-export type="button" aria-label="Als M3U speichern" title="Als M3U speichern">' + u.icon('download', 16) + '</button>'
         : '') +
     '</div>';
 
@@ -292,7 +292,7 @@
       '</div>' +
       (tab === 'recent'
         ? '<div class="start-shelf__foot"><button class="btn btn--sm btn--ghost" id="stClearRecent">' + u.icon('trash', 14) + ' Verlauf leeren</button></div>'
-        : '');
+        : '<div class="start-shelf__foot"><button class="btn btn--sm btn--ghost" data-fav-export type="button">' + u.icon('download', 14) + ' Als M3U</button></div>');
   }
 
   /** Suche und - bei mehreren Playlisten - Auswahl der Playlist */
@@ -327,6 +327,28 @@
 
   function groupLabel(g) { return g || tr('Ohne Kategorie'); }
 
+  /* Die zuletzt gewählte Kategorie, je Playlist - beim nächsten Öffnen steht
+     man wieder dort. Der Reiter (Favoriten, Alle, Verlauf) wird schon über
+     TAB_KEY gemerkt. */
+  var GROUP_KEY = 'g04tv.startGroup';
+  function savedGroup(id) {
+    try {
+      var m = JSON.parse(localStorage.getItem(GROUP_KEY) || '{}');
+      return typeof m[id] === 'string' ? m[id] : '*';
+    } catch (e) { return '*'; }
+  }
+  // „Alles löschen“ nimmt auch die gemerkten Kategorien mit
+  G.store.subscribe(function (st, why) {
+    if (why === 'wipe') { try { localStorage.removeItem(GROUP_KEY); } catch (e) { /* optional */ } }
+  });
+  function saveGroup(id, group) {
+    try {
+      var m = JSON.parse(localStorage.getItem(GROUP_KEY) || '{}');
+      if (group === '*') delete m[id]; else m[id] = group;
+      localStorage.setItem(GROUP_KEY, JSON.stringify(m));
+    } catch (e) { /* optional */ }
+  }
+
   function paintCats() {
     var host = u.$('#stCats');
     if (!host) return;
@@ -342,7 +364,13 @@
           u.esc(groupLabel(g.name)) + '<span class="chip__n">' + u.fmtInt(g.count) + '</span></button>';
       }).join('');
     var on = host.querySelector('.chip.is-on');
-    if (on && on.scrollIntoView) host.scrollLeft = Math.max(0, on.offsetLeft - 12);
+    // Die aktive Kategorie ins Bild holen. Gemessen wird vom Rand der Leiste:
+    // offsetLeft zählt vom Rand der Karte und schob die Leiste um deren
+    // Innenabstand zu weit - die aktive Kategorie saß dann angeschnitten am Rand.
+    if (on) {
+      var left = on.getBoundingClientRect().left - host.getBoundingClientRect().left + host.scrollLeft;
+      host.scrollLeft = Math.max(0, left - 16);
+    }
   }
 
   /* Von aussen: Reiter "Alle" zeigen (statt des frueheren Bereichs Sender) */
@@ -412,7 +440,8 @@
       }
       allPool = pool; allPoolId = id;
       allGroups = groupsInOrder(pool);
-      if (allGroup !== '*' && !allGroups.some(function (g) { return g.name === allGroup; })) allGroup = '*';
+      allGroup = savedGroup(id);
+      if (allGroup !== '*' &&!allGroups.some(function (g) { return g.name === allGroup; })) allGroup = '*';
     }
     paintCats();
     if (!u.$('#stGrid')) return;                      // Ansicht verlassen
@@ -688,6 +717,7 @@
         var b = e.target.closest('[data-cat]');
         if (!b) return;
         allGroup = b.getAttribute('data-cat');
+        saveGroup(allPoolId || G.store.state.activeId, allGroup);
         paintCats();
         applyAll();
         scrollToShelf();
@@ -698,6 +728,7 @@
         var h = e.target.closest('.start-shelf__cat');
         if (!h) return;
         allGroup = h.getAttribute('data-cat');
+        saveGroup(allPoolId || G.store.state.activeId, allGroup);
         paintCats();
         applyAll();
         scrollToShelf();
@@ -712,8 +743,8 @@
       loadAll();
     }
 
-    var exp = u.$('#stFavExport');
-    if (exp) exp.onclick = function () {
+    // Oben der kleine Knopf, unten unter der Liste der beschriftete - beide sichern
+    u.$$('[data-fav-export]').forEach(function (exp) { exp.onclick = function () {
       var favs = G.store.state.favorites;
       var lines = ['#EXTM3U'];
       favs.forEach(function (c) {
@@ -724,7 +755,7 @@
       u.toast(ok ? 'Datei erstellt' : 'Ging nicht',
         ok ? favs.length + ' Sender als M3U gespeichert.' : 'Der Browser hat den Download verhindert.',
         ok ? 'ok' : 'warn');
-    };
+    }; });
 
     var clear = u.$('#stClearRecent');
     if (clear) clear.onclick = async function () {
