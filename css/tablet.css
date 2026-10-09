@@ -51,6 +51,10 @@
   [data-theme="light"] .sidebar{background:var(--bg-1)}
   .nav__item{padding:13px 14px;font-size:15.5px}
 
+  /* Auf der Startseite braucht es den Titel nicht - die Marke genügt */
+  body[data-view="start"] .topbar__title,
+  body[data-view="start"] .topbar__divider{display:none}
+
   /* Kopfzeile: Menüknopf, Marke und Titel nebeneinander */
   .topbar{
     padding-left:max(clamp(16px,3vw,32px),env(safe-area-inset-left));
@@ -88,7 +92,7 @@
     position:sticky;top:-14px;z-index:3;margin:-14px -16px 0;padding:14px 16px 8px;
     background:var(--bg-1);
   }
-  .start-view:has(> .start-shelf) .start-shelf__grid{grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:10px}
+  .start-view:has(> .start-shelf) .start-shelf__grid{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
 
   .start-view:has(> .start-shelf) .start-shelf__tab svg{display:none}
   .start-view:has(> .start-shelf) .start-shelf__tab{padding:0 7px;font-size:13px;gap:4px}
@@ -115,4 +119,19 @@
 /* Handy: kein Platz in der Kopfzeile - der Vollbild-Knopf der App entfällt */
 @media (max-width:620px){
   #appFull{display:none !important}
+}
+
+/* ---------- Senderkacheln auf Tablet kleiner ---------- */
+@media (min-width:621px) and (max-width:1366px){
+  .start-shelf:not(.is-list) .start-shelf__grid{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
+  .start-shelf:not(.is-list) .ch-tile{padding:7px;gap:5px;border-radius:12px}
+  .start-shelf:not(.is-list) .ch-tile:hover{transform:none}
+  .start-shelf:not(.is-list) .ch-tile__logo{height:46px;border-radius:9px}
+  .start-shelf:not(.is-list) .ch-tile__logo img{inset:4px;max-width:calc(100% - 8px);max-height:calc(100% - 8px)}
+  .start-shelf:not(.is-list) .ch-tile__logo b{font-size:15px}
+  .start-shelf:not(.is-list) .ch-tile__name{font-size:12.5px}
+  .start-shelf:not(.is-list) .ch-tile__grp{font-size:11px}
+  .start-shelf:not(.is-list) .ch-tile__fav{top:4px;right:4px;width:30px;height:30px;border-radius:9px}
+  .start-shelf:not(.is-list) .ch-tile__fav svg{width:14px;height:14px}
+  .start-shelf:not(.is-list) .ch-tile__lock{top:4px;left:4px;width:30px;height:30px}
 }
