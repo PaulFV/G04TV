@@ -327,6 +327,45 @@
 
   function groupLabel(g) { return g || tr('Ohne Kategorie'); }
 
+  /**
+   * Eine seitwärts scrollende Leiste mit der Maus bedienbar machen. Auf dem
+   * Handy wischt man; am Rechner gibt es dafür weder Geste noch Leiste. Das
+   * Mausrad scrollt hier deshalb seitwärts, und Ziehen mit gedrückter Taste
+   * geht auch.
+   */
+  function mouseScroll(el) {
+    el.addEventListener('wheel', function (e) {
+      if (el.scrollWidth <= el.clientWidth) return;
+      if (Math.abs(e.deltaX) >= Math.abs(e.deltaY)) return;   // Touchpad scrollt schon seitwärts
+      el.scrollLeft += e.deltaY;
+      e.preventDefault();
+    }, { passive: false });
+
+    var start = null, dragged = false;
+    el.addEventListener('pointerdown', function (e) {
+      if (e.pointerType !== 'mouse' || e.button !== 0) return;
+      start = { x: e.clientX, left: el.scrollLeft, id: e.pointerId };
+      dragged = false;
+    });
+    el.addEventListener('pointermove', function (e) {
+      if (!start) return;
+      var dx = e.clientX - start.x;
+      if (!dragged && Math.abs(dx) < 5) return;
+      if (!dragged) { dragged = true; try { el.setPointerCapture(start.id); } catch (err) { /* egal */ } }
+      el.scrollLeft = start.left - dx;
+    });
+    var end = function () { start = null; };
+    el.addEventListener('pointerup', end);
+    el.addEventListener('pointercancel', end);
+    // Nach dem Ziehen kein Klick auf die Kategorie unter dem Zeiger
+    el.addEventListener('click', function (e) {
+      if (!dragged) return;
+      dragged = false;
+      e.stopPropagation();
+      e.preventDefault();
+    }, true);
+  }
+
   /* Die zuletzt gewählte Kategorie, je Playlist - beim nächsten Öffnen steht
      man wieder dort. Der Reiter (Favoriten, Alle, Verlauf) wird schon über
      TAB_KEY gemerkt. */
@@ -713,6 +752,7 @@
         applyAll();
       }, 200));
       var cats = u.$('#stCats');
+      if (cats) mouseScroll(cats);
       if (cats) cats.addEventListener('click', function (e) {
         var b = e.target.closest('[data-cat]');
         if (!b) return;

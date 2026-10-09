@@ -1,12 +1,12 @@
 /* ============================================================
-   G04TV v1.0.63 — Hilfsfunktionen
+   G04TV v1.0.64 — Hilfsfunktionen
 
    Klassisches Script (kein Modul), damit die App auch per
    Doppelklick ueber file:// laeuft.
    ============================================================ */
 var G04TV = window.G04TV || {};
 window.G04TV = G04TV;
-G04TV.VERSION = '1.0.63';
+G04TV.VERSION = '1.0.64';
 G04TV.NAME = 'G04TV';
 
 (function (G) {

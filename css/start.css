@@ -555,3 +555,12 @@ body[data-view="start"] .topbar{background:var(--bg-0)}
    Rand hinausragt - links und oben/unten war die aktive "Alle"-Kategorie angeschnitten. */
 .start-shelf__cats{margin:4px -8px 0;padding:8px 8px 8px;scroll-padding:0 8px}
 @media (max-width:620px){ .start-shelf__cats{margin:2px -6px 0;padding:8px 6px 8px;scroll-padding:0 6px} }
+
+/* Kategorie-Leiste am Rechner: eine dünne Leiste zeigt, dass es weitergeht -
+   das Mausrad scrollt sie seitwärts, Ziehen geht auch (view-start.js) */
+@media (hover:hover) and (pointer:fine){
+  .start-shelf__cats{scrollbar-width:thin;scrollbar-color:var(--glass-hi) transparent;cursor:grab}
+  .start-shelf__cats::-webkit-scrollbar{display:block;height:6px}
+  .start-shelf__cats::-webkit-scrollbar-thumb{background:var(--glass-hi);border-radius:99px}
+  .start-shelf__cats .chip{cursor:pointer}
+}
