@@ -165,7 +165,8 @@
     '</section>';
   }
 
-  var fbOpen = false;     // Feedback bleibt aufgeklappt, wenn die Einstellungen neu gezeichnet werden
+  // Welche ausklappbaren Abschnitte offen sind - bleibt, wenn die Einstellungen neu gezeichnet werden
+  var folds = { net: false, data: false, app: false, fb: false };
 
   function renderModern() {
     var s = G.store.state.settings;
@@ -225,8 +226,8 @@
 
       lockSection() +
 
-      '<section class="card settings-section sec-net">' +
-        '<div class="settings-section__head">' + u.icon('link', 22) + '<h3>Playlisten aus dem Netz</h3></div>' +
+      '<details class="card settings-section settings-fold sec-net" id="fold-net"' + (folds.net ? ' open' : '') + '>' +
+        '<summary class="settings-section__head">' + u.icon('link', 22) + '<h3>Playlisten aus dem Netz</h3></summary>' +
         '<div class="settings-proxy__intro">' + u.icon('shield', 17) + '<div>Der Vermittler ist optional. Er holt eine blockierte Playlist stellvertretend — trage nur eine Adresse ein, der du selbst vertraust.</div></div>' +
         '<div class="settings-panel">' + sw('proxyOn', 'Vermittler verwenden', 'Direkt versuchen; nur bei Bedarf über den Vermittler laden.') + '</div>' +
         '<div class="field settings-proxy__field"><label for="setProxy">Adresse des Vermittlers</label>' +
@@ -237,10 +238,10 @@
         (s.proxyStreams && !G.store.proxy()
           ? '<div class="note note--warn" style="margin-top:10px">' + u.icon('warn', 16) + '<div>Es ist kein Vermittler eingeschaltet — der Schalter bleibt wirkungslos.</div></div>'
           : '') +
-      '</section>' +
+      '</details>' +
 
-      '<section class="card settings-section sec-data">' +
-        '<div class="settings-section__head">' + u.icon('shield', 22) + '<h3>Daten auf diesem Gerät</h3></div>' +
+      '<details class="card settings-section settings-fold sec-data" id="fold-data"' + (folds.data ? ' open' : '') + '>' +
+        '<summary class="settings-section__head">' + u.icon('shield', 22) + '<h3>Daten auf diesem Gerät</h3></summary>' +
         '<div class="settings-data">' +
           '<div class="settings-stat">' + u.icon('playlists', 30) + '<div class="settings-stat__main"><span class="stat__v">' + G.store.state.playlists.length + '</span><span class="stat__d">Playlisten</span></div></div>' +
           '<div class="settings-stat">' + u.icon('database', 30) + '<div class="settings-stat__main"><span class="stat__v" id="setUsage">' + (usage ? u.fmtSize(usage.used) : '…') + '</span><span class="stat__d">Playlisten, Favoriten, Einstellungen</span></div></div>' +
@@ -251,10 +252,10 @@
           '<button class="btn btn--danger" id="setWipe">' + u.icon('trash', 16) + ' Alles löschen</button>' +
         '</div>' +
         '<p class="settings-section__foot">Die Sicherung enthält Einstellungen und Listen, nicht die Senderlisten selbst.</p>' +
-      '</section>' +
+      '</details>' +
 
-      '<section class="card settings-section sec-app">' +
-        '<div class="settings-section__head">' + u.icon('live', 22) + '<h3>Als App installieren</h3></div>' +
+      '<details class="card settings-section settings-fold sec-app" id="fold-app"' + (folds.app ? ' open' : '') + '>' +
+        '<summary class="settings-section__head">' + u.icon('live', 22) + '<h3>Als App installieren</h3></summary>' +
         '<div class="settings-install">' +
           '<div class="settings-install__art">' + u.icon('live', 22) + '</div>' +
           '<div class="settings-platforms">' +
@@ -263,9 +264,9 @@
           '</div>' +
           '<div class="settings-install__action"><button class="btn btn--primary" id="setInstall" hidden>' + u.icon('download', 16) + ' Jetzt installieren</button></div>' +
         '</div>' +
-      '</section>' +
+      '</details>' +
 
-      '<details class="card settings-section settings-fold settings-feedback sec-fb" id="fbBox"' + (fbOpen ? ' open' : '') + '>' +
+      '<details class="card settings-section settings-fold settings-feedback sec-fb" id="fbBox"' + (folds.fb ? ' open' : '') + '>' +
         '<summary class="settings-section__head">' + u.icon('edit', 22) + '<h3>Feedback &amp; Ideen</h3></summary>' +
         '<p class="settings-feedback__intro">Bug gefunden, eine Idee oder ein Wunsch? Schreib mir eine Nachricht — ganz ohne Konto.</p>' +
         '<form id="settingsFeedbackForm" class="settings-feedback__form" novalidate>' +
@@ -297,8 +298,10 @@
      ------------------------------------------------------------ */
   function mount(host) {
     if (G.info) G.info.mount();
-    var fbBox = u.$('#fbBox');
-    if (fbBox) fbBox.addEventListener('toggle', function () { fbOpen = fbBox.open; });
+    ['net', 'data', 'app', 'fb'].forEach(function (id) {
+      var box = u.$(id === 'fb' ? '#fbBox' : '#fold-' + id);
+      if (box) box.addEventListener('toggle', function () { folds[id] = box.open; });
+    });
 
     /* Sprache und Farbschema - dieselben Wege wie die Knoepfe in der Kopfzeile */
     var language = u.$('#setLanguage');
