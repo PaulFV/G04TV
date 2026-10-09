@@ -1,16 +1,15 @@
 /* ============================================================
-   G04TV v1.0.66 — Anwendung, Navigation, Start
+   G04TV v1.0.82 — Anwendung, Navigation, Start
    ============================================================ */
 (function (G) {
   'use strict';
   var u = G.u;
 
-  /* Die sechs Bereiche - wie die Bereichsleiste in Connect+ */
+  /* Die Bereiche - wie die Bereichsleiste in Connect+ */
   var NAV = [
     { k: 'start', n: 'Start', ic: 'start', tab: true },
     { k: 'playlists', n: 'Playlisten', ic: 'playlists', tab: true },
-    { k: 'settings', n: 'Einstellungen', ic: 'settings', tab: true },
-    { k: 'info', n: 'Info', ic: 'info' }
+    { k: 'settings', n: 'Einstellungen', ic: 'settings', tab: true }
   ];
 
   var current = 'start';
@@ -313,7 +312,6 @@
     u.$('#mobileMenuBtn').addEventListener('click', function () {
       if (u.$('.sidebar').classList.contains('is-open')) closeMobileNav(); else openMobileNav();
     });
-    u.$('#infoBtn').addEventListener('click', function () { go('info'); });
     u.$('#liveChip').addEventListener('click', function () { go('live'); });
     u.$('#sheetClose').addEventListener('click', u.closeSheet);
     u.$('#scrim').addEventListener('click', function () {

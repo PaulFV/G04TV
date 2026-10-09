@@ -287,6 +287,8 @@
         '</form>' +
       '</section>' +
 
+      (G.info ? G.info.html() : '') +
+
       '<p class="tiny dim center">' + u.esc(G.NAME) + ' ' + u.esc(G.VERSION) + '</p>' +
     '</div>';
   }
@@ -295,6 +297,8 @@
      Einhaengen
      ------------------------------------------------------------ */
   function mount(host) {
+    if (G.info) G.info.mount();
+
     /* Sprache und Farbschema - dieselben Wege wie die Knoepfe in der Kopfzeile */
     var language = u.$('#setLanguage');
     if (language) language.onchange = function () { if (G.i18n) G.i18n.setLanguage(language.value); };

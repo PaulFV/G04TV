@@ -1,5 +1,5 @@
 /* ============================================================
-   G04TV — Bereich Info
+   G04TV — Info (ausklappbar in den Einstellungen)
 
    Was die App tut, was sie nicht tut, wie sie bedient wird und
    was rechtlich gilt.
@@ -7,9 +7,9 @@
 (function (G) {
   'use strict';
   var u = G.u;
-  G.views = G.views || {};
 
   var tab = 'info';
+  var isOpen = false;       // bleibt aufgeklappt, wenn die Einstellungen neu gezeichnet werden
 
   var KEYS = [
     ['Leertaste / Enter', 'Gewählten Sender abspielen'],
@@ -18,7 +18,7 @@
     ['M', 'Ton aus und an'],
     ['↑ ↓', 'In der Senderliste blättern'],
     ['/', 'In das Suchfeld springen'],
-    ['1 – 4', 'Bereich wechseln']
+    ['1 – 3', 'Bereich wechseln']
   ];
 
   function infoTab() {
@@ -38,8 +38,7 @@
         '<div class="list">' +
           [['start', 'Start', 'Das Bild, darunter Favoriten, alle Sender mit Suche und der Verlauf'],
            ['playlists', 'Playlisten', 'Quellen eintragen, aktualisieren, ersetzen, löschen'],
-           ['settings', 'Einstellungen', 'Wiedergabe, Vermittler, Sicherung und Löschen'],
-           ['info', 'Info', 'Dieser Bereich']].map(function (r) {
+           ['settings', 'Einstellungen', 'Wiedergabe, Vermittler, Sicherung und Löschen — und diese Info']].map(function (r) {
             return '<div class="list__row"><span class="list__ic">' +
               u.icon(r[0] === 'favorites' ? 'star' : r[0], 17) + '</span>' +
               '<span class="list__main"><b>' + r[1] + '</b><span>' + r[2] + '</span></span></div>';
@@ -175,38 +174,50 @@
     '</div>';
   }
 
-  function render() {
-    return '<div class="view stack">' +
-      '<div class="tabs" id="infoTabs">' +
-        '<button class="tabs__b' + (tab === 'info' ? ' is-on' : '') + '" data-tab="info">Über</button>' +
-        '<button class="tabs__b' + (tab === 'keys' ? ' is-on' : '') + '" data-tab="keys">Bedienung</button>' +
-        '<button class="tabs__b' + (tab === 'diag' ? ' is-on' : '') + '" data-tab="diag">Wiedergabe</button>' +
-        '<button class="tabs__b' + (tab === 'privacy' ? ' is-on' : '') + '" data-tab="privacy">Daten &amp; Recht</button>' +
-      '</div>' +
-      (tab === 'info' ? infoTab() : tab === 'keys' ? keysTab() : tab === 'diag' ? diagTab() : privacyTab()) +
-    '</div>';
+  function tabsHtml() {
+    return [['info', 'Über'], ['keys', 'Bedienung'], ['diag', 'Wiedergabe'], ['privacy', 'Daten & Recht']].map(function (t) {
+      return '<button class="tabs__b' + (tab === t[0] ? ' is-on' : '') + '" data-tab="' + t[0] + '">' + u.esc(t[1]) + '</button>';
+    }).join('');
   }
 
-  function mount(host) {
+  function bodyHtml() {
+    return tab === 'info' ? infoTab() : tab === 'keys' ? keysTab() : tab === 'diag' ? diagTab() : privacyTab();
+  }
+
+  /** Der Abschnitt für die Einstellungen: zugeklappt zeigt er nur die Überschrift. */
+  function html() {
+    return '<details class="card settings-section settings-info" id="infoBox"' + (isOpen ? ' open' : '') + '>' +
+      '<summary class="settings-section__head">' + u.icon('info', 22) + '<h3>Info</h3>' +
+        '<span class="settings-info__ver">' + u.esc(G.NAME + ' ' + G.VERSION) + '</span></summary>' +
+      '<div class="settings-info__body">' +
+        '<div class="tabs" id="infoTabs">' + tabsHtml() + '</div>' +
+        '<div id="infoBody">' + bodyHtml() + '</div>' +
+      '</div>' +
+    '</details>';
+  }
+
+  function mount() {
+    var box = u.$('#infoBox');
+    if (!box) return;
+
+    box.addEventListener('toggle', function () { isOpen = box.open; });
+
     var paintDiag = function () { var el = u.$('#diagText'); if (el) el.textContent = diagText(); };
-    u.on(host, 'click', '#diagRefresh', paintDiag);
-    u.on(host, 'click', '#diagClear', function () { G.player.clearLog(); paintDiag(); });
-    u.on(host, 'click', '#diagCopy', function () {
+    u.on(box, 'click', '#diagRefresh', paintDiag);
+    u.on(box, 'click', '#diagClear', function () { G.player.clearLog(); paintDiag(); });
+    u.on(box, 'click', '#diagCopy', function () {
       var text = diagText();
       var done = function () { u.toast('Kopiert', 'Das Protokoll liegt in der Zwischenablage.', 'ok'); };
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, function () { });
       else { var el = u.$('#diagText'); if (el) { var r = document.createRange(); r.selectNodeContents(el); var sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); } }
     });
-    u.on(host, 'click', '[data-tab]', function (e, t) {
+    // Nur der Inhalt wird getauscht - die Einstellungen bleiben, wie sie sind
+    u.on(box, 'click', '[data-tab]', function (e, t) {
       tab = t.getAttribute('data-tab');
-      G.app.rerender();
+      u.$('#infoTabs').innerHTML = tabsHtml();
+      u.$('#infoBody').innerHTML = bodyHtml();
     });
   }
 
-  G.views.info = {
-    title: 'Info',
-    sub: function () { return G.NAME + ' ' + G.VERSION + ' — Web-App für iPhone, Android und Desktop'; },
-    render: render,
-    mount: mount
-  };
+  G.info = { html: html, mount: mount };
 })(G04TV);

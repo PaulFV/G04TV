@@ -190,3 +190,20 @@
 .settings-lock__hint svg{flex:none;margin-top:1px}
 
 .settings-range__note{margin:10px 0 0;color:var(--tx-2);font-size:12.5px;line-height:1.5}
+
+/* ---------- Info: ausklappbar ---------- */
+.settings-info > summary{list-style:none;cursor:pointer;margin-bottom:0}
+.settings-info > summary::-webkit-details-marker{display:none}
+.settings-info > summary::after{
+  content:"";margin-left:auto;flex:none;width:10px;height:10px;
+  border-right:2px solid var(--tx-2);border-bottom:2px solid var(--tx-2);
+  transform:translateY(-3px) rotate(45deg);transition:transform .2s;
+}
+.settings-info[open] > summary::after{transform:translateY(2px) rotate(-135deg)}
+.settings-info__ver{color:var(--tx-2);font-size:13px;font-weight:600}
+.settings-info__body{margin-top:16px;display:flex;flex-direction:column;gap:14px}
+.settings-info__body .card{background:rgba(255,255,255,.03);box-shadow:none}
+@media (max-width:620px){
+  .settings-info__body{margin-top:8px;margin-bottom:6px}
+  .settings-info__ver{display:none}
+}

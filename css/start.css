@@ -381,8 +381,21 @@ body[data-view="start"] .topbar{background:var(--bg-0)}
   .ch-tile__fav svg{width:13px;height:13px}
 }
 
+/* Stern gleich hinter dem Sendernamen, ohne Rahmen; Ton und Regler bleiben rechts */
+.start-now__head .start-now__meta{flex:0 1 auto}
+.start-now__head #stStar{border-color:transparent;background:none;margin-left:-6px}
+.start-now__head #stStar:hover{background:rgba(255,201,60,.12)}
+.start-now__head #stStar.is-on{border-color:transparent;background:none}
+.start-now__break{display:none}
+.start-now__head #stStar + .start-now__break + *{margin-left:auto}
+
+/* Vollbild ohne Browser-Vollbild (z. B. nach dem Drehen des Handys): "fixed" bezieht
+   sich auf die nächste Ebene mit Weichzeichner - die Karte muss ihn dafür ablegen. */
+.start-live:has(.stage.is-full){-webkit-backdrop-filter:none;backdrop-filter:none;z-index:300 !important}
+
 /* ---------- Ton / Vollbild unter dem Bild statt im Bild ---------- */
 .start-live .pdock.is-inline .stage:not(.is-full):not(.is-fs) .stage__bar{display:none}
+.start-live__full{display:none}
 .start-now__head .start-now__icon--sm{width:38px;height:38px;border-radius:11px;flex:none}
 .start-now__head .start-now__icon--sm svg{width:18px;height:18px}
 .start-now__icon.is-acc{color:var(--acc);border-color:var(--acc-line)}
@@ -392,6 +405,13 @@ body[data-view="start"] .topbar{background:var(--bg-0)}
   .start-now__head .start-now__icon--sm svg{width:16px;height:16px}
   .start-now__head{gap:6px}
 }
+
+/* ---------- Lautstärke-Regler (ab Tablet-Breite) ---------- */
+.start-now__body{display:flex;flex-direction:column;gap:14px;min-width:0}
+.start-now__vol{display:none;flex:1 1 0;min-width:56px;max-width:150px;align-items:center}
+@media (min-width:621px) and (min-height:501px){.start-now__vol{display:flex}}
+.start-now__vol input[type=range]{flex:1;min-width:0;height:22px;margin:0;accent-color:var(--acc);cursor:pointer}
+.start-now__time{font-variant-numeric:tabular-nums;font-weight:650;color:var(--tx-1)}
 
 /* ---------- Kategorien in "Alle" ---------- */
 .start-shelf__cats{margin-top:10px;padding-bottom:2px}
@@ -530,17 +550,8 @@ body[data-view="start"] .topbar{background:var(--bg-0)}
   .ch-tile__mv button{width:30px;height:30px}
 }
 
-/* Favoriten sichern: kleiner Knopf neben den Ansicht-Umschaltern */
-.start-shelf__export{
-  flex:none;width:40px;display:grid;place-items:center;cursor:pointer;
-  border-radius:13px;border:1px solid var(--glass-br);background:rgba(0,0,0,.22);color:var(--tx-1);
-  transition:color .2s,border-color .2s,background .2s;
-}
-.start-shelf__export:hover{color:var(--acc);border-color:var(--acc-line);background:var(--acc-dim)}
-@media (max-width:620px){ .start-shelf__export{width:36px} }
-/* Schmale Handys: mit dem Sichern-Knopf alle drei Reiter ohne Kürzung */
+/* Schmale Handys: Reiter ohne Kürzung */
 @media (max-width:400px){
-  .start-shelf__export{width:32px}
   .start-shelf__mode button{width:26px}
   .start-shelf__top{gap:4px}
   .start-shelf .start-shelf__tab{padding:0 4px;gap:3px;font-size:12px}

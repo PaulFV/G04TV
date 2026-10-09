@@ -67,6 +67,25 @@
     document.addEventListener('fullscreenchange', paintFull);
     document.addEventListener('webkitfullscreenchange', paintFull);
 
+    // Handy gedreht (quer, niedrig): läuft ein Sender, geht das Bild gleich in den
+    // Vollbildmodus; zurück ins Hochformat beendet ihn wieder - aber nur, wenn
+    // die Drehung ihn ausgelöst hat. Tablets bleiben, wie sie sind.
+    if (window.matchMedia) {
+      var turned = matchMedia('(orientation: landscape) and (max-height: 500px)');
+      var autoFull = false;
+      var onTurn = function () {
+        var st = G.player.status;
+        if (turned.matches) {
+          if ((st === 'playing' || st === 'loading') && !G.player.isFull()) { autoFull = true; G.player.fullscreen(true); }
+        } else if (autoFull) {
+          autoFull = false;
+          if (G.player.isFull()) G.player.fullscreen(false);
+        }
+      };
+      if (turned.addEventListener) turned.addEventListener('change', onTurn);
+      else if (turned.addListener) turned.addListener(onTurn);
+    }
+
     paint(G.player.status, G.player.message, G.player.channel);
     paintMute();
     paintFull();

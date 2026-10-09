@@ -93,9 +93,43 @@
      ------------------------------------------------------------ */
   function liveCard() {
     return '<section class="card start-live">' +
-      '<div class="stage-slot start-live__stage" id="stageSlot"></div>' +
-      '<div class="start-now" id="stNow">' + nowHtml() + '</div>' +
+      // Der Vollbild-Knopf über dem Bild gilt nur auf dem Tablet (siehe tablet.css)
+      '<div class="stage-slot start-live__stage" id="stageSlot">' +
+        '<button class="icon-btn start-live__full" id="stFullTop" type="button" aria-label="Vollbild" title="Vollbild">' + u.icon('full', 22) + '</button>' +
+      '</div>' +
+      '<div class="start-now" id="stNow">' +
+        '<div class="start-now__body" id="stNowBody">' + nowHtml() + '</div>' +
+      '</div>' +
     '</section>';
+  }
+
+  /**
+   * Lautstärke-Regler in der Knopfreihe, neben dem Ton-Knopf - nur ab Tablet-Breite
+   * (auf dem Handy gibt es die Tasten). Er bleibt beim Neuzeichnen der Infos
+   * erhalten und wird nur umgesetzt, sonst risse das Ziehen mittendrin ab.
+   */
+  var volBox = null;
+  function placeVol() {
+    var slot = u.$('#stVolSlot');
+    if (!slot) return;
+    if (!volBox) {
+      volBox = u.el('<span class="start-now__vol"><input type="range" id="stVol" min="0" max="100" step="1" aria-label="Lautstärke"></span>');
+      var r = volBox.querySelector('input');
+      r.addEventListener('input', function () {
+        G.player.setVolume(u.num(r.value, 80));
+        G.dock.paintMute();
+        var m = u.$('#stMute');
+        if (m) {
+          var silent = G.store.state.settings.muted || G.store.state.settings.volume <= 0;
+          m.innerHTML = u.icon(silent ? 'muted' : 'volume', 18);
+          m.title = silent ? 'Ton an' : 'Ton aus';
+          m.setAttribute('aria-label', m.title);
+        }
+      });
+    }
+    slot.replaceWith(volBox);
+    var inp = volBox.querySelector('input');
+    if (document.activeElement !== inp) inp.value = G.store.state.settings.volume;
   }
 
   function nowHtml() {
@@ -122,8 +156,11 @@
 
     var fav = G.store.isFavorite(c.url);
     var state;
-    if (status === 'playing') state = '<span class="start-now__state is-live"><i></i>Live</span>';
-    else if (status === 'loading') state = '<span class="start-now__state is-busy"><i></i>Wird geladen …</span>';
+    // Laufzeit: auch beim kurzen Nachladen stehen lassen, sonst flackert sie
+    var clock = G.player.elapsed() >= 0 && (status === 'playing' || status === 'loading')
+      ? '<span class="start-now__time" id="stClock">' + clockText() + '</span>' : '';
+    if (status === 'playing') state = '<span class="start-now__state is-live"><i></i>Live' + clock + '</span>';
+    else if (status === 'loading') state = '<span class="start-now__state is-busy"><i></i>Wird geladen …' + clock + '</span>';
     else if (status === 'error') state = '<span class="start-now__state is-err"><i></i>Fehler</span>';
     else state = '<span class="start-now__state"><i></i>Zuletzt gesehen' +
       (s.last && s.last.at ? ' · ' + u.esc(u.relTime(s.last.at)) : '') + '</span>';
@@ -135,12 +172,21 @@
           '<b class="start-now__name" title="' + u.esc(c.name) + '">' + u.esc(c.name) + '</b>' +
           '<span class="start-now__sub">' + u.esc(c.group || G.player.kindOf(c.url).toUpperCase()) + '</span>' +
         '</span>' +
-        // Ton, Vollbild (und AirPlay) - frueher oben im Bild
-        stageButtons() +
+        // Stern gleich hinter dem Namen, dann Ton und Regler (und AirPlay)
         '<button class="start-now__icon' + (fav ? ' is-on' : '') + '" id="stStar" ' +
           'aria-label="' + (fav ? 'Favorit entfernen' : 'Als Favorit merken') + '" title="Favorit">' +
           u.icon(fav ? 'starFill' : 'star', 20) + '</button>' +
+        '<span class="start-now__break"></span>' +
+        stageButtons() +
       '</div>';
+  }
+
+  /** Laufzeit als m:ss, ab einer Stunde h:mm:ss. */
+  function clockText() {
+    var s = Math.max(0, Math.floor(G.player.elapsed() / 1000));
+    var h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, sec = s % 60;
+    var two = function (n) { return (n < 10 ? '0' : '') + n; };
+    return '· ' + (h ? h + ':' + two(m) : m) + ':' + two(sec);
   }
 
   function stageButtons() {
@@ -153,18 +199,22 @@
         : '') +
       '<button class="start-now__icon start-now__icon--sm" id="stMute" aria-label="' + (muted ? 'Ton an' : 'Ton aus') + '" title="' + (muted ? 'Ton an' : 'Ton aus') + '">' +
         u.icon(muted ? 'muted' : 'volume', 18) + '</button>' +
+      '<span id="stVolSlot"></span>' +
       '<button class="start-now__icon start-now__icon--sm" id="stFull" aria-label="Vollbild" title="Vollbild">' + u.icon('full', 18) + '</button>';
   }
 
   function paintNow() {
-    var host = u.$('#stNow');
+    var host = u.$('#stNowBody');
     if (!host) return;
     host.innerHTML = nowHtml();
+    placeVol();
 
     var mute = u.$('#stMute');
     if (mute) mute.onclick = function () { G.player.toggleMuted(); G.dock.paintMute(); paintNow(); };
     var full = u.$('#stFull');
     if (full) full.onclick = function () { G.player.fullscreen(true); };
+    var fullTop = u.$('#stFullTop');
+    if (fullTop) fullTop.onclick = function () { G.player.fullscreen(true); };
     var air = u.$('#stAir');
     if (air) air.onclick = function () { var b = u.$('#stageAirplay'); if (b) b.click(); };
 
@@ -262,10 +312,6 @@
         '<button class="' + (mode === 'tiles' ? 'is-on' : '') + '" data-view="tiles" aria-label="Kacheln" title="Kacheln">' + u.icon('grid', 16) + '</button>' +
         '<button class="' + (mode === 'list' ? 'is-on' : '') + '" data-view="list" aria-label="Liste" title="Liste">' + u.icon('playlists', 16) + '</button>' +
       '</div>' +
-      // Favoriten als M3U-Datei sichern - nur im Reiter Favoriten, solange es welche gibt
-      (tab === 'fav' && s.favorites.length
-        ? '<button class="start-shelf__export" data-fav-export type="button" aria-label="Als M3U speichern" title="Als M3U speichern">' + u.icon('download', 16) + '</button>'
-        : '') +
     '</div>';
 
     var body;
@@ -636,6 +682,12 @@
     var onPlayer = function () { paintNow(); paintPlaying(); };
     document.addEventListener('g04tv:player', onPlayer);
     off.push(function () { document.removeEventListener('g04tv:player', onPlayer); });
+    // Laufzeit jede Sekunde nachziehen - nur der Text, nichts wird neu gezeichnet
+    var tick = setInterval(function () {
+      var c = u.$('#stClock');
+      if (c && G.player.elapsed() >= 0) c.textContent = clockText();
+    }, 1000);
+    off.push(function () { clearInterval(tick); });
     document.addEventListener('g04tv:airplay', paintNow);
     off.push(function () { document.removeEventListener('g04tv:airplay', paintNow); });
 
@@ -801,6 +853,14 @@
       });
       loadAll();
     }
+
+    // Enter schließt die Tastatur (auf dem Tablet bleibt sie sonst stehen)
+    ['#stSearch', '#stListSearch'].forEach(function (sel) {
+      var f = u.$(sel);
+      if (f) f.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); f.blur(); }
+      });
+    });
 
     var listSearch = u.$('#stListSearch');
     if (listSearch) listSearch.addEventListener('input', u.debounce(function () {

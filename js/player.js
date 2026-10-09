@@ -47,6 +47,7 @@
   var stalls = 0;            // Hänger seit dem letzten ruhigen Lauf
   var progressAt = 0;        // wann zuletzt Bild weiterlief
   var playingSince = 0;      // seit wann es ohne Aussetzer läuft
+  var runStart = 0;          // wann dieser Sender zum ersten Mal lief (Laufzeit-Anzeige)
   var started = false;       // hat dieser Versuch schon einmal gespielt?
   var journal = [];          // die letzten Ereignisse, zum Nachsehen
 
@@ -223,6 +224,7 @@
       if (!started && current) note('Läuft: ' + (current.name || '') + ' · ' + describe(snapshot()));
       started = true;
       progressAt = playingSince = Date.now();
+      if (!runStart) runStart = playingSince;
       set('playing');
     });
     video.addEventListener('timeupdate', function () { progressAt = Date.now(); });
@@ -384,6 +386,7 @@
       queue = [];
       current = null;
       playingUrl = '';
+      runStart = 0;
       set('idle');
     }
   }
@@ -608,6 +611,7 @@
     current = channel;
     tries = 0;
     started = false;
+    runStart = 0;
     progressAt = Date.now();
     set('loading', 'Verbindung wird aufgebaut …');
 
@@ -753,6 +757,8 @@
     play: play,
     stop: stop,
     on: on,
+    /** Wie lange der laufende Sender schon läuft (ms) - -1, solange er noch nicht lief. */
+    elapsed: function () { return runStart && current ? Date.now() - runStart : -1; },
     log: function () { return journal.slice(); },
     clearLog: function () { journal = []; },
     stats: function () { var s = snapshot(); s.text = describe(s); return s; },

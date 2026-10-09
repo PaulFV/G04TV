@@ -1,4 +1,4 @@
-# G04TV v1.0.66
+# G04TV v1.0.82
 
 Abspieler für **eigene IPTV-Playlisten** — als eigenständige Web-App für **iPhone, Android und
 Desktop**. Ohne Backend, ohne Konto, ohne Tracking. Playlisten, Favoriten und Zugangsdaten bleiben
@@ -18,7 +18,6 @@ gesperrten Einträge. Die Umsetzung als installierbare Web-App folgt **GoFit**.
 | **Sender** | Senderliste mit Suche und Gruppen, daneben das Bild; Stern, Vollbild, extern öffnen |
 | **Playlisten** | Quellen eintragen (Adresse, Datei, Einfügen, Xtream), aktualisieren, ersetzen, umbenennen, löschen |
 | **Einstellungen** | Wiedergabe, Vermittler, Sicherung, alles löschen |
-| **Info** | Aufbau, Bedienung, Daten und Recht |
 
 * **Playlisten werden gespeichert.** Kopfdaten im `localStorage`, die Senderlisten in der
   `IndexedDB` — auch zehntausende Sender.
@@ -181,7 +180,7 @@ G04TV/
     view-live.js            Bereich Sender
     view-playlists.js       Bereich Playlisten
     view-settings.js        Bereich Einstellungen
-    view-info.js            Bereich Info
+    info.js                 Info (ausklappbar in den Einstellungen)
     onboarding.js           Ersteinrichtung (drei Schritte, einmalig)
     app.js                  Navigation, Tastatur, Start
   proxy/
