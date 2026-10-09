@@ -93,6 +93,20 @@
     return !!video.canPlayType('application/vnd.apple.mpegurl');
   }
 
+  /**
+   * Eingebautes HLS nur dort, wo es das bessere ist: auf Apple-Geräten
+   * (Safari, iPhone, iPad - mit AirPlay und Ton bei gesperrtem Bildschirm)
+   * oder wenn es kein MediaSource für hls.js gibt. Neuere Chrome-Versionen
+   * melden HLS ebenfalls als abspielbar; ihr eingebauter Weg hat aber
+   * weder den einstellbaren Puffer noch Wiederholungen bei Netzfehlern -
+   * dort läuft hls.js, wie bei Firefox und Edge auch.
+   */
+  function preferNativeHls() {
+    if (!nativeHls()) return false;
+    if (typeof window.MediaSource !== 'function' && !window.ManagedMediaSource) return true;
+    return /Apple/i.test(navigator.vendor || '');
+  }
+
   function hlsUsable() { return !!(window.Hls && window.Hls.isSupported()); }
 
   function tsUsable() {
@@ -425,16 +439,27 @@
     }
   }
 
+  /** Der eingestellte Vorrat in ganzen Minuten, 1 bis 12. */
+  function bufferMinutes() {
+    var n = Math.round(Number(G.store.state.settings.bufferMin));
+    return n >= 1 && n <= 12 ? n : 1;
+  }
+
   function startHls(url) {
     // Kein Low-Latency-Modus: IPTV-Sender sind kein LL-HLS, und der Modus
     // haelt den Puffer klein - das stottert. Lieber 3-4 Segmente Abstand
     // zur Live-Kante und bis zu 30 s Vorrat.
+    // Der Vorrat kommt aus den Einstellungen (1-12 Min). hls.js füllt ihn,
+    // soweit der Sender Segmente vorhält; bei Live-Sendern ist das oft nur
+    // das Fenster der Playlist. maxBufferSize deckelt den Speicherbedarf.
+    var bufMin = bufferMinutes();
     hls = new window.Hls({
       lowLatencyMode: false,
       liveSyncDurationCount: 4,
       liveMaxLatencyDurationCount: 12,
-      maxBufferLength: 30,
-      maxMaxBufferLength: 60,
+      maxBufferLength: bufMin * 60,
+      maxMaxBufferLength: bufMin * 60,
+      maxBufferSize: Math.max(60, bufMin * 25) * 1000 * 1000,
       backBufferLength: 30,
       manifestLoadingTimeOut: 20000,
       fragLoadingTimeOut: 20000
@@ -551,10 +576,12 @@
 
   function viaHls(url) {
     return async function (mine) {
-      if (nativeHls()) { startNative(url); return; }
+      if (preferNativeHls()) { startNative(url); return; }
       var ok = await ensure('hls') && hlsUsable();
       if (mine !== run) return;
       if (ok) { startHls(url); return; }
+      // hls.js nicht ladbar: lieber der eingebaute Weg als gar nichts
+      if (nativeHls()) { startNative(url); return; }
       if (!next()) fail('HLS lässt sich hier nicht abspielen — hls.js konnte nicht geladen werden.');
     };
   }
@@ -629,6 +656,8 @@
     if (kind === 'hls') {
       // Auf iPhone, iPad und in Safari ist der eingebaute Weg der bessere.
       steps.push({ label: 'Verbindung wird aufgebaut …', go: viaHls(url) });
+      // Chrome kann HLS auch selbst - als zweiter Weg, falls hls.js scheitert
+      if (nativeHls() && !preferNativeHls()) steps.push({ label: 'Neuer Versuch …', go: viaNative(url) });
     }
     else if (kind === 'ts' || kind === 'flv') {
       var tsStep = { label: 'Versuch über MPEG-TS …', go: viaTs(url, kind) };

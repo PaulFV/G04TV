@@ -188,3 +188,5 @@
 .settings-lock__counts div{display:flex;flex-direction:column;align-items:center;padding:10px 6px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)}
 .settings-lock__hint{display:flex;gap:8px;align-items:flex-start;color:var(--tx-2);font-size:12.5px;line-height:1.45;margin:0 0 12px}
 .settings-lock__hint svg{flex:none;margin-top:1px}
+
+.settings-range__note{margin:10px 0 0;color:var(--tx-2);font-size:12.5px;line-height:1.5}

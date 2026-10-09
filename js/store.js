@@ -75,6 +75,7 @@
         autoplay: true,          // beim Antippen sofort abspielen
         resume: false,           // beim Start den letzten Sender laden
         reduceMotion: false,
+        bufferMin: 1,            // Vorrat, den der Abspieler höchstens vorhält (1-12 Minuten)
         showTabbar: true,        // untere Leiste auf dem Handy
         confirmExternal: true,   // vor dem Oeffnen in einer anderen App fragen
         proxyOn: false,

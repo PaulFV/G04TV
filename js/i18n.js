@@ -284,6 +284,8 @@
     , 'Kacheln': 'Tiles'
     , 'Als M3U': 'As M3U'
     , 'Als M3U speichern': 'Save as M3U'
+    , 'Puffer': 'Buffer'
+    , 'Wie viel Vorrat G04TV höchstens vorhält. Mehr Puffer braucht mehr Arbeitsspeicher. Gilt ab dem nächsten Sender. Ein Live-Sender füllt den Vorrat nur so schnell, wie der Anbieter liefert; bei HLS auf iPhone und iPad bestimmt das System den Puffer selbst.': 'How much reserve G04TV keeps at most. A bigger buffer needs more memory. Applies from the next channel. A live channel only fills the reserve as fast as the provider delivers; for HLS on iPhone and iPad the system decides the buffer itself.'
     , 'Nach oben': 'Move up'
     , 'Nach unten': 'Move down'
     , 'Stern entfernen': 'Remove favorite'

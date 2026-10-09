@@ -21,6 +21,12 @@
     '</label>';
   }
 
+  /** Der gespeicherte Puffer in Minuten, immer 1 bis 12. */
+  function bufferValue(s) {
+    var n = Math.round(Number(s.bufferMin));
+    return n >= 1 && n <= 12 ? n : 1;
+  }
+
   function render() {
     var s = G.store.state.settings;
 
@@ -207,6 +213,14 @@
             '<input type="range" id="setVol" min="0" max="100" value="' + s.volume + '">' +
             '<div class="settings-range__ends"><span>Leise</span><span>Laut</span></div>' +
           '</div>' +
+          '<div class="settings-panel settings-range">' +
+            '<div class="settings-range__head"><span>Puffer</span><span id="setBufV">' + bufferValue(s) + ' Min</span></div>' +
+            '<input type="range" id="setBuf" min="1" max="12" step="1" value="' + bufferValue(s) + '">' +
+            '<div class="settings-range__ends"><span>1 Min</span><span>12 Min</span></div>' +
+            '<p class="settings-range__note">Wie viel Vorrat G04TV höchstens vorhält. Mehr Puffer braucht mehr Arbeitsspeicher. ' +
+              'Gilt ab dem nächsten Sender. Ein Live-Sender füllt den Vorrat nur so schnell, wie der Anbieter liefert; ' +
+              'bei HLS auf iPhone und iPad bestimmt das System den Puffer selbst.</p>' +
+          '</div>' +
         '</div>' +
       '</section>' +
 
@@ -303,6 +317,14 @@
       // Der Hinweis unter den Schaltern haengt an beiden - neu zeichnen.
       if (key === 'proxyOn' || key === 'proxyStreams') G.app.rerender();
     });
+
+    /* Puffer (1-12 Minuten) - gilt ab dem naechsten Sender */
+    var buf = u.$('#setBuf');
+    if (buf) buf.oninput = function () {
+      var n = G.u.clamp(Math.round(u.num(buf.value, 1)), 1, 12);
+      G.store.setSetting('bufferMin', n);
+      u.$('#setBufV').textContent = n + ' Min';
+    };
 
     /* Lautstaerke */
     var vol = u.$('#setVol');
