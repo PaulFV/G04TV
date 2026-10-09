@@ -149,10 +149,13 @@
   /* Vollbild: Knopf oben rechts auf dem Bild statt in der Knopfreihe */
   .start-live__full{
     display:grid;position:absolute;top:10px;right:max(10px,env(safe-area-inset-right));z-index:5;margin:0;
-    width:48px;height:48px;border:0;border-radius:14px;background:rgba(6,8,12,.72);
+    width:48px;height:48px;border:0;border-radius:14px;background:none;color:#fff;filter:drop-shadow(0 1px 3px rgba(0,0,0,.85));
   }
   .start-live__full svg{width:24px;height:24px}
   .start-now__head #stFull{display:none}
+  /* Lautsprecher neben dem Regler: ohne Rahmen und Hintergrund */
+  .start-now__head #stMute{border-color:transparent;background:none}
+  .start-now__head #stMute:hover{background:none;border-color:transparent}
 }
 
 
