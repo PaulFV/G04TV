@@ -359,6 +359,7 @@ body[data-view="start"] .topbar{background:var(--bg-0)}
 
 /* ---------- Ton / Vollbild unter dem Bild statt im Bild ---------- */
 .start-live .pdock.is-inline .stage:not(.is-full):not(.is-fs) .stage__bar{display:none}
+.start-live__stage{position:relative}
 .start-live__full{display:none}
 .start-now__head .start-now__icon--sm{width:38px;height:38px;border-radius:11px;flex:none}
 .start-now__head .start-now__icon--sm svg{width:18px;height:18px}

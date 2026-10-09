@@ -11,14 +11,14 @@
 
 /* ---------- 1. Hochkant ---------- */
 @media (min-width:621px) and (max-width:980px){
-  /* Das Bild steht oben, so groß wie es die Höhe erlaubt (höchstens 680 px
-     breit), darunter in einer Zeile Sender, Stern, Ton und Regler. */
+  /* Das Bild geht über die ganze Breite bis zum Rand, darunter in einer
+     Zeile Sender, Stern, Ton und Regler. */
   .start-live{
-    grid-template-columns:minmax(0,1fr);justify-items:center;
-    gap:12px;align-items:start;padding:12px max(16px,env(safe-area-inset-right)) 12px max(16px,env(safe-area-inset-left));
+    grid-template-columns:minmax(0,1fr);justify-items:stretch;
+    gap:10px;align-items:start;padding:0 0 12px;
   }
-  .start-live > .start-live__stage,.start-live > .start-now{width:100%;max-width:680px}
-  body[data-view="start"] .start-now{padding:0 4px}
+  .start-live > .start-live__stage,.start-live > .start-now{width:100%;max-width:none}
+  body[data-view="start"] .start-now{padding:0 max(16px,env(safe-area-inset-right)) 0 max(16px,env(safe-area-inset-left))}
   .start-now__name{font-size:19px}
   .start-now__sub{font-size:13.5px}
 
@@ -146,8 +146,11 @@
   .start-now__head .start-now__icon--sm{width:52px;height:52px;border-radius:14px}
   .start-now__head .start-now__icon svg,
   .start-now__head .start-now__icon--sm svg{width:25px;height:25px}
-  /* Vollbild: Knopf über dem Bild, rechtsbündig, statt in der Knopfreihe */
-  .start-live__full{display:grid;width:48px;height:48px;border-radius:14px;margin:0 0 8px auto}
+  /* Vollbild: Knopf oben rechts auf dem Bild statt in der Knopfreihe */
+  .start-live__full{
+    display:grid;position:absolute;top:10px;right:max(10px,env(safe-area-inset-right));z-index:5;margin:0;
+    width:48px;height:48px;border-radius:14px;background:rgba(6,8,12,.72);border-color:rgba(255,255,255,.16);
+  }
   .start-live__full svg{width:24px;height:24px}
   .start-now__head #stFull{display:none}
 }
@@ -161,6 +164,7 @@
   body[data-view="start"] .start-view{padding-top:calc(var(--topbar-h,66px) + 6px)}
   body[data-view="start"] .start-live{position:relative;top:auto;left:auto;right:auto;z-index:1}
   .start-live{
+    padding:10px max(16px,env(safe-area-inset-right)) 10px max(16px,env(safe-area-inset-left));
     --stH:calc(100vh - var(--topbar-h,66px) - var(--tabbar-h,66px) - 40px);
     grid-template-columns:minmax(0,calc(var(--stH) * 16 / 9)) minmax(0,1fr);
     justify-items:stretch;align-items:center;gap:14px;

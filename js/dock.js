@@ -76,10 +76,16 @@
       var onTurn = function () {
         var st = G.player.status;
         if (turned.matches) {
-          if ((st === 'playing' || st === 'loading') && !G.player.isFull()) { autoFull = true; G.player.fullscreen(true); }
+          if ((st === 'playing' || st === 'loading') && !G.player.isFull()) {
+            autoFull = true;
+            G.player.softFullscreen(true);
+            // Die Leiste mit dem Knopf zum Verlassen kurz zeigen
+            stage.classList.add('is-hint');
+            setTimeout(function () { stage.classList.remove('is-hint'); }, 3000);
+          }
         } else if (autoFull) {
           autoFull = false;
-          if (G.player.isFull()) G.player.fullscreen(false);
+          G.player.softFullscreen(false);
         }
       };
       if (turned.addEventListener) turned.addEventListener('change', onTurn);

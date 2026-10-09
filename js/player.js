@@ -746,6 +746,21 @@
     if (stage) stage.classList.remove('is-full');
   }
 
+  /**
+   * Vollbild ohne Browser-Schnittstelle: das Bild füllt die Seite. Anders als
+   * fullscreen() braucht das keine Berührung - nötig beim Drehen des Handys,
+   * wo der Browser das echte Vollbild verweigert (auf dem iPhone bleibt der
+   * Versuch über das Videofeld sonst stumm ohne Wirkung).
+   */
+  function softFullscreen(on) {
+    if (!stage) return;
+    stage.classList.toggle('is-full', !!on);
+    if (!on) {
+      var fe = document.fullscreenElement || document.webkitFullscreenElement;
+      if (fe && stage.contains(fe)) fullscreen(false);
+    }
+  }
+
   /** Ohne Vollbild-Schnittstelle: das Videofeld selbst, sonst die Notloesung. */
   function fallbackFull() {
     if (video && video.webkitEnterFullscreen) { try { video.webkitEnterFullscreen(); return; } catch (e) { } }
@@ -766,6 +781,7 @@
     toggleMuted: toggleMuted,
     applyVolume: applyVolume,
     fullscreen: fullscreen,
+    softFullscreen: softFullscreen,
     isFull: isFull,
     kindOf: kindOf,
     hlsVariant: hlsVariant,
