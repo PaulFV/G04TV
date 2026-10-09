@@ -42,6 +42,14 @@
   var listeners = [];
   var loaded = {};           // welche Bibliothek schon da ist
 
+  // Hänger-Überwachung (siehe watchStalls)
+  var activeStep = null;     // der Weg, der gerade läuft - für den Neustart
+  var stalls = 0;            // Hänger seit dem letzten ruhigen Lauf
+  var progressAt = 0;        // wann zuletzt Bild weiterlief
+  var playingSince = 0;      // seit wann es ohne Aussetzer läuft
+  var started = false;       // hat dieser Versuch schon einmal gespielt?
+  var journal = [];          // die letzten Ereignisse, zum Nachsehen
+
   /* ------------------------------------------------------------
      Bibliotheken nachladen
      ------------------------------------------------------------ */
@@ -198,8 +206,12 @@
     applyVolume();
 
     video.addEventListener('playing', function () {
+      started = true;
+      progressAt = playingSince = Date.now();
       set('playing');
     });
+    video.addEventListener('timeupdate', function () { progressAt = Date.now(); });
+    setInterval(watchStalls, 1000);
     // Kurze Aussetzer (Bruchteile einer Sekunde) nicht gleich mit der
     // Ladeanzeige quittieren - das Aufblitzen wirkte selbst wie Stottern.
     var waitTimer = null;
@@ -225,6 +237,65 @@
       var e = video.error;
       fail(e ? mediaErrorText(e.code) : 'Der Stream ließ sich nicht öffnen.');
     });
+  }
+
+  /* ------------------------------------------------------------
+     Hänger erkennen und beheben
+
+     Ein Strom, der einfach stehen bleibt, meldet keinen Fehler - weder
+     mpegts.js noch hls.js geben dann auf. Ohne Überwachung stünde dort
+     für immer "Zwischenspeicher füllt sich". Hier: bleibt das Bild
+     länger als 7 s stehen (beim Start 20 s), wird derselbe Weg neu
+     aufgebaut; hilft das nicht, der nächste (bei Xtream die HLS-Fassung
+     des Senders); nach vier Hängern kommt eine Meldung.
+     ------------------------------------------------------------ */
+  function note(text) {
+    journal.push(new Date().toTimeString().slice(0, 8) + ' ' + text);
+    if (journal.length > 40) journal.shift();
+    try { console.info('[G04TV] ' + text); } catch (e) { }
+  }
+
+  function attempt(step) {
+    activeStep = step;
+    started = false;
+    progressAt = Date.now();
+  }
+
+  function watchStalls() {
+    if (!current || !video || document.hidden) return;
+    if (status !== 'playing' && status !== 'loading') return;
+    if (started && video.paused) return;               // vom Nutzer angehalten
+
+    var now = Date.now();
+    if (status === 'playing' && stalls && now - playingSince > 60000) stalls = 0;
+    if (now - progressAt < (started ? 7000 : 20000)) return;
+
+    stalls++;
+    note('Hänger Nr. ' + stalls + (started ? '' : ' (beim Start)') + ' bei ' + (current.name || ''));
+    progressAt = now;
+
+    if (stalls > 4) {
+      stop(true);
+      fail('Der Sender liefert nicht gleichmäßig. Mit „Extern öffnen“ an einen Abspieler wie VLC weitergeben.');
+      return;
+    }
+    // Erst derselbe Weg noch einmal, dann der nächste, dann wieder der letzte
+    if (stalls !== 1 && next()) { note('Wechsel auf den nächsten Weg'); return; }
+    restartStep();
+  }
+
+  function restartStep() {
+    if (!activeStep) return;
+    var mine = run;
+    var step = activeStep;
+    teardown();
+    tries = 0;
+    set('loading', 'Hängt – verbindet neu …');
+    setTimeout(function () {
+      if (mine !== run) return;
+      attempt(step);
+      step.go(mine);
+    }, 300);
   }
 
   function mediaErrorText(code) {
@@ -284,6 +355,7 @@
       teardown();
       tries = 0;
       set('loading', step.label);
+      attempt(step);
       step.go(mine);
     }, 0);
     return true;
@@ -462,6 +534,8 @@
     queue = [];
     current = channel;
     tries = 0;
+    started = false;
+    progressAt = Date.now();
     set('loading', 'Verbindung wird aufgebaut …');
 
     var source = String(channel.url).trim();
@@ -532,6 +606,8 @@
     }
 
     queue = steps.slice(1);
+    stalls = 0;
+    attempt(steps[0]);
     steps[0].go(mine);
   }
 
@@ -599,6 +675,7 @@
     play: play,
     stop: stop,
     on: on,
+    log: function () { return journal.slice(); },
     setVolume: setVolume,
     toggleMuted: toggleMuted,
     applyVolume: applyVolume,

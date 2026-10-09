@@ -203,6 +203,8 @@
     'Zwischenspeicher füllt sich …': 'Buffering …',
     'Zweiter Versuch mit MPEG-TS …': 'Retrying with MPEG-TS …',
     'Neuer Versuch …': 'Retrying …',
+    'Hängt – verbindet neu …': 'Stalled – reconnecting …',
+    'Der Sender liefert nicht gleichmäßig. Mit „Extern öffnen“ an einen Abspieler wie VLC weitergeben.': 'The channel is not delivering steadily. Hand it to a player such as VLC with “Open externally”.',
     'Abruf abgebrochen.': 'Request aborted.',
     'Netzfehler beim Abruf des Streams.': 'Network error while loading the stream.',
     'Der Stream ließ sich nicht dekodieren.': 'The stream could not be decoded.',
