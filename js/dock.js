@@ -64,6 +64,28 @@
       G.player.stop();
     });
 
+    // Vollbild: Knöpfe 5 s zeigen (beim Eintritt und bei jeder Berührung), dann ausblenden
+    var barTimer = null;
+    var wasFull = false;
+    var fullNow = function () { return stage.classList.contains('is-full') || stage.classList.contains('is-fs'); };
+    var showBar = function () {
+      stage.classList.add('is-hint');
+      clearTimeout(barTimer);
+      barTimer = setTimeout(function () { stage.classList.remove('is-hint'); }, 5000);
+    };
+    new MutationObserver(function () {
+      // Nur beim Wechsel reagieren: is-hint ändert selbst die Klassen und löste sonst
+      // diesen Beobachter endlos neu aus.
+      var full = fullNow();
+      if (full === wasFull) return;
+      wasFull = full;
+      if (full) showBar();
+      else { clearTimeout(barTimer); stage.classList.remove('is-hint'); }
+    }).observe(stage, { attributes: true, attributeFilter: ['class'] });
+    ['pointerdown', 'pointermove'].forEach(function (ev) {
+      stage.addEventListener(ev, function () { if (fullNow()) showBar(); }, { passive: true });
+    });
+
     document.addEventListener('fullscreenchange', paintFull);
     document.addEventListener('webkitfullscreenchange', paintFull);
 
@@ -79,9 +101,6 @@
           if ((st === 'playing' || st === 'loading') && !G.player.isFull()) {
             autoFull = true;
             G.player.softFullscreen(true);
-            // Die Leiste mit dem Knopf zum Verlassen kurz zeigen
-            stage.classList.add('is-hint');
-            setTimeout(function () { stage.classList.remove('is-hint'); }, 3000);
           }
         } else if (autoFull) {
           autoFull = false;

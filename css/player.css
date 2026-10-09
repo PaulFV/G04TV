@@ -154,9 +154,12 @@
   width:100vw;height:100vh;height:100dvh;
   aspect-ratio:auto;border-radius:0;border:0;
 }
-.stage.is-full .stage__bar{opacity:0}
-.stage.is-full:hover .stage__bar,
-.stage.is-full.is-hint .stage__bar{opacity:1}
+/* Im Vollbild blenden sich die Knöpfe nach 5 s aus und kommen bei Berührung
+   für 5 s wieder (is-hint, gesteuert in dock.js). Unsichtbar sind sie auch nicht antippbar. */
+.stage.is-full .stage__bar,
+.stage.is-fs .stage__bar{opacity:0;pointer-events:none}
+.stage.is-full.is-hint .stage__bar,
+.stage.is-fs.is-hint .stage__bar{opacity:1;pointer-events:auto}
 
 /* Schwebende Leiste im Bild (Vollbild verlassen, Ton) */
 .stage__bar{
