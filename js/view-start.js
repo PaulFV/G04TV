@@ -255,6 +255,9 @@
   var allPoolId = null;        // ... fuer welche Playlist
   var allQuery = '';
   var listQuery = { fav: '', recent: '' };   // Suche in Favoriten und Verlauf
+  var FAVPL_KEY = 'g04tv.favPlaylist';
+  var favPl = '*';                           // Favoriten: '*' = alle Playlisten, sonst Kennung
+  try { favPl = localStorage.getItem(FAVPL_KEY) || '*'; } catch (e) { /* optional */ }
   var allGroup = '*';          // gewaehlte Kategorie ('*' = alle)
   var allGroups = [];          // Kategorien in der Reihenfolge der Playlist
   var allList = [];            // nach Suche gefiltert
@@ -321,21 +324,90 @@
     return head + body;
   }
 
-  /** Die Kacheln von Favoriten oder Verlauf, nach der Suche des Reiters gefiltert. */
+  /** Die Playlisten, aus denen Favoriten stammen - mit Anzahl, in der Reihenfolge der Playlisten. */
+  function favPlaylists() {
+    var s = G.store.state;
+    var counts = {};
+    s.favorites.forEach(function (f) { if (f.pl) counts[f.pl] = (counts[f.pl] || 0) + 1; });
+    return s.playlists.filter(function (p) { return counts[p.id]; })
+      .map(function (p) { return { id: p.id, name: p.name, count: counts[p.id] }; });
+  }
+
+  /** Die gewählte Playlist - '*' (alle), wenn es nichts zum Umschalten gibt oder sie fehlt. */
+  function activeFavPl() {
+    var pls = favPlaylists();
+    if (pls.length < 2) return '*';
+    return pls.some(function (p) { return p.id === favPl; }) ? favPl : '*';
+  }
+
+  function favChips() {
+    var pls = favPlaylists();
+    if (pls.length < 2) return '';
+    var cur = activeFavPl();
+    var total = G.store.state.favorites.length;
+    return '<div class="chips chips--scroll start-shelf__cats" id="stFavPl">' +
+      '<button class="chip' + (cur === '*' ? ' is-on' : '') + '" data-favpl="*">' + tr('Alle') +
+        '<span class="chip__n">' + u.fmtInt(total) + '</span></button>' +
+      pls.map(function (p) {
+        return '<button class="chip' + (cur === p.id ? ' is-on' : '') + '" data-favpl="' + u.esc(p.id) + '">' +
+          u.esc(p.name) + '<span class="chip__n">' + u.fmtInt(p.count) + '</span></button>';
+      }).join('') +
+    '</div>';
+  }
+
+  /**
+   * Favoriten aus der Zeit, bevor die Playlist mitgemerkt wurde (oder aus einer
+   * eingelesenen Sicherung), kennen ihre Playlist nicht: einmal in den Senderlisten
+   * nachsehen. Gibt true zurück, wenn sich etwas geändert hat.
+   */
+  var favScanKey = '';
+  async function resolveFavPlaylists() {
+    var s = G.store.state;
+    var ids = s.playlists.map(function (p) { return p.id; });
+    var missing = s.favorites.filter(function (f) { return !f.pl || ids.indexOf(f.pl) < 0; });
+    var key = ids.join(',') + '|' + missing.length;
+    if (!missing.length || key === favScanKey) return false;
+    favScanKey = key;
+
+    var map = {};
+    for (var i = 0; i < ids.length; i++) {
+      var list = await G.library.channelsOf(ids[i]);
+      for (var j = 0; j < list.length; j++) {
+        var k = String(list[j].url || '').trim().toLowerCase();
+        if (k && !(k in map)) map[k] = ids[i];
+      }
+    }
+    var changed = false;
+    missing.forEach(function (f) {
+      var hit = map[String(f.url || '').trim().toLowerCase()];
+      if (hit) { f.pl = hit; changed = true; }
+    });
+    if (changed) {
+      favScanKey = ids.join(',') + '|' + s.favorites.filter(function (f) { return !f.pl || ids.indexOf(f.pl) < 0; }).length;
+      G.store.commit('favorites');
+    }
+    return changed;
+  }
+
+  /** Die Kacheln von Favoriten oder Verlauf, nach Playlist und Suche des Reiters gefiltert. */
   function listItems(tab) {
     var s = G.store.state;
     var playing = G.player.channel;
     var all = tab === 'fav' ? s.favorites : s.recent;
+    var pl = tab === 'fav' ? activeFavPl() : '*';
     var q = listQuery[tab];
-    var list = q ? G.library.filter(all, q, '*') : all;
+    var list = all;
+    if (pl !== '*') list = list.filter(function (c) { return c.pl === pl; });
+    if (q) list = G.library.filter(list, q, '*');
 
     if (!list.length) return '<p class="start-shelf__empty">' + tr('Nichts gefunden') + '</p>';
 
-    // Die Pfeile gelten für die ganze Liste - in einer Suche wären sie irreführend.
+    // Die Pfeile gelten für die ganze Liste - in einer Suche oder Auswahl wären sie irreführend.
+    var ordered = tab === 'fav' && !q && pl === '*';
     return '<div class="start-shelf__grid">' +
       list.map(function (c, i) {
         return tile(c, playing && G.m3u.sameSource(playing.url, c.url), tab === 'recent' ? u.relTime(c.at) : '',
-          tab === 'fav' && !q ? { i: i, n: list.length } : null);
+          ordered ? { i: i, n: list.length } : null);
       }).join('') +
     '</div>';
   }
@@ -354,6 +426,7 @@
           '<input class="input" id="stListSearch" type="search" inputmode="search" autocomplete="off" ' +
           'placeholder="Suchen …" value="' + u.esc(listQuery[tab]) + '"></div>' +
       '</div>' +
+      (tab === 'fav' ? favChips() : '') +
       '<div id="stListBody">' + listItems(tab) + '</div>' +
       (tab === 'recent'
         ? '<div class="start-shelf__foot"><button class="btn btn--sm btn--ghost" id="stClearRecent">' + u.icon('trash', 14) + ' Verlauf leeren</button></div>'
@@ -443,7 +516,7 @@
   }
   // „Alles löschen“ nimmt auch die gemerkten Kategorien mit
   G.store.subscribe(function (st, why) {
-    if (why === 'wipe') { try { localStorage.removeItem(GROUP_KEY); } catch (e) { /* optional */ } }
+    if (why === 'wipe') { try { localStorage.removeItem(GROUP_KEY); localStorage.removeItem(FAVPL_KEY); } catch (e) { /* optional */ } }
   });
   function saveGroup(id, group) {
     try {
@@ -493,7 +566,7 @@
       if (!key || seen[key]) return;
       seen[key] = true;
       out.push({ name: c.name || G.m3u.nameFromSource(c.url), url: c.url,
-        group: c.group || fallbackGroup || '', logo: c.logo || '' });
+        group: c.group || fallbackGroup || '', logo: c.logo || '', pl: fallbackGroup ? '' : id });
     };
     (await G.library.channelsOf(id)).forEach(function (c) { add(c); });
     G.store.state.channels.forEach(function (c) { add(c, tr('Eigene Sender')); });
@@ -861,6 +934,24 @@
         if (e.key === 'Enter') { e.preventDefault(); f.blur(); }
       });
     });
+
+    // Favoriten: zwischen den Playlisten umschalten
+    var favChipsEl = u.$('#stFavPl');
+    if (favChipsEl) {
+      mouseScroll(favChipsEl);
+      favChipsEl.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-favpl]');
+        if (!b) return;
+        favPl = b.getAttribute('data-favpl');
+        try { localStorage.setItem(FAVPL_KEY, favPl); } catch (err) { /* optional */ }
+        u.$$('[data-favpl]', favChipsEl).forEach(function (x) { x.classList.toggle('is-on', x === b); });
+        var body = u.$('#stListBody');
+        if (body) body.innerHTML = listItems('fav');
+      });
+    }
+    if (currentTab() === 'fav') {
+      resolveFavPlaylists().then(function (changed) { if (changed && currentTab() === 'fav') paintShelf(); });
+    }
 
     var listSearch = u.$('#stListSearch');
     if (listSearch) listSearch.addEventListener('input', u.debounce(function () {

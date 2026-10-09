@@ -274,6 +274,7 @@
       url: channel.url,
       group: channel.group || '',
       logo: channel.logo || '',
+      pl: channel.pl || '',
       addedAt: new Date().toISOString()
     });
     commit('favorites');
@@ -300,6 +301,7 @@
       url: channel.url,
       group: channel.group || '',
       logo: channel.logo || '',
+      pl: channel.pl || '',
       at: new Date().toISOString()
     };
 
