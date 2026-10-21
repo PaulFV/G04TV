@@ -78,6 +78,7 @@
         bufferMin: 1,            // Vorrat, den der Abspieler höchstens vorhält (1-12 Minuten)
         showTabbar: true,        // untere Leiste auf dem Handy
         confirmExternal: true,   // vor dem Oeffnen in einer anderen App fragen
+        keepAwake: true,         // Bildschirm anlassen, solange ein Sender läuft
         proxyOn: false,
         proxy: '',               // eigener Vermittler, z. B. https://…/?url={url}
         proxyStreams: false,     // auch die Streams über den Vermittler holen

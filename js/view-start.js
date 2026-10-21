@@ -176,6 +176,7 @@
         '<button class="start-now__icon' + (fav ? ' is-on' : '') + '" id="stStar" ' +
           'aria-label="' + (fav ? 'Favorit entfernen' : 'Als Favorit merken') + '" title="Favorit">' +
           u.icon(fav ? 'starFill' : 'star', 20) + '</button>' +
+        (G.extras ? G.extras.sleepButton() : '') +
         '<span class="start-now__break"></span>' +
         stageButtons() +
       '</div>';

@@ -684,6 +684,26 @@
     , 'Dort lässt sich die Sperre aufheben.': 'The lock can be removed there.'
     , 'Sender gesperrt': 'Channel locked'
     , 'Kategorie gesperrt': 'Category locked'
+    // Komfort: Timer, Bildschirm
+    , 'Gute Nacht': 'Good night'
+    , 'Der Einschlaf-Timer hat die Wiedergabe beendet.': 'The sleep timer stopped playback.'
+    , 'Einschlaf-Timer': 'Sleep timer'
+    , 'Die Wiedergabe endet in': 'Playback ends in'
+    , 'Nach der gewählten Zeit wird der Ton leiser und die Wiedergabe endet.': 'After the chosen time the sound fades out and playback stops.'
+    , 'Timer ausschalten': 'Turn timer off'
+    , 'Timer aus': 'Timer off'
+    , 'Bildschirm anlassen': 'Keep screen on'
+    , 'Solange ein Sender läuft, wird das Display nicht dunkel.': 'While a channel is playing, the display stays on.'
+    // Info: Wischen und Timer
+    , 'Nächster / vorheriger Sender': 'Next / previous channel'
+    , 'Bild ↓ / Bild ↑': 'Page ↓ / Page ↑'
+    , 'Im Bild wischen': 'Swipe on the picture'
+    , 'Links: nächster Sender, rechts: vorheriger. Im Vollbild auch hoch und runter': 'Left: next channel, right: previous. In full screen also up and down'
+    , 'Mond antippen': 'Tap the moon'
+    , 'Einschlaf-Timer stellen': 'Set the sleep timer'
+    // Lautstärke-Enden
+    , 'Leise': 'Quiet'
+    , 'Laut': 'Loud'
   };
 
 

@@ -6,7 +6,7 @@
    ============================================================ */
 var G04TV = window.G04TV || {};
 window.G04TV = G04TV;
-G04TV.VERSION = '1.0.109';
+G04TV.VERSION = '1.0.110';
 G04TV.NAME = 'G04TV';
 
 (function (G) {
@@ -221,6 +221,7 @@ G04TV.NAME = 'G04TV';
     muted: '<path d="M5 9.5h3L12 6v12l-4-3.5H5v-5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M16 9.6l4.4 4.8M20.4 9.6L16 14.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
     menu: '<path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
     shield: '<path d="M12 3l7 3v6c0 4.2-2.8 7.7-7 9-4.2-1.3-7-4.8-7-9V6l7-3z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+    moon: '<path d="M19.5 14.6A8 8 0 019.4 4.5a8 8 0 1010.1 10.1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>',
     clock: '<circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 7v5.3l3.3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
     folder: '<path d="M3.5 7.5A1.5 1.5 0 015 6h4l2 2.4h8a1.5 1.5 0 011.5 1.5V18A1.5 1.5 0 0119 19.5H5A1.5 1.5 0 013.5 18v-10.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>',
     chevron: '<path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',

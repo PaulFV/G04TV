@@ -208,7 +208,8 @@
         '<div class="settings-grid settings-grid--2">' +
           '<div class="settings-panel">' + sw('autoplay', 'Sofort abspielen', 'Sender beim Antippen direkt starten.') + '</div>' +
           '<div class="settings-panel">' + sw('resume', 'Letzten Sender beim Start laden', 'Zuletzt gesehenen Sender vorbereiten.') + '</div>' +
-          '<div class="settings-panel settings-panel--wide">' + sw('confirmExternal', 'Vor „Extern öffnen“ fragen', 'Übergabe an einen anderen Player bestätigen.') + '</div>' +
+          '<div class="settings-panel">' + sw('keepAwake', 'Bildschirm anlassen', 'Solange ein Sender läuft, wird das Display nicht dunkel.') + '</div>' +
+          '<div class="settings-panel">' + sw('confirmExternal', 'Vor „Extern öffnen“ fragen', 'Übergabe an einen anderen Player bestätigen.') + '</div>' +
           '<div class="settings-panel settings-range">' +
             '<div class="settings-range__head"><span>Lautstärke</span><span id="setVolV">' + s.volume + ' %</span></div>' +
             '<input type="range" id="setVol" min="0" max="100" value="' + s.volume + '">' +

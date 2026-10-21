@@ -16,6 +16,7 @@
     ['F', 'Vollbild ein und aus'],
     ['Esc', 'Vollbild verlassen'],
     ['M', 'Ton aus und an'],
+    ['Bild ↓ / Bild ↑', 'Nächster / vorheriger Sender'],
     ['↑ ↓', 'In der Senderliste blättern'],
     ['/', 'In das Suchfeld springen'],
     ['1 – 3', 'Bereich wechseln']
@@ -81,6 +82,8 @@
           [['Antippen', 'Sender abspielen'],
            ['Stern antippen', 'Sender merken oder vergessen'],
            ['Doppeltippen ins Bild', 'Vollbild ein und aus'],
+           ['Im Bild wischen', 'Links: nächster Sender, rechts: vorheriger. Im Vollbild auch hoch und runter'],
+           ['Mond antippen', 'Einschlaf-Timer stellen'],
            ['Bereich wechseln', 'Das Bild läuft unten rechts weiter']].map(function (k) {
             return '<div class="list__row"><span class="list__main"><b>' + k[0] + '</b><span>' + k[1] + '</span></span></div>';
           }).join('') +
