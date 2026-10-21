@@ -6,7 +6,7 @@
    ausschließlich die eigenen Programmdateien — keine Playlisten,
    keine Streams, keine Anfragen an fremde Server.
    ============================================================ */
-var CACHE = 'g04tv-v1.0.109';
+var CACHE = 'g04tv-v1.0.110';
 
 var ASSETS = [
   './',
@@ -33,6 +33,7 @@ var ASSETS = [
   './js/lock.js',
   './js/dock.js',
   './js/carplay.js',
+  './js/extras.js',
   './js/view-start.js',
   './js/view-live.js',
   './js/view-playlists.js',
