@@ -226,3 +226,25 @@
   .settings-info__body{margin-bottom:6px}
   .settings-info__ver{display:none}
 }
+
+/* ---------- Programmführer ---------- */
+.sec-epg{--sec:#F472B6;--sec-rgb:244,114,182}
+.settings-epg__state{display:flex;gap:10px;align-items:center;margin:12px 0 8px;padding:10px 12px;border-radius:12px;font-size:13.5px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--tx-1)}
+.settings-epg__state b{color:var(--tx-0)}
+.settings-epg__state.is-ok{border-color:rgba(52,211,153,.35);background:rgba(52,211,153,.08)}
+.settings-epg__state.is-ok svg{color:#34D399}
+.settings-epg__state svg{flex:none}
+.settings-epg__spin{width:16px;height:16px;border-radius:50%;border:2px solid rgba(var(--sec-rgb),.3);border-top-color:var(--sec);animation:epgSpin .8s linear infinite;flex:none}
+@keyframes epgSpin{to{transform:rotate(360deg)}}
+.settings-epg__list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.settings-epg__src{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;padding:6px 2px}
+.settings-epg__src div{display:flex;flex-direction:column;gap:1px;min-width:0}
+.settings-epg__src b{font-weight:600;color:var(--tx-0);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.settings-epg__src span{color:var(--tx-2);line-height:1.35}
+.settings-epg__dot{flex:none;width:8px;height:8px;border-radius:50%;margin-top:5px;background:var(--tx-2)}
+.settings-epg__src.is-ok .settings-epg__dot{background:#34D399}
+.settings-epg__src.is-err .settings-epg__dot{background:#FF6B6B}
+.settings-epg__src.is-err span{color:#FF8B8B}
+.settings-epg__field{margin:6px 0 12px}
+.settings-epg__field .textarea{min-height:56px;height:64px;font-size:13px}

@@ -579,3 +579,29 @@ body[data-view="start"] .topbar{background:var(--bg-0)}
 .sleep-sheet__opt span{font-size:11.5px;color:var(--tx-2)}
 .sleep-sheet__off{width:100%;margin-top:12px}
 @media (max-width:400px){ .sleep-sheet__grid{grid-template-columns:repeat(3,1fr)} }
+
+/* ---------- Programmführer ---------- */
+.epg-bar{display:block;height:3px;border-radius:2px;background:rgba(255,255,255,.12);overflow:hidden}
+.epg-bar i{display:block;height:100%;background:var(--acc);border-radius:2px}
+.ch-tile__grp.is-epg{color:var(--tx-1)}
+.ch-tile__bar{position:absolute;left:10px;right:10px;bottom:5px;height:2.5px;border-radius:2px;background:rgba(255,255,255,.1);overflow:hidden;pointer-events:none}
+.ch-tile__bar i{display:block;height:100%;background:var(--acc);opacity:.85}
+.start-shelf.is-list .ch-tile__bar{left:74px;right:auto;width:calc(100% - 74px - 90px);bottom:4px}
+.start-now__epg{display:flex;flex-direction:column;gap:3px;cursor:pointer;min-width:0;max-width:100%}
+.start-now__epgt{color:var(--tx-0);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.start-now__epgm{font-size:11.5px;color:var(--tx-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.start-now__epg .epg-bar{width:100%;max-width:240px;margin-top:1px}
+
+/* Blatt: Programm eines Senders */
+.epg-sheet{display:flex;flex-direction:column}
+.epg-sheet__row{display:grid;grid-template-columns:62px minmax(0,1fr) auto;gap:10px;padding:10px 4px;border-bottom:1px solid rgba(255,255,255,.06)}
+.epg-sheet__row:last-child{border-bottom:0}
+.epg-sheet__time{font-variant-numeric:tabular-nums;color:var(--tx-2);font-size:13.5px;padding-top:1px}
+.epg-sheet__main{display:flex;flex-direction:column;gap:4px;min-width:0}
+.epg-sheet__main b{font-size:14.5px;color:var(--tx-0)}
+.epg-sheet__sub{font-size:12.5px;color:var(--tx-1)}
+.epg-sheet__main p{margin:2px 0 0;font-size:12.5px;line-height:1.45;color:var(--tx-2)}
+.epg-sheet__end{font-size:12px;color:var(--acc);white-space:nowrap;padding-top:2px}
+.epg-sheet__row.is-live{background:linear-gradient(90deg,rgba(49,216,255,.08),transparent);border-radius:12px}
+.epg-sheet__row.is-live .epg-sheet__time{color:var(--acc);font-weight:700}
+.epg-sheet__main .epg-bar{max-width:260px}
