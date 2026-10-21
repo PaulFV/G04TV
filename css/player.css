@@ -316,3 +316,18 @@
 }
 /* Startseite: ohne Knopfzeile etwas weniger Abstand unter dem Namen */
 .start-now{gap:8px}
+
+/* ---------- Umschalten per Wischen: kurze Einblendung ---------- */
+.stage{touch-action:pan-y pinch-zoom}
+.stage.is-full,.stage.is-fs{touch-action:none}
+.stage__zap{
+  position:absolute;left:50%;top:50%;z-index:6;transform:translate(-50%,-50%) scale(.94);
+  display:flex;flex-direction:column;align-items:center;gap:2px;max-width:80%;
+  padding:12px 22px 14px;border-radius:18px;text-align:center;pointer-events:none;
+  background:rgba(4,8,14,.72);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  color:#fff;opacity:0;transition:opacity .2s,transform .2s;
+}
+.stage__zap.is-on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.stage__zap-dir{font-size:30px;line-height:1;color:var(--acc)}
+.stage__zap b{font-size:18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.stage__zap span:last-child:not(.stage__zap-dir){font-size:12.5px;color:rgba(255,255,255,.7)}
