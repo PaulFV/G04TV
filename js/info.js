@@ -84,6 +84,7 @@
            ['Doppeltippen ins Bild', 'Vollbild ein und aus'],
            ['Im Bild wischen', 'Links: nächster Sender, rechts: vorheriger. Im Vollbild auch hoch und runter'],
            ['Mond antippen', 'Einschlaf-Timer stellen'],
+           ['Sendung unter dem Namen antippen', 'Programm der nächsten Stunden'],
            ['Bereich wechseln', 'Das Bild läuft unten rechts weiter']].map(function (k) {
             return '<div class="list__row"><span class="list__main"><b>' + k[0] + '</b><span>' + k[1] + '</span></span></div>';
           }).join('') +

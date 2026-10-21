@@ -6,7 +6,7 @@
    ============================================================ */
 var G04TV = window.G04TV || {};
 window.G04TV = G04TV;
-G04TV.VERSION = '1.0.110';
+G04TV.VERSION = '1.0.111';
 G04TV.NAME = 'G04TV';
 
 (function (G) {

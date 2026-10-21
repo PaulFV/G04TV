@@ -166,8 +166,53 @@
     '</details>';
   }
 
+  /* ------------------------------------------------------------
+     Programmführer (EPG)
+     ------------------------------------------------------------ */
+  function epgSection() {
+    if (!G.epg) return '';
+    var s = G.store.state.settings;
+    return '<details class="card settings-section settings-fold sec-epg" id="fold-epg"' + (folds.epg ? ' open' : '') + '>' +
+      '<summary class="settings-section__head">' + u.icon('clock', 22) + '<h3>Programmführer (EPG)</h3></summary>' +
+      '<div class="settings-panel">' + sw('epgOn', 'Programm anzeigen', 'Auf den Kacheln und unter dem Bild: was gerade läuft und was danach kommt.') + '</div>' +
+      '<div id="epgLive">' + epgLiveHtml() + '</div>' +
+      '<div class="field settings-epg__field"><label for="setEpgUrls">Eigene Programm-Adressen</label>' +
+        '<textarea class="textarea" id="setEpgUrls" rows="2" spellcheck="false" autocomplete="off" placeholder="https://…/epg.xml.gz">' + u.esc(s.epgUrls || '') + '</textarea>' +
+        '<span class="settings-proxy__hint">XMLTV-Datei (.xml oder .xml.gz), eine Adresse pro Zeile. Adressen aus der Playlist (url-tvg) und von Xtream-Zugängen kommen von selbst dazu.</span>' +
+      '</div>' +
+      '<div class="settings-actions"><button class="btn" id="epgRefresh">' + u.icon('refresh', 16) + ' Programm jetzt laden</button></div>' +
+    '</details>';
+  }
+
+  function epgLiveHtml() {
+    var i = G.epg.info();
+    var state;
+    if (i.busy) state = '<div class="settings-epg__state is-busy"><span class="settings-epg__spin"></span><span data-no-translate>' + u.esc(i.status) + '</span></div>';
+    else if (!i.sources.length) state = '<div class="settings-epg__state is-none">' + u.icon('info', 18) + '<span>Keine Programm-Adresse gefunden. Viele Anbieter nennen sie in der Playlist — sonst unten eintragen.</span></div>';
+    else if (!i.at) state = '<div class="settings-epg__state is-none">' + u.icon('clock', 18) + '<span>Noch kein Programm geladen.</span></div>';
+    else state = '<div class="settings-epg__state' + (i.channels ? ' is-ok' : ' is-none') + '">' + u.icon(i.channels ? 'check' : 'warn', 18) +
+      '<span><b>' + u.fmtInt(i.channels) + '</b> ' + (i.channels === 1 ? 'Sender' : 'Sender') + ' mit Programm · Stand ' + G.epg.hm(i.at) + '</span></div>';
+    var res = i.results || [];
+    var list = i.sources.map(function (src) {
+      var r = res.filter(function (x) { return x.url === src.url; })[0];
+      var shown = G.xtream ? G.xtream.masked(src.url) : src.url;
+      return '<div class="settings-epg__src' + (r ? (r.ok ? ' is-ok' : ' is-err') : '') + '">' +
+        '<span class="settings-epg__dot"></span>' +
+        '<div><b data-no-translate>' + u.esc(u.shorten ? u.shorten(shown, 60) : shown) + '</b>' +
+        '<span>' + u.esc(src.from || '') + (r ? ' · ' + (r.ok ? u.fmtInt(r.channels) + ' ' + tr('Sender') + ', ' + u.fmtInt(r.items) + ' ' + tr('Sendungen') : u.esc(r.error)) : '') + '</span></div>' +
+      '</div>';
+    }).join('');
+    return state + (list ? '<div class="settings-epg__list">' + list + '</div>' : '');
+  }
+
+  // Programm lädt oder ist fertig: nur den Zustand nachziehen (Eingaben bleiben)
+  document.addEventListener('g04tv:epg', function () {
+    var box = u.$('#epgLive');
+    if (box) box.innerHTML = epgLiveHtml();
+  });
+
   // Welche ausklappbaren Abschnitte offen sind - bleibt, wenn die Einstellungen neu gezeichnet werden
-  var folds = { lang: false, play: false, lock: false, net: false, data: false, app: false, fb: false };
+  var folds = { lang: false, play: false, lock: false, epg: false, net: false, data: false, app: false, fb: false };
 
   function renderModern() {
     var s = G.store.state.settings;
@@ -227,6 +272,7 @@
       '</details>' +
 
       lockSection() +
+      epgSection() +
 
       '<details class="card settings-section settings-fold sec-net" id="fold-net"' + (folds.net ? ' open' : '') + '>' +
         '<summary class="settings-section__head">' + u.icon('link', 22) + '<h3>Playlisten aus dem Netz</h3></summary>' +
@@ -300,7 +346,7 @@
      ------------------------------------------------------------ */
   function mount(host) {
     if (G.info) G.info.mount();
-    ['lang', 'play', 'lock', 'net', 'data', 'app', 'fb'].forEach(function (id) {
+    ['lang', 'play', 'lock', 'epg', 'net', 'data', 'app', 'fb'].forEach(function (id) {
       var box = u.$(id === 'fb' ? '#fbBox' : '#fold-' + id);
       if (box) box.addEventListener('toggle', function () { folds[id] = box.open; });
     });
@@ -318,6 +364,7 @@
 
       if (key === 'reduceMotion') document.body.classList.toggle('no-motion', t.checked);
       if (key === 'showTabbar') document.body.classList.toggle('no-tabbar', !t.checked);
+      if (key === 'epgOn' && G.epg) { if (t.checked) G.epg.refresh(false); document.dispatchEvent(new CustomEvent('g04tv:epg')); }
       if (key === 'resume' && t.checked) {
         u.toast('Gemerkt', 'Beim nächsten Start wird der letzte Sender vorbereitet.', 'ok', 2600);
       }
@@ -349,6 +396,22 @@
     if (proxy) proxy.onchange = function () {
       G.store.setSetting('proxy', proxy.value.trim());
       u.toast('Gespeichert', 'Der Vermittler wird beim nächsten Abruf verwendet.', 'ok', 2600);
+    };
+
+    /* Programmführer */
+    var epgUrls = u.$('#setEpgUrls');
+    if (epgUrls) epgUrls.onchange = function () {
+      G.store.setSetting('epgUrls', epgUrls.value.trim());
+    };
+    var epgRefresh = u.$('#epgRefresh');
+    if (epgRefresh) epgRefresh.onclick = async function () {
+      if (epgUrls) G.store.setSetting('epgUrls', epgUrls.value.trim());
+      if (!G.epg.sources().length) { u.toast('Keine Programm-Adresse', 'Trage eine XMLTV-Adresse ein.', 'warn', 3500); return; }
+      if (!G.store.state.settings.epgOn) { u.toast('Programm ist ausgeschaltet', 'Schalter „Programm anzeigen“ einschalten.', 'warn', 3500); return; }
+      var ok = await G.epg.refresh(true);
+      var n = G.epg.info().channels;
+      u.toast(ok ? 'Programm geladen' : 'Kein Programm gefunden',
+        ok ? n + ' ' + tr('Sender mit Programm') : 'Adresse prüfen — oder die Sender passen nicht zur Playlist.', ok ? 'ok' : 'warn', 4000);
     };
 
     /* Sperre */

@@ -704,6 +704,35 @@
     // Lautstärke-Enden
     , 'Leise': 'Quiet'
     , 'Laut': 'Loud'
+    // Programmführer
+    , 'Programmführer (EPG)': 'Programme guide (EPG)'
+    , 'Programm anzeigen': 'Show programme'
+    , 'Auf den Kacheln und unter dem Bild: was gerade läuft und was danach kommt.': 'On the tiles and below the picture: what\'s on now and what comes next.'
+    , 'Eigene Programm-Adressen': 'Own programme addresses'
+    , 'XMLTV-Datei (.xml oder .xml.gz), eine Adresse pro Zeile. Adressen aus der Playlist (url-tvg) und von Xtream-Zugängen kommen von selbst dazu.': 'XMLTV file (.xml or .xml.gz), one address per line. Addresses from the playlist (url-tvg) and from Xtream logins are added automatically.'
+    , 'Programm jetzt laden': 'Load programme now'
+    , 'Keine Programm-Adresse gefunden. Viele Anbieter nennen sie in der Playlist — sonst unten eintragen.': 'No programme address found. Many providers include it in the playlist — otherwise enter it below.'
+    , 'Noch kein Programm geladen.': 'No programme loaded yet.'
+    , 'mit Programm · Stand': 'with programme · as of'
+    , 'Sendungen': 'shows'
+    , 'Keine Programm-Adresse': 'No programme address'
+    , 'Trage eine XMLTV-Adresse ein.': 'Enter an XMLTV address.'
+    , 'Programm ist ausgeschaltet': 'Programme is switched off'
+    , 'Schalter „Programm anzeigen“ einschalten.': 'Turn on “Show programme”.'
+    , 'Programm geladen': 'Programme loaded'
+    , 'Kein Programm gefunden': 'No programme found'
+    , 'Sender mit Programm': 'channels with programme'
+    , 'Adresse prüfen — oder die Sender passen nicht zur Playlist.': 'Check the address — or the channels don\'t match the playlist.'
+    , 'Eigene Adresse': 'Own address'
+    , 'Gepackte Programmdaten (.gz) kann dieser Browser nicht öffnen.': 'This browser can\'t open packed programme data (.gz).'
+    , 'Das ist kein Fernsehprogramm (XMLTV).': 'This is not a TV programme (XMLTV).'
+    , 'Programm wird geladen …': 'Loading programme …'
+    , 'http-Adresse: der Browser blockiert sie. Ein Vermittler hilft (Playlisten aus dem Netz).': 'http address: the browser blocks it. A relay helps (Playlists from the web).'
+    , 'Abruf aus dem Browser nicht erlaubt (CORS) oder nicht erreichbar. Ein Vermittler hilft.': 'Not allowed from the browser (CORS) or unreachable. A relay helps.'
+    , 'Kein Programm': 'No programme'
+    // Info: EPG
+    , 'Sendung unter dem Namen antippen': 'Tap the show below the name'
+    , 'Programm der nächsten Stunden': 'Programme for the next hours'
   };
 
 

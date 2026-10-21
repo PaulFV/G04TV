@@ -190,7 +190,13 @@
   function read(text) {
     if (isHlsManifest(text)) return { isStream: true, channels: [] };
     check(text);
-    return { isStream: false, channels: parse(text) };
+    return { isStream: false, channels: parse(text), tvgUrl: tvgUrl(text) };
+  }
+
+  /** Programm-Adresse aus der Kopfzeile: #EXTM3U url-tvg="…" (auch x-tvg-url, tvg-url) */
+  function tvgUrl(text) {
+    var head = String(text).slice(0, 4000).split('\n').filter(function (l) { return /^\s*#EXTM3U/i.test(l); })[0] || '';
+    return attribute(head, 'url-tvg') || attribute(head, 'x-tvg-url') || attribute(head, 'tvg-url') || '';
   }
 
   /** Notname, wenn kein Name angegeben wurde. */

@@ -33,11 +33,36 @@
       '</span>' : '') +
       u.logoHtml(c, 'ch-tile__logo') +
       '<span class="ch-tile__name">' + u.esc(c.name) + '</span>' +
-      '<span class="ch-tile__grp">' + u.esc(sub || c.group || '—') + '</span>' +
+      epgLine(c, sub) +
       '<button class="ch-tile__fav' + (fav ? ' is-on' : '') + '" type="button" data-fav="' + u.esc(c.url) + '" ' +
         'aria-label="' + (fav ? 'Favorit entfernen' : 'Als Favorit merken') + '" title="Favorit">' +
         u.icon(fav ? 'starFill' : 'star', 15) + '</button>' +
     '</div>';
+  }
+
+  /** Unter dem Namen: was gerade läuft (mit Fortschritt) - sonst die Gruppe */
+  function epgLine(c, sub) {
+    var ep = G.epg && G.epg.nowNext(c);
+    var pn = ep && ep.now;
+    if (!pn) return '<span class="ch-tile__grp">' + u.esc(sub || c.group || '—') + '</span>';
+    return '<span class="ch-tile__grp is-epg" title="' + u.esc(G.epg.hm(pn.start) + '–' + G.epg.hm(pn.stop) + ' ' + pn.title) + '">' + u.esc(pn.title || '—') + '</span>' +
+      '<span class="ch-tile__bar"><i style="width:' + G.epg.progress(pn).toFixed(1) + '%"></i></span>';
+  }
+
+  /** Programmzeilen der sichtbaren Kacheln nachführen (jede Minute, nach dem Laden) */
+  function refreshEpg() {
+    u.$$('.start-view .ch-tile[data-play]').forEach(function (t) {
+      var c = findChannel(t.getAttribute('data-play'));
+      if (!c) return;
+      var g = t.querySelector('.ch-tile__grp');
+      if (!g) return;
+      var bar = t.querySelector('.ch-tile__bar');
+      if (bar) bar.remove();
+      var sub = g.classList.contains('is-epg') ? null : g.textContent;
+      var tmp = document.createElement('div');
+      tmp.innerHTML = epgLine(c, sub === '—' ? '' : sub);
+      g.replaceWith.apply(g, Array.prototype.slice.call(tmp.childNodes));
+    });
   }
 
   /** Schloss oben links auf der Kachel (nur wenn ein Code festgelegt ist) */
@@ -170,7 +195,7 @@
         '<span class="start-now__meta">' +
           state +
           '<b class="start-now__name" title="' + u.esc(c.name) + '">' + u.esc(c.name) + '</b>' +
-          '<span class="start-now__sub">' + u.esc(c.group || G.player.kindOf(c.url).toUpperCase()) + '</span>' +
+          nowSub(c) +
         '</span>' +
         // Stern gleich hinter dem Namen, dann Ton und Regler (und AirPlay)
         '<button class="start-now__icon' + (fav ? ' is-on' : '') + '" id="stStar" ' +
@@ -180,6 +205,19 @@
         '<span class="start-now__break"></span>' +
         stageButtons() +
       '</div>';
+  }
+
+  /** Unter dem Sendernamen: laufende Sendung mit Fortschritt - sonst die Gruppe */
+  function nowSub(c) {
+    var ep = G.epg && G.epg.nowNext(c);
+    if (!ep || !ep.now) return '<span class="start-now__sub">' + u.esc(c.group || G.player.kindOf(c.url).toUpperCase()) + '</span>';
+    var pn = ep.now;
+    return '<span class="start-now__sub start-now__epg" id="stEpg" role="button" tabindex="0" data-no-translate>' +
+        '<span class="start-now__epgt">' + u.esc(pn.title || '—') + '</span>' +
+        '<span class="start-now__epgm">' + G.epg.hm(pn.start) + '–' + G.epg.hm(pn.stop) +
+          (ep.next ? ' · ' + (G.epg.en() ? 'then ' : 'danach ') + u.esc(ep.next.title || '') : '') + '</span>' +
+        '<span class="epg-bar"><i style="width:' + G.epg.progress(pn).toFixed(1) + '%"></i></span>' +
+      '</span>';
   }
 
   /** Laufzeit als m:ss, ab einer Stunde h:mm:ss. */
@@ -218,6 +256,12 @@
     if (fullTop) fullTop.onclick = function () { G.player.fullscreen(true); };
     var air = u.$('#stAir');
     if (air) air.onclick = function () { var b = u.$('#stageAirplay'); if (b) b.click(); };
+
+    var epgBox = u.$('#stEpg');
+    if (epgBox) epgBox.onclick = function () {
+      var c = G.player.channel || G.store.state.last;
+      if (c && G.epg) G.epg.sheet(c);
+    };
 
     var star = u.$('#stStar');
     if (star) star.onclick = function () {
@@ -799,6 +843,16 @@
     };
     document.addEventListener('g04tv:lock', onLock);
     off.push(function () { document.removeEventListener('g04tv:lock', onLock); });
+
+    // Programmführer: geladen oder neue Minute - Zeilen und Fortschritt nachführen
+    var onEpg = function () {
+      if (G.epg && G.epg.info().busy) return;
+      var vol = u.$('#stVol');
+      if (!(vol && document.activeElement === vol)) paintNow();
+      refreshEpg();
+    };
+    document.addEventListener('g04tv:epg', onEpg);
+    off.push(function () { document.removeEventListener('g04tv:epg', onEpg); });
 
     // Stern auf einer Kachel: Favorit an/aus - ohne abzuspielen
     u.on(host, 'click', '[data-fav]', function (e, t) {

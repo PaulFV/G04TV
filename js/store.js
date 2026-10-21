@@ -79,6 +79,8 @@
         showTabbar: true,        // untere Leiste auf dem Handy
         confirmExternal: true,   // vor dem Oeffnen in einer anderen App fragen
         keepAwake: true,         // Bildschirm anlassen, solange ein Sender läuft
+        epgOn: true,             // Programmführer anzeigen
+        epgUrls: '',             // eigene Programm-Adressen (XMLTV), eine pro Zeile
         proxyOn: false,
         proxy: '',               // eigener Vermittler, z. B. https://…/?url={url}
         proxyStreams: false,     // auch die Streams über den Vermittler holen
@@ -276,6 +278,7 @@
       group: channel.group || '',
       logo: channel.logo || '',
       pl: channel.pl || '',
+      tvgId: channel.tvgId || '',
       addedAt: new Date().toISOString()
     });
     commit('favorites');
@@ -303,6 +306,7 @@
       group: channel.group || '',
       logo: channel.logo || '',
       pl: channel.pl || '',
+      tvgId: channel.tvgId || '',
       at: new Date().toISOString()
     };
 
@@ -448,7 +452,7 @@
     var known = state.playlists.map(function (p) { return p.id; });
     var stored = await G.db.keys();
     await Promise.all(stored
-      .filter(function (id) { return known.indexOf(id) < 0; })
+      .filter(function (id) { return known.indexOf(id) < 0 && String(id).indexOf('__') !== 0; })
       .map(function (id) { return G.db.del(id); }));
   }
 
