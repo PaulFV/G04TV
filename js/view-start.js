@@ -239,6 +239,7 @@
       '<button class="start-now__icon start-now__icon--sm" id="stMute" aria-label="' + (muted ? 'Ton an' : 'Ton aus') + '" title="' + (muted ? 'Ton an' : 'Ton aus') + '">' +
         u.icon(muted ? 'muted' : 'volume', 18) + '</button>' +
       '<span id="stVolSlot"></span>' +
+      (G.extras ? G.extras.pipButton() : '') +
       '<button class="start-now__icon start-now__icon--sm" id="stFull" aria-label="Vollbild" title="Vollbild">' + u.icon('full', 18) + '</button>';
   }
 

@@ -733,6 +733,16 @@
     // Info: EPG
     , 'Sendung unter dem Namen antippen': 'Tap the show below the name'
     , 'Programm der nächsten Stunden': 'Programme for the next hours'
+    // Bild-in-Bild
+    , 'Bild-in-Bild': 'Picture in picture'
+    , 'Erst einen Sender starten': 'Start a channel first'
+    , 'Bild-in-Bild braucht ein laufendes Bild.': 'Picture in picture needs a playing picture.'
+    , 'Bild-in-Bild geht hier nicht': 'Picture in picture not possible here'
+    , 'Dieser Sender oder Browser lässt es nicht zu.': 'This channel or browser does not allow it.'
+    , 'Läuft im Bild-in-Bild': 'Playing in picture in picture'
+    // Info: PiP
+    , 'Bild-in-Bild-Knopf': 'Picture-in-picture button'
+    , 'Video läuft im kleinen Fenster weiter, auch in anderen Apps': 'Video keeps playing in a small window, even in other apps'
   };
 
 

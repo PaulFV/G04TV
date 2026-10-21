@@ -225,6 +225,80 @@
   document.addEventListener('visibilitychange', syncWake);
 
   /* ------------------------------------------------------------
+     4. Bild-in-Bild
+     iPhone/iPad (Safari): webkitSetPresentationMode, sonst die
+     Standard-Schnittstelle (Chrome, Edge, Safari am Mac).
+     ------------------------------------------------------------ */
+  function vid() { return u.$('#video'); }
+  function pipSupported() {
+    var v = vid();
+    if (!v) return false;
+    if (typeof v.webkitSupportsPresentationMode === 'function' && v.webkitSupportsPresentationMode('picture-in-picture')) return true;
+    return !!(document.pictureInPictureEnabled && !v.disablePictureInPicture);
+  }
+  function isPip() {
+    var v = vid();
+    return !!v && (document.pictureInPictureElement === v || v.webkitPresentationMode === 'picture-in-picture');
+  }
+  async function togglePip() {
+    var v = vid();
+    if (!v) return;
+    if (isPip()) {
+      try {
+        if (document.pictureInPictureElement && document.exitPictureInPicture) await document.exitPictureInPicture();
+        else if (v.webkitSetPresentationMode) v.webkitSetPresentationMode('inline');
+      } catch (e) { /* schon zu */ }
+      return;
+    }
+    var st = G.player.status;
+    if (st !== 'playing' && st !== 'loading') {
+      u.toast(tr('Erst einen Sender starten'), tr('Bild-in-Bild braucht ein laufendes Bild.'), 'warn', 3000);
+      return;
+    }
+    try {
+      if (typeof v.webkitSupportsPresentationMode === 'function' && v.webkitSupportsPresentationMode('picture-in-picture')) {
+        v.webkitSetPresentationMode('picture-in-picture');
+      } else {
+        await v.requestPictureInPicture();
+      }
+    } catch (e) {
+      u.toast(tr('Bild-in-Bild geht hier nicht'), tr('Dieser Sender oder Browser lässt es nicht zu.'), 'warn', 4000);
+    }
+  }
+  function pipButton() {
+    if (!pipSupported()) return '';
+    var on = isPip();
+    return '<button class="start-now__icon start-now__icon--sm' + (on ? ' is-acc' : '') + '" id="stPip" ' +
+      'aria-label="Bild-in-Bild" title="Bild-in-Bild">' + u.icon('pip', 18) + '</button>';
+  }
+  function paintPip() {
+    var on = isPip();
+    var stage = u.$('#stage');
+    if (stage) { stage.classList.toggle('is-pip', on); stage.setAttribute('data-pip', tr('Läuft im Bild-in-Bild')); }
+    var a = u.$('#stPip'); if (a) a.classList.toggle('is-acc', on);
+    var b = u.$('#stagePip');
+    if (b) {
+      b.hidden = !pipSupported();
+      b.classList.toggle('is-on', on);
+      if (!b.innerHTML) b.innerHTML = u.icon('pip', 18);
+    }
+  }
+  function initPip() {
+    var v = vid();
+    if (!v) return;
+    // Beim Wechsel in eine andere App von selbst ins kleine Fenster (wo der Browser es kann)
+    v.setAttribute('autopictureinpicture', '');
+    try { v.autoPictureInPicture = true; } catch (e) { /* nicht überall */ }
+    ['enterpictureinpicture', 'leavepictureinpicture', 'webkitpresentationmodechanged'].forEach(function (ev) {
+      v.addEventListener(ev, paintPip);
+    });
+    document.addEventListener('click', function (e) {
+      if (e.target.closest('#stPip, #stagePip')) { e.stopPropagation(); togglePip(); }
+    }, true);
+    paintPip();
+  }
+
+  /* ------------------------------------------------------------
      Einhängen
      ------------------------------------------------------------ */
   G.player.on(function (status) {
@@ -234,12 +308,13 @@
   });
   G.store.subscribe(function () { syncWake(); });
 
-  function init() { initSwipe(); }
+  function init() { initSwipe(); initPip(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 
   G.extras = {
     zap: zap,
+    pip: togglePip, pipButton: pipButton, isPip: isPip, pipSupported: pipSupported,
     setSleep: setSleep, sleepLeft: sleepLeft, sleepButton: sleepButton, sleepSheet: sleepSheet,
     awake: function () { return !!wake; }
   };
