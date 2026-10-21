@@ -184,9 +184,11 @@
     // Laufzeit: auch beim kurzen Nachladen stehen lassen, sonst flackert sie
     var clock = G.player.elapsed() >= 0 && (status === 'playing' || status === 'loading')
       ? '<span class="start-now__time" id="stClock">' + clockText() + '</span>' : '';
-    if (status === 'playing') state = '<span class="start-now__state is-live"><i></i>Live' + clock + '</span>';
-    else if (status === 'loading') state = '<span class="start-now__state is-busy"><i></i>Wird geladen …' + clock + '</span>';
-    else if (status === 'error') state = '<span class="start-now__state is-err"><i></i>Fehler</span>';
+    var back = G.extras && G.extras.previous();
+    var backBtn = back ? '<button class="start-now__back" id="stBack" title="' + tr('Zurück zu') + ' ' + u.esc(back.name) + '">' + u.icon('back', 12) + '<span data-no-translate>' + u.esc(back.name) + '</span></button>' : '';
+    if (status === 'playing') state = '<span class="start-now__state is-live"><i></i>Live' + clock + backBtn + '</span>';
+    else if (status === 'loading') state = '<span class="start-now__state is-busy"><i></i>Wird geladen …' + clock + backBtn + '</span>';
+    else if (status === 'error') state = '<span class="start-now__state is-err"><i></i>Fehler' + backBtn + '</span>';
     else state = '<span class="start-now__state"><i></i>Zuletzt gesehen' +
       (s.last && s.last.at ? ' · ' + u.esc(u.relTime(s.last.at)) : '') + '</span>';
 
@@ -257,6 +259,9 @@
     if (fullTop) fullTop.onclick = function () { G.player.fullscreen(true); };
     var air = u.$('#stAir');
     if (air) air.onclick = function () { var b = u.$('#stageAirplay'); if (b) b.click(); };
+
+    var backB = u.$('#stBack');
+    if (backB) backB.onclick = function (e) { e.stopPropagation(); G.extras.back(); };
 
     var epgBox = u.$('#stEpg');
     if (epgBox) epgBox.onclick = function () {
@@ -487,6 +492,8 @@
         '<div class="search start-shelf__search">' + u.icon('search', 16) +
           '<input class="input" id="stSearch" type="search" inputmode="search" autocomplete="off" ' +
           'placeholder="Suchen …" value="' + u.esc(allQuery) + '"></div>' +
+        (G.epg && G.epg.has() && G.store.state.settings.epgOn
+          ? '<button class="btn start-shelf__guide" id="stGuide" title="Jetzt im TV">' + u.icon('clock', 16) + '<span>Jetzt im TV</span></button>' : '') +
         (s.playlists.length > 1
           ? '<select class="select start-shelf__pick" id="stPick" aria-label="Playlist">' +
               s.playlists.map(function (p) {
@@ -572,20 +579,174 @@
     } catch (e) { /* optional */ }
   }
 
+  /** Blatt: Kategorien ein- und ausblenden */
+  function catSheet() {
+    var plId = allPoolId || G.store.state.activeId;
+    var p = G.store.playlist(plId);
+    var rows = function () {
+      var hid = G.store.hiddenGroups(plId);
+      return allGroups.map(function (g) {
+        var on = hid.indexOf(g.name) < 0;
+        return '<label class="switch cat-sheet__row">' +
+          '<input type="checkbox" data-catshow="' + u.esc(g.name) + '"' + (on ? ' checked' : '') + '>' +
+          '<span class="switch__track"></span>' +
+          '<span class="switch__label" data-no-translate><b>' + u.esc(groupLabel(g.name)) + '</b><span>' + u.fmtInt(g.count) + ' ' + (G.epg && G.epg.en() ? 'channels' : 'Sender') + '</span></span>' +
+        '</label>';
+      }).join('');
+    };
+    u.openSheet(tr('Kategorien'),
+      '<p class="cat-sheet__intro">' + tr('Ausgeschaltete Kategorien verschwinden unter „Alle“, aus der Suche und beim Umschalten. Favoriten bleiben.') + '</p>' +
+      '<div class="cat-sheet__actions"><button class="btn btn--sm" data-catall="1">' + u.icon('eye', 15) + ' ' + tr('Alle zeigen') + '</button>' +
+        '<button class="btn btn--sm" data-catall="0">' + u.icon('eyeOff', 15) + ' ' + tr('Alle ausblenden') + '</button></div>' +
+      '<div class="cat-sheet__list">' + rows() + '</div>' +
+      (p ? '<p class="cat-sheet__foot" data-no-translate>' + u.esc(p.name) + '</p>' : ''),
+      function (body) {
+        body.addEventListener('change', function (e) {
+          var t = e.target.closest('[data-catshow]');
+          if (!t) return;
+          G.store.setGroupHidden(plId, t.getAttribute('data-catshow'), !t.checked);
+          paintCats(); applyAll();
+        });
+        body.addEventListener('click', function (e) {
+          var b = e.target.closest('[data-catall]');
+          if (!b) return;
+          if (b.getAttribute('data-catall') === '1') G.store.showAllGroups(plId);
+          else allGroups.forEach(function (g) { G.store.setGroupHidden(plId, g.name, true); });
+          body.querySelector('.cat-sheet__list').innerHTML = rows();
+          paintCats(); applyAll();
+        });
+      });
+  }
+
+  /* ------------------------------------------------------------
+     Jetzt im TV: alle Sender mit ihrer Sendung - jetzt, um 20:15,
+     um 22:00 - und Suche im ganzen Programm
+     ------------------------------------------------------------ */
+  var guideAt = 'now';
+  var guideQuery = '';
+  function guideTime() {
+    if (guideAt === 'now') return Date.now();
+    var d = new Date(), hm = guideAt.split(':');
+    d.setHours(+hm[0], +hm[1], 0, 0);
+    if (d.getTime() < Date.now() - 3600000) d.setDate(d.getDate() + 1);   // schon vorbei: morgen
+    return d.getTime();
+  }
+  function guideChannels() {
+    var hid = hiddenNow();
+    return (allPool || []).filter(function (c) { return hid.indexOf(c.group || '') < 0; });
+  }
+  function guideRows() {
+    var list = guideChannels();
+    var out = [];
+    var q = guideQuery.toLowerCase();
+    var en = G.epg.en();
+    if (q) {
+      // Suche: alle kommenden Sendungen
+      list.forEach(function (c) {
+        var cn = (c.name || '').toLowerCase();
+        G.epg.upcoming(c, 60).forEach(function (pr) {
+          if ((pr.title || '').toLowerCase().indexOf(q) >= 0 || cn.indexOf(q) >= 0 && pr.start <= Date.now() && pr.stop > Date.now()) out.push({ c: c, p: pr });
+        });
+      });
+      out.sort(function (a, b) { return a.p.start - b.p.start; });
+      out = out.slice(0, 120);
+    } else {
+      var t = guideTime();
+      list.forEach(function (c) {
+        var ep = G.epg.nowNext(c, t);
+        if (ep && ep.now) out.push({ c: c, p: ep.now, n: ep.next });
+      });
+    }
+    if (!out.length) return '<p class="guide__empty">' + (q ? (en ? 'Nothing found in the programme.' : 'Im Programm nichts gefunden.') : (en ? 'No programme for these channels.' : 'Für diese Sender gibt es kein Programm.')) + '</p>';
+    var now = Date.now();
+    return out.map(function (r) {
+      var live = r.p.start <= now && r.p.stop > now;
+      var left = Math.max(1, Math.round((r.p.stop - now) / 60000));
+      var info = live ? (en ? left + ' min left' : 'noch ' + left + ' Min.') : G.epg.hm(r.p.start) + '–' + G.epg.hm(r.p.stop);
+      if (q && !live) {
+        var d = new Date(r.p.start);
+        if (d.toDateString() !== new Date().toDateString()) info = d.toLocaleDateString(en ? 'en-GB' : 'de-DE', { weekday: 'short' }) + ' ' + info;
+      }
+      return '<button class="guide__row' + (live ? ' is-live' : '') + '" data-guide="' + u.esc(r.c.url) + '">' +
+        u.logoHtml(r.c, 'guide__logo') +
+        '<span class="guide__main" data-no-translate>' +
+          '<span class="guide__ch">' + u.esc(r.c.name) + '</span>' +
+          '<b>' + u.esc(r.p.title || '—') + '</b>' +
+          (live ? '<span class="epg-bar"><i style="width:' + G.epg.progress(r.p).toFixed(1) + '%"></i></span>' : '') +
+          (r.n ? '<span class="guide__next">' + G.epg.hm(r.n.start) + ' ' + u.esc(r.n.title || '') + '</span>' : '') +
+        '</span>' +
+        '<span class="guide__time" data-no-translate>' + info + '</span>' +
+      '</button>';
+    }).join('');
+  }
+  function guideSheet() {
+    if (!G.epg || !G.epg.has()) return;
+    var en = G.epg.en();
+    var chips = [['now', en ? 'Now' : 'Jetzt'], ['20:15', '20:15'], ['22:00', '22:00']];
+    u.openSheet(tr('Jetzt im TV'),
+      '<div class="guide">' +
+        '<div class="search guide__search">' + u.icon('search', 16) +
+          '<input class="input" id="guideQ" type="search" autocomplete="off" placeholder="' + tr('Sendung oder Sender suchen …') + '" value="' + u.esc(guideQuery) + '"></div>' +
+        '<div class="chips guide__when">' + chips.map(function (c) {
+          return '<button class="chip' + (guideAt === c[0] ? ' is-on' : '') + '" data-at="' + c[0] + '">' + c[1] + '</button>';
+        }).join('') + '</div>' +
+        '<div class="guide__list" id="guideList">' + guideRows() + '</div>' +
+      '</div>',
+      function (body) {
+        var list = body.querySelector('#guideList');
+        var when = body.querySelector('.guide__when');
+        var q = body.querySelector('#guideQ');
+        var paint = function () {
+          list.innerHTML = guideRows();
+          when.style.opacity = guideQuery ? '.4' : '';
+        };
+        q.addEventListener('input', u.debounce(function () { guideQuery = q.value.trim(); paint(); }, 200));
+        q.addEventListener('keydown', function (e) { if (e.key === 'Enter') q.blur(); });
+        when.addEventListener('click', function (e) {
+          var b = e.target.closest('[data-at]');
+          if (!b) return;
+          guideAt = b.getAttribute('data-at');
+          u.$$('[data-at]', when).forEach(function (x) { x.classList.toggle('is-on', x === b); });
+          paint();
+        });
+        list.addEventListener('click', function (e) {
+          var b = e.target.closest('[data-guide]');
+          if (!b) return;
+          var c = findChannel(b.getAttribute('data-guide'));
+          if (!c) return;
+          u.closeSheet();
+          G.views.live.playChannel(c);
+        });
+        paint();
+      });
+  }
+
+  /** Ausgeblendete Kategorien der gezeigten Playlist */
+  function hiddenNow() { return G.store.hiddenGroups(allPoolId || G.store.state.activeId); }
+  function visibleGroups() {
+    var hid = hiddenNow();
+    return allGroups.filter(function (g) { return hid.indexOf(g.name) < 0; });
+  }
+
   function paintCats() {
     var host = u.$('#stCats');
     if (!host) return;
     // eine einzige Kategorie (oder keine) - dann braucht es keine Leiste
     if (allGroups.length < 2) { host.innerHTML = ''; host.hidden = true; return; }
     host.hidden = false;
-    var total = allGroups.reduce(function (n, g) { return n + g.count; }, 0);
+    var groups = visibleGroups();
+    var nHidden = allGroups.length - groups.length;
+    var total = groups.reduce(function (n, g) { return n + g.count; }, 0);
     host.innerHTML =
       '<button class="chip' + (allGroup === '*' ? ' is-on' : '') + '" data-cat="*">' + tr('Alle') +
         '<span class="chip__n">' + u.fmtInt(total) + '</span></button>' +
-      allGroups.map(function (g) {
+      groups.map(function (g) {
         return '<button class="chip' + (allGroup === g.name ? ' is-on' : '') + '" data-cat="' + u.esc(g.name) + '">' +
           u.esc(groupLabel(g.name)) + '<span class="chip__n">' + u.fmtInt(g.count) + '</span></button>';
-      }).join('');
+      }).join('') +
+      // Am Ende: Kategorien ein- und ausblenden
+      '<button class="chip chip--edit' + (nHidden ? ' has-hidden' : '') + '" data-catedit title="' + tr('Kategorien ein- und ausblenden') + '">' +
+        u.icon(nHidden ? 'eyeOff' : 'eye', 15) + '<span>' + (nHidden ? u.fmtInt(nHidden) + ' ' + tr('ausgeblendet') : tr('Kategorien')) + '</span></button>';
     var on = host.querySelector('.chip.is-on');
     // Die aktive Kategorie ins Bild holen. Gemessen wird vom Rand der Leiste:
     // offsetLeft zählt vom Rand der Karte und schob die Leiste um deren
@@ -612,7 +773,7 @@
       if (!key || seen[key]) return;
       seen[key] = true;
       out.push({ name: c.name || G.m3u.nameFromSource(c.url), url: c.url,
-        group: c.group || fallbackGroup || '', logo: c.logo || '', pl: fallbackGroup ? '' : id });
+        group: c.group || fallbackGroup || '', logo: c.logo || '', tvgId: c.tvgId || '', pl: fallbackGroup ? '' : id });
     };
     (await G.library.channelsOf(id)).forEach(function (c) { add(c); });
     G.store.state.channels.forEach(function (c) { add(c, tr('Eigene Sender')); });
@@ -672,7 +833,10 @@
   }
 
   function applyAll() {
-    var base = allGroup === '*' ? (allPool || [])
+    var hid = hiddenNow();
+    if (allGroup !== '*' && hid.indexOf(allGroup) >= 0) allGroup = '*';
+    var base = allGroup === '*'
+      ? (hid.length ? (allPool || []).filter(function (c) { return hid.indexOf(c.group || '') < 0; }) : (allPool || []))
       : (allPool || []).filter(function (c) { return (c.group || '') === allGroup; });
     allList = G.library.filter(base, allQuery, '*');
     lastGroup = null;
@@ -695,7 +859,7 @@
     var next = allList.slice(allShown, allShown + CHUNK);
     allShown += next.length;
     // Ueberschrift, wo eine neue Kategorie beginnt (nur bei "Alle Kategorien")
-    var showHeads = allGroup === '*' && allGroups.length > 1;
+    var showHeads = allGroup === '*' && visibleGroups().length > 1;
     grid.insertAdjacentHTML('beforeend', next.map(function (c) {
       var head = '';
       if (showHeads && (c.group || '') !== lastGroup) {
@@ -848,11 +1012,24 @@
     // Programmführer: geladen oder neue Minute - Zeilen und Fortschritt nachführen
     var onEpg = function () {
       if (G.epg && G.epg.info().busy) return;
+      // Programm gerade fertig geladen: Knopf „Jetzt im TV“ nachreichen
+      var tools = u.$('.start-shelf__tools');
+      var want = G.epg && G.epg.has() && G.store.state.settings.epgOn;
+      var gb = u.$('#stGuide');
+      if (tools && want && !gb) {
+        var sb = tools.querySelector('.start-shelf__search');
+        if (sb) {
+          sb.insertAdjacentHTML('afterend', '<button class="btn start-shelf__guide" id="stGuide" title="' + tr('Jetzt im TV') + '">' + u.icon('clock', 16) + '<span>' + tr('Jetzt im TV') + '</span></button>');
+          u.$('#stGuide').onclick = function () { if (allPool) guideSheet(); else loadAll().then(guideSheet); };
+        }
+      } else if (gb && !want) gb.remove();
       var vol = u.$('#stVol');
       if (!(vol && document.activeElement === vol)) paintNow();
       refreshEpg();
     };
     document.addEventListener('g04tv:epg', onEpg);
+    document.addEventListener('g04tv:prev', paintNow);
+    off.push(function () { document.removeEventListener('g04tv:prev', paintNow); });
     off.push(function () { document.removeEventListener('g04tv:epg', onEpg); });
 
     // Stern auf einer Kachel: Favorit an/aus - ohne abzuspielen
@@ -956,6 +1133,7 @@
       var cats = u.$('#stCats');
       if (cats) mouseScroll(cats);
       if (cats) cats.addEventListener('click', function (e) {
+        if (e.target.closest('[data-catedit]')) { catSheet(); return; }
         var b = e.target.closest('[data-cat]');
         if (!b) return;
         allGroup = b.getAttribute('data-cat');
@@ -975,6 +1153,11 @@
         applyAll();
         scrollToShelf();
       });
+      var guideBtn = u.$('#stGuide');
+      if (guideBtn) guideBtn.onclick = function () {
+        if (allPool) guideSheet();
+        else loadAll().then(guideSheet);
+      };
       var pick = u.$('#stPick');
       if (pick) pick.addEventListener('change', function () {
         G.store.setActive(pick.value);

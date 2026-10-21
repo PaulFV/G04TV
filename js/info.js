@@ -17,6 +17,7 @@
     ['Esc', 'Vollbild verlassen'],
     ['M', 'Ton aus und an'],
     ['Bild ↓ / Bild ↑', 'Nächster / vorheriger Sender'],
+    ['B', 'Zum vorherigen Sender'],
     ['↑ ↓', 'In der Senderliste blättern'],
     ['/', 'In das Suchfeld springen'],
     ['1 – 3', 'Bereich wechseln']
@@ -84,6 +85,8 @@
            ['Doppeltippen ins Bild', 'Vollbild ein und aus'],
            ['Im Bild wischen', 'Links: nächster Sender, rechts: vorheriger. Im Vollbild auch hoch und runter'],
            ['Mond antippen', 'Einschlaf-Timer stellen'],
+           ['Sender-Knopf neben „Live“', 'Zum vorherigen Sender'],
+           ['Jetzt im TV', 'Ins Programm aller Sender schauen, auch 20:15 und 22:00'],
            ['Bild-in-Bild-Knopf', 'Video läuft im kleinen Fenster weiter, auch in anderen Apps'],
            ['Sendung unter dem Namen antippen', 'Programm der nächsten Stunden'],
            ['Bereich wechseln', 'Das Bild läuft unten rechts weiter']].map(function (k) {

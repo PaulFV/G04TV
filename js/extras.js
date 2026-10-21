@@ -23,7 +23,12 @@
     var s = G.store.state;
     if (s.favorites.some(function (c) { return same(c, current); })) return s.favorites;
     var list = [];
-    if (s.activeId) { try { list = await G.library.channelsOf(s.activeId); } catch (e) { list = []; } }
+    if (s.activeId) {
+      try { list = await G.library.channelsOf(s.activeId); } catch (e) { list = []; }
+      // Ausgeblendete Kategorien beim Umschalten überspringen
+      var hid = G.store.hiddenGroups(s.activeId);
+      if (hid.length) list = list.filter(function (c) { return hid.indexOf(c.group || '') < 0 || same(c, current); });
+    }
     if (!list.some(function (c) { return same(c, current); })) {
       // Sender aus einer anderen Liste (z. B. Verlauf): den Verlauf nehmen
       if (s.recent.some(function (c) { return same(c, current); })) return s.recent;
@@ -225,6 +230,24 @@
   document.addEventListener('visibilitychange', syncWake);
 
   /* ------------------------------------------------------------
+     5. Zurück zum vorherigen Sender (wie die Taste auf der Fernbedienung)
+     ------------------------------------------------------------ */
+  var curCh = null, prevCh = null;
+  function previous() {
+    var cur = G.player.channel || G.store.state.last;
+    if (prevCh && !same(prevCh, cur)) return prevCh;
+    // Nach dem Start der App: aus dem Verlauf
+    return G.store.state.recent.filter(function (c) { return !same(c, cur); })[0] || null;
+  }
+  function goBack() {
+    var p = previous();
+    if (!p) return;
+    flash(p, -1);
+    G.store.pushRecent(p);
+    G.player.play(p);
+  }
+
+  /* ------------------------------------------------------------
      4. Bild-in-Bild
      iPhone/iPad (Safari): webkitSetPresentationMode, sonst die
      Standard-Schnittstelle (Chrome, Edge, Safari am Mac).
@@ -301,7 +324,12 @@
   /* ------------------------------------------------------------
      Einhängen
      ------------------------------------------------------------ */
-  G.player.on(function (status) {
+  G.player.on(function (status, message, channel) {
+    if (channel && (status === 'loading' || status === 'playing') && !same(channel, curCh)) {
+      if (curCh) prevCh = curCh;
+      curCh = channel;
+      document.dispatchEvent(new CustomEvent('g04tv:prev'));
+    }
     syncWake();
     // Von Hand angehalten: Timer ist erledigt
     if (status === 'idle' && sleepUntil) setSleep(0);
@@ -314,6 +342,7 @@
 
   G.extras = {
     zap: zap,
+    previous: previous, back: goBack,
     pip: togglePip, pipButton: pipButton, isPip: isPip, pipSupported: pipSupported,
     setSleep: setSleep, sleepLeft: sleepLeft, sleepButton: sleepButton, sleepSheet: sleepSheet,
     awake: function () { return !!wake; }

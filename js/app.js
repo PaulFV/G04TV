@@ -278,6 +278,7 @@
 
     if (e.key === '/') { e.preventDefault(); go('live', { search: true }); return; }
     if (e.key === 'f' || e.key === 'F') { G.player.fullscreen(); return; }
+    if ((e.key === 'b' || e.key === 'B') && G.extras && G.extras.previous()) { G.extras.back(); return; }
     if ((e.key === 'PageDown' || e.key === 'PageUp') && G.extras && G.player.channel) { e.preventDefault(); G.extras.zap(e.key === 'PageDown' ? 1 : -1); return; }
     if (e.key === 'm' || e.key === 'M') { G.player.toggleMuted(); G.dock.paintMute(); rerender(); return; }
 

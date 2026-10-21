@@ -743,6 +743,18 @@
     // Info: PiP
     , 'Bild-in-Bild-Knopf': 'Picture-in-picture button'
     , 'Video läuft im kleinen Fenster weiter, auch in anderen Apps': 'Video keeps playing in a small window, even in other apps'
+    // Kategorien, Zurück, Jetzt im TV
+    , 'Kategorien ein- und ausblenden': 'Show and hide categories'
+    , 'ausgeblendet': 'hidden'
+    , 'Ausgeschaltete Kategorien verschwinden unter „Alle“, aus der Suche und beim Umschalten. Favoriten bleiben.': 'Switched-off categories disappear from “All”, from search and when switching channels. Favourites stay.'
+    , 'Alle zeigen': 'Show all'
+    , 'Alle ausblenden': 'Hide all'
+    , 'Jetzt im TV': 'On TV now'
+    , 'Sendung oder Sender suchen …': 'Search show or channel …'
+    , 'Zurück zu': 'Back to'
+    , 'Zum vorherigen Sender': 'To the previous channel'
+    , 'Sender-Knopf neben „Live“': 'Channel button next to “Live”'
+    , 'Ins Programm aller Sender schauen, auch 20:15 und 22:00': 'See what\'s on all channels, also at 20:15 and 22:00'
   };
 
 

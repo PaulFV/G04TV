@@ -81,6 +81,7 @@
         keepAwake: true,         // Bildschirm anlassen, solange ein Sender läuft
         epgOn: true,             // Programmführer anzeigen
         epgUrls: '',             // eigene Programm-Adressen (XMLTV), eine pro Zeile
+        hiddenGroups: {},        // ausgeblendete Kategorien: { playlistId: [Name, …] }
         proxyOn: false,
         proxy: '',               // eigener Vermittler, z. B. https://…/?url={url}
         proxyStreams: false,     // auch die Streams über den Vermittler holen
@@ -331,6 +332,28 @@
     commit('settings');
   }
 
+  /* ---------- Ausgeblendete Kategorien (je Playlist) ---------- */
+  function hiddenGroups(plId) {
+    var m = state.settings.hiddenGroups;
+    return (m && plId && Array.isArray(m[plId])) ? m[plId] : [];
+  }
+  function groupHidden(plId, group) {
+    return hiddenGroups(plId).indexOf(group || '') >= 0;
+  }
+  function setGroupHidden(plId, group, hide) {
+    if (!plId) return;
+    var m = state.settings.hiddenGroups = Object.assign({}, state.settings.hiddenGroups || {});
+    var list = (m[plId] || []).filter(function (g) { return g !== (group || ''); });
+    if (hide) list.push(group || '');
+    if (list.length) m[plId] = list; else delete m[plId];
+    commit('settings');
+  }
+  function showAllGroups(plId) {
+    var m = state.settings.hiddenGroups = Object.assign({}, state.settings.hiddenGroups || {});
+    delete m[plId];
+    commit('settings');
+  }
+
   /** Der Vermittler, wenn einer eingeschaltet ist - sonst leer. */
   function proxy() {
     return state.settings.proxyOn ? String(state.settings.proxy || '').trim() : '';
@@ -483,6 +506,7 @@
     clearRecent: clearRecent,
 
     setSetting: setSetting,
+    hiddenGroups: hiddenGroups, groupHidden: groupHidden, setGroupHidden: setGroupHidden, showAllGroups: showAllGroups,
     proxy: proxy,
     viaProxy: viaProxy,
     streamViaProxy: streamViaProxy,
