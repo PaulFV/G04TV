@@ -766,6 +766,29 @@
     , '4 Sender': '4 channels'
     , 'Mehrfachansicht-Knopf': 'Multiview button'
     , 'Bis zu vier Sender gleichzeitig (iPad, Rechner); Bild antippen gibt ihm den Ton': 'Up to four channels at once (iPad, computer); tap a picture to give it the sound'
+    // Vereinfachung
+    , 'Mehr': 'More'
+    , 'In anderer App öffnen': 'Open in another app'
+    , 'Programm ansehen': 'View programme'
+    , 'In die Mehrfachansicht': 'Add to multiview'
+    , 'Nur diese Kategorie zeigen': 'Show only this category'
+    , 'Kategorie ausblenden': 'Hide category'
+    , 'Kategorie ausgeblendet': 'Category hidden'
+    , 'Ton an': 'Sound on'
+    , 'Ton aus': 'Sound off'
+    , 'Senderliste': 'Channel list'
+    , 'Einstellungen': 'Settings'
+    , 'Alles Wichtige auf einen Blick — gespeichert nur auf diesem Gerät.': 'Everything important at a glance — stored only on this device.'
+    , 'Allgemein': 'General'
+    , 'Programm & Sperre': 'Programme & lock'
+    , 'Erweitert': 'Advanced'
+    , 'Über': 'About'
+    , 'Lang drücken': 'Long press'
+    , 'Favorit, Sperre, Programm, Mehrfachansicht': 'Favourite, lock, programme, multiview'
+    // Vereinfachung 2
+    , 'Programm': 'Guide'
+    , '„⋯ Mehr“ unter dem Bild': '“⋯ More” below the picture'
+    , 'Timer, Bild-in-Bild, Mehrfachansicht, AirPlay, andere App': 'Timer, picture in picture, multiview, AirPlay, other app'
   };
 
 

@@ -339,7 +339,7 @@
   /* ------------------------------------------------------------
      Öffnen / Schließen
      ------------------------------------------------------------ */
-  async function open() {
+  async function open(extra) {
     if (box) return;
     build();
     document.body.classList.add('mv-open');
@@ -350,6 +350,11 @@
     var list = (st.channels || []).filter(Boolean);
     // Der laufende Sender kommt in die erste Kachel
     if (first) list = [first].concat(list.filter(function (c) { return !same(c, first); }));
+    // Per langem Drücken gewählter Sender: gleich als zweites Bild
+    if (extra && extra.url) {
+      list = list.filter(function (c) { return !same(c, extra); });
+      list.splice(first ? 1 : 0, 0, extra);
+    }
     G.player.stop();
     setLayout(layout);
     var n = 0;

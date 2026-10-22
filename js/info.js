@@ -81,14 +81,12 @@
         '<div class="card__head">' + u.icon('live', 18) + '<h3>Mit dem Finger</h3></div>' +
         '<div class="list">' +
           [['Antippen', 'Sender abspielen'],
-           ['Stern antippen', 'Sender merken oder vergessen'],
+           ['Lang drücken', 'Favorit, Sperre, Programm, Mehrfachansicht'],
            ['Doppeltippen ins Bild', 'Vollbild ein und aus'],
            ['Im Bild wischen', 'Links: nächster Sender, rechts: vorheriger. Im Vollbild auch hoch und runter'],
-           ['Mond antippen', 'Einschlaf-Timer stellen'],
+           ['„⋯ Mehr“ unter dem Bild', 'Timer, Bild-in-Bild, Mehrfachansicht, AirPlay, andere App'],
            ['Sender-Knopf neben „Live“', 'Zum vorherigen Sender'],
-           ['Jetzt im TV', 'Ins Programm aller Sender schauen, auch 20:15 und 22:00'],
-           ['Mehrfachansicht-Knopf', 'Bis zu vier Sender gleichzeitig (iPad, Rechner); Bild antippen gibt ihm den Ton'],
-           ['Bild-in-Bild-Knopf', 'Video läuft im kleinen Fenster weiter, auch in anderen Apps'],
+           ['Programm', 'Ins Programm aller Sender schauen, auch 20:15 und 22:00'],
            ['Sendung unter dem Namen antippen', 'Programm der nächsten Stunden'],
            ['Bereich wechseln', 'Das Bild läuft unten rechts weiter']].map(function (k) {
             return '<div class="list__row"><span class="list__main"><b>' + k[0] + '</b><span>' + k[1] + '</span></span></div>';

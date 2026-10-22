@@ -214,14 +214,66 @@
   // Welche ausklappbaren Abschnitte offen sind - bleibt, wenn die Einstellungen neu gezeichnet werden
   var folds = { lang: false, play: false, lock: false, epg: false, net: false, data: false, app: false, fb: false };
 
+  function viewMode() {
+    try { return localStorage.getItem('g04tv.startView') === 'list' ? 'list' : 'tiles'; } catch (e) { return 'tiles'; }
+  }
+
+  /**
+   * Vier Gruppen statt neun Abschnitten: Allgemein, Programm & Sperre,
+   * Erweitert, Über. Jede Zeile zeigt rechts den aktuellen Stand.
+   */
+  function regroup(html) {
+    var t = document.createElement('template');
+    t.innerHTML = html;
+    var root = t.content;
+    var view = root.querySelector('.settings-view');
+    if (!view) return html;
+    var s = G.store.state.settings;
+    var en = G.i18n && G.i18n.language === 'en';
+    var L = G.lock, info = G.epg ? G.epg.info() : null;
+    var sums = {
+      'fold-lang': (en ? 'English' : 'Deutsch') + ' · ' + (s.theme === 'light' ? tr('Hell') : tr('Dunkel')) + ' · ' + (viewMode() === 'list' ? tr('Liste') : tr('Kacheln')),
+      'fold-play': (s.autoplay ? tr('Sofort abspielen') : (en ? 'Select first' : 'Erst auswählen')) + ' · ' + bufferValue(s) + ' Min',
+      'fold-lock': L && L.hasCode() ? (L.isOpen() ? tr('Entsperrt') : tr('Code aktiv')) : (en ? 'Off' : 'Aus'),
+      'fold-epg': !s.epgOn ? (en ? 'Off' : 'Aus') : info && info.busy ? '…' : info && info.channels ? info.channels + ' ' + (en ? 'channels' : 'Sender') : (en ? 'No programme' : 'Kein Programm'),
+      'fold-net': s.proxyOn && G.store.proxy() ? (en ? 'Relay on' : 'Vermittler an') : (en ? 'Direct' : 'Direkt'),
+      'fold-data': G.store.state.playlists.length + ' ' + (G.store.state.playlists.length === 1 ? 'Playlist' : (en ? 'playlists' : 'Playlisten'))
+    };
+    Object.keys(sums).forEach(function (id) {
+      var d = root.getElementById(id);
+      var sm = d && d.querySelector('summary');
+      if (sm) sm.insertAdjacentHTML('beforeend', '<span class="settings-sum" data-no-translate>' + u.esc(sums[id]) + '</span>');
+    });
+    var groups = [
+      ['Allgemein', ['fold-lang', 'fold-play']],
+      ['Programm & Sperre', ['fold-lock', 'fold-epg']],
+      ['Erweitert', ['fold-net', 'fold-data']],
+      ['Über', ['fold-app', 'infoBox', 'fbBox']]
+    ];
+    var tail = view.querySelector(':scope > p.tiny');
+    groups.forEach(function (g) {
+      var sec = document.createElement('section');
+      sec.className = 'settings-group';
+      sec.innerHTML = '<h3 class="settings-group__h">' + g[0].replace('&', '&amp;') + '</h3>';
+      g[1].forEach(function (id) { var d = root.getElementById(id); if (d) sec.appendChild(d); });
+      view.insertBefore(sec, tail);
+    });
+    var box = document.createElement('div');
+    box.appendChild(root.cloneNode(true));
+    return box.innerHTML;
+  }
+
   function renderModern() {
+    return regroup(renderSections());
+  }
+
+  function renderSections() {
     var s = G.store.state.settings;
     var lang = G.i18n ? G.i18n.language : 'de';
 
     return '<div class="view settings-view">' +
       '<div class="settings-intro">' +
-        '<div><h2>Deine Einstellungen</h2><p>Wiedergabe, Darstellung und lokale Daten verwalten.</p></div>' +
-        '<span class="settings-device">' + u.icon('shield', 18) + ' Nur auf diesem Gerät</span>' +
+        '<div><h2>Einstellungen</h2><p>Alles Wichtige auf einen Blick — gespeichert nur auf diesem Gerät.</p></div>' +
       '</div>' +
 
       '<details class="card settings-section settings-fold sec-lang" id="fold-lang"' + (folds.lang ? ' open' : '') + '>' +
@@ -241,6 +293,14 @@
               '<select class="select" id="setTheme">' +
                 '<option value="dark"' + (s.theme !== 'light' ? ' selected' : '') + '>' + tr('Dunkel') + '</option>' +
                 '<option value="light"' + (s.theme === 'light' ? ' selected' : '') + '>' + tr('Hell') + '</option>' +
+              '</select></div>' +
+          '</div>' +
+          '<div class="settings-panel settings-panel__language">' +
+            u.icon('playlists', 22) +
+            '<div class="field"><label for="setView">Senderliste</label>' +
+              '<select class="select" id="setView">' +
+                '<option value="tiles"' + (viewMode() !== 'list' ? ' selected' : '') + '>' + tr('Kacheln') + '</option>' +
+                '<option value="list"' + (viewMode() === 'list' ? ' selected' : '') + '>' + tr('Liste') + '</option>' +
               '</select></div>' +
           '</div>' +
           '<div class="settings-panel">' + sw('showTabbar', 'Untere Leiste anzeigen', 'Aus: mehr Platz für die Sender. Die Bereiche erreichst du dann über das Menü oben links.') + '</div>' +
@@ -356,6 +416,11 @@
     if (language) language.onchange = function () { if (G.i18n) G.i18n.setLanguage(language.value); };
     var theme = u.$('#setTheme');
     if (theme) theme.onchange = function () { G.app.setTheme(theme.value); };
+    var viewSel = u.$('#setView');
+    if (viewSel) viewSel.onchange = function () {
+      try { localStorage.setItem('g04tv.startView', viewSel.value); } catch (e) { /* optional */ }
+      G.app.rerender();
+    };
 
     /* Schalter */
     u.on(host, 'change', '[data-set]', function (e, t) {

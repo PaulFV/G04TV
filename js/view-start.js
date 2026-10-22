@@ -25,8 +25,7 @@
     var fav = G.store.isFavorite(c.url);
     var L = G.lock, withLock = L && L.hasCode();
     var locked = withLock && L.isLocked(c);
-    return '<div class="ch-tile ch-tile--star' + (ord ? ' ch-tile--ord' : '') + (playing ? ' is-playing' : '') + (locked ? ' is-locked' : '') + (locked && L.isOpen() ? ' is-open' : '') + '" role="button" tabindex="0" data-play="' + u.esc(c.url) + '">' +
-      (withLock ? lockBtn(c) : '') +
+    return '<div class="ch-tile ch-tile--star' + (ord ? ' ch-tile--ord' : '') + (playing ? ' is-playing' : '') + (fav ? ' is-fav' : '') + (locked ? ' is-locked' : '') + (locked && L.isOpen() ? ' is-open' : '') + '" role="button" tabindex="0" data-play="' + u.esc(c.url) + '">' +
       (ord ? '<span class="ch-tile__mv">' +
         '<button type="button" data-mv="' + u.esc(c.url) + '" data-dir="-1" aria-label="Nach oben" title="Nach oben"' + (ord.i === 0 ? ' disabled' : '') + '>▲</button>' +
         '<button type="button" data-mv="' + u.esc(c.url) + '" data-dir="1" aria-label="Nach unten" title="Nach unten"' + (ord.i === ord.n - 1 ? ' disabled' : '') + '>▼</button>' +
@@ -34,9 +33,6 @@
       u.logoHtml(c, 'ch-tile__logo') +
       '<span class="ch-tile__name">' + u.esc(c.name) + '</span>' +
       epgLine(c, sub) +
-      '<button class="ch-tile__fav' + (fav ? ' is-on' : '') + '" type="button" data-fav="' + u.esc(c.url) + '" ' +
-        'aria-label="' + (fav ? 'Favorit entfernen' : 'Als Favorit merken') + '" title="Favorit">' +
-        u.icon(fav ? 'starFill' : 'star', 15) + '</button>' +
     '</div>';
   }
 
@@ -67,6 +63,9 @@
 
   /** Schloss oben links auf der Kachel (nur wenn ein Code festgelegt ist) */
   function lockBtn(c) {
+    return '';
+  }
+  function lockBtnOld(c) {
     var why = G.lock.reason(c);
     var own = why === 'channel';
     var title = own ? 'Sperre aufheben' : why ? 'Gesperrt über Kategorie oder Playlist' : 'Sender sperren';
@@ -85,6 +84,7 @@
       if (!c) return;
       var locked = withLock && L.isLocked(c);
       t.classList.toggle('is-locked', !!locked);
+      t.classList.toggle('is-fav', G.store.isFavorite(c.url));
       t.classList.toggle('is-open', !!locked && L.isOpen());
       var b = t.querySelector('.ch-tile__lock');
       if (withLock) {
@@ -103,6 +103,9 @@
   }
 
   function catLockBtn(name) {
+    return '';
+  }
+  function catLockBtnOld(name) {
     var on = G.lock.groupLocked(name);
     var title = on ? 'Kategorie entsperren' : 'Kategorie sperren';
     return '<button class="start-shelf__catlock' + (on ? ' is-on' : '') + '" type="button" data-lockcat="' + u.esc(name) + '" aria-label="' + title + '" title="' + title + '">' +
@@ -182,8 +185,9 @@
     var fav = G.store.isFavorite(c.url);
     var state;
     // Laufzeit: auch beim kurzen Nachladen stehen lassen, sonst flackert sie
-    var clock = G.player.elapsed() >= 0 && (status === 'playing' || status === 'loading')
-      ? '<span class="start-now__time" id="stClock">' + clockText() + '</span>' : '';
+    // Laufzeit entfällt (Vereinfachung); läuft der Einschlaf-Timer, steht er hier
+    var left = G.extras ? Math.ceil(G.extras.sleepLeft() / 60000) : 0;
+    var clock = left ? '<button class="start-now__sleepchip" id="stSleepChip" title="Einschlaf-Timer">' + u.icon('moon', 12) + '<span>' + left + ' Min.</span></button>' : '';
     var back = G.extras && G.extras.previous();
     var backBtn = back ? '<button class="start-now__back" id="stBack" title="' + tr('Zurück zu') + ' ' + u.esc(back.name) + '">' + u.icon('back', 12) + '<span data-no-translate>' + u.esc(back.name) + '</span></button>' : '';
     if (status === 'playing') state = '<span class="start-now__state is-live"><i></i>Live' + clock + backBtn + '</span>';
@@ -203,7 +207,6 @@
         '<button class="start-now__icon' + (fav ? ' is-on' : '') + '" id="stStar" ' +
           'aria-label="' + (fav ? 'Favorit entfernen' : 'Als Favorit merken') + '" title="Favorit">' +
           u.icon(fav ? 'starFill' : 'star', 20) + '</button>' +
-        (G.extras ? G.extras.sleepButton() : '') +
         '<span class="start-now__break"></span>' +
         stageButtons() +
       '</div>';
@@ -222,6 +225,83 @@
       '</span>';
   }
 
+  /** „⋯ Mehr“ unter dem Bild */
+  function moreMenu() {
+    var c = G.player.channel || G.store.state.last;
+    if (!c) return;
+    var en = G.i18n && G.i18n.language === 'en';
+    var ep = G.epg && G.epg.nowNext(c);
+    var left = G.extras ? Math.ceil(G.extras.sleepLeft() / 60000) : 0;
+    var air = u.$('#stageAirplay');
+    var s = G.store.state.settings;
+    var volOk = G.player.volumeSettable ? G.player.volumeSettable() : true;
+    var running = G.player.status === 'playing' || G.player.status === 'loading';
+    u.menu({
+      title: c.name,
+      items: [
+        ep && { icon: 'clock', label: tr('Programm'), sub: ep.now ? (en ? 'Now: ' : 'Jetzt: ') + ep.now.title : '', act: function () { G.epg.sheet(c); } },
+        G.extras && { icon: 'moon', label: tr('Einschlaf-Timer'), sub: left ? left + ' Min.' : (en ? 'off' : 'aus'), on: !!left, act: function () { G.extras.sleepSheet(); } },
+        G.extras && running && G.extras.pipSupported() && { icon: 'pip', label: tr('Bild-in-Bild'), on: G.extras.isPip(), act: function () { G.extras.pip(); } },
+        G.multiview && window.innerWidth >= 700 && { icon: 'multi', label: tr('Mehrfachansicht'), act: function () { G.multiview.open(); } },
+        air && !air.hidden && { icon: 'airplay', label: 'AirPlay', act: function () { air.click(); } },
+        !volOk && { icon: s.muted ? 'volume' : 'muted', label: s.muted ? tr('Ton an') : tr('Ton aus'), act: function () { G.player.toggleMuted(); G.dock.paintMute(); paintNow(); } },
+        G.dock.external && { icon: 'external', label: tr('In anderer App öffnen'), act: function () { G.dock.external(c); } }
+      ]
+    });
+  }
+
+  /** Langes Drücken auf einen Sender */
+  function channelMenu(c) {
+    if (!c) return;
+    var fav = G.store.isFavorite(c.url);
+    var L = G.lock;
+    var why = L && L.hasCode() ? L.reason(c) : '';
+    var ep = G.epg && G.epg.nowNext(c);
+    u.menu({
+      title: c.name,
+      items: [
+        { icon: fav ? 'starFill' : 'star', label: fav ? tr('Favorit entfernen') : tr('Als Favorit merken'), on: fav, act: function () {
+          var on = G.store.toggleFavorite(c);
+          u.toast(on ? 'Als Favorit gemerkt' : 'Favorit entfernt', c.name, 'ok', 2200);
+          paintShelf(); paintNow();
+        } },
+        L && { icon: why ? 'unlock' : 'lock', label: why === 'channel' ? tr('Sperre aufheben') : why ? tr('Gesperrt über Kategorie oder Playlist') : tr('Sender sperren'), act: async function () {
+          if (!L.hasCode()) { u.toast(tr('Erst einen Code festlegen'), tr('Einstellungen › Sperre'), 'warn', 3500); return; }
+          if (why && why !== 'channel') { u.toast(tr('Gesperrt über Kategorie oder Playlist'), tr('Dort lässt sich die Sperre aufheben.'), 'warn', 3500); return; }
+          var on = await L.toggleChannel(c);
+          if (on != null) u.toast(on ? tr('Sender gesperrt') : tr('Sperre aufgehoben'), c.name, 'ok', 2000);
+        } },
+        ep && { icon: 'clock', label: tr('Programm ansehen'), sub: ep.now ? ep.now.title : '', act: function () { G.epg.sheet(c); } },
+        G.multiview && window.innerWidth >= 700 && { icon: 'multi', label: tr('In die Mehrfachansicht'), act: function () { G.multiview.open(c); } }
+      ]
+    });
+  }
+
+  /** Langes Drücken auf eine Kategorie-Überschrift */
+  function categoryMenu(name) {
+    var L = G.lock;
+    var plId = allPoolId || G.store.state.activeId;
+    var locked = L && L.groupLocked(name);
+    u.menu({
+      title: groupLabel(name),
+      items: [
+        { icon: 'grid', label: tr('Nur diese Kategorie zeigen'), act: function () {
+          allGroup = name; saveGroup(plId, allGroup); paintCats(); applyAll(); scrollToShelf();
+        } },
+        { icon: 'eyeOff', label: tr('Kategorie ausblenden'), act: function () {
+          G.store.setGroupHidden(plId, name, true); paintCats(); applyAll();
+          u.toast(tr('Kategorie ausgeblendet'), groupLabel(name), 'ok', 2400);
+        } },
+        L && { icon: locked ? 'unlock' : 'lock', label: locked ? tr('Kategorie entsperren') : tr('Kategorie sperren'), act: async function () {
+          if (!L.hasCode()) { u.toast(tr('Erst einen Code festlegen'), tr('Einstellungen › Sperre'), 'warn', 3500); return; }
+          var on = await L.toggleGroup(name);
+          if (on != null) u.toast(on ? tr('Kategorie gesperrt') : tr('Sperre aufgehoben'), groupLabel(name), 'ok', 2000);
+        } }
+      ]
+    });
+  }
+
+
   /** Laufzeit als m:ss, ab einer Stunde h:mm:ss. */
   function clockText() {
     var s = Math.max(0, Math.floor(G.player.elapsed() / 1000));
@@ -235,14 +315,15 @@
     var muted = st.muted || st.volume <= 0;
     var air = u.$('#stageAirplay');
     var airOn = air && !air.hidden;
-    return (airOn
-        ? '<button class="start-now__icon start-now__icon--sm' + (air.classList.contains('is-on') ? ' is-acc' : '') + '" id="stAir" aria-label="AirPlay" title="AirPlay">' + air.innerHTML + '</button>'
+    // Ton und Regler nur, wo die Lautstärke einstellbar ist (nicht auf iPhone/iPad);
+    // alles Weitere steckt in „⋯ Mehr“.
+    var volOk = G.player.volumeSettable ? G.player.volumeSettable() : true;
+    return (volOk
+        ? '<button class="start-now__icon start-now__icon--sm" id="stMute" aria-label="' + (muted ? 'Ton an' : 'Ton aus') + '" title="' + (muted ? 'Ton an' : 'Ton aus') + '">' +
+            u.icon(muted ? 'muted' : 'volume', 18) + '</button>' +
+          '<span id="stVolSlot"></span>'
         : '') +
-      '<button class="start-now__icon start-now__icon--sm" id="stMute" aria-label="' + (muted ? 'Ton an' : 'Ton aus') + '" title="' + (muted ? 'Ton an' : 'Ton aus') + '">' +
-        u.icon(muted ? 'muted' : 'volume', 18) + '</button>' +
-      '<span id="stVolSlot"></span>' +
-      (G.extras ? G.extras.pipButton() : '') +
-      (G.multiview ? '<button class="start-now__icon start-now__icon--sm start-now__multi" id="stMulti" aria-label="Mehrfachansicht" title="Mehrfachansicht">' + u.icon('multi', 18) + '</button>' : '') +
+      '<button class="start-now__icon start-now__icon--sm" id="stMenu" aria-label="Mehr" title="Mehr">' + u.icon('dots', 20) + '</button>' +
       '<button class="start-now__icon start-now__icon--sm" id="stFull" aria-label="Vollbild" title="Vollbild">' + u.icon('full', 18) + '</button>';
   }
 
@@ -261,8 +342,10 @@
     var air = u.$('#stAir');
     if (air) air.onclick = function () { var b = u.$('#stageAirplay'); if (b) b.click(); };
 
-    var multiB = u.$('#stMulti');
-    if (multiB) multiB.onclick = function () { G.multiview.open(); };
+    var moreB = u.$('#stMenu');
+    if (moreB) moreB.onclick = moreMenu;
+    var chip = u.$('#stSleepChip');
+    if (chip) chip.onclick = function () { if (G.extras) G.extras.sleepSheet(); };
 
     var backB = u.$('#stBack');
     if (backB) backB.onclick = function (e) { e.stopPropagation(); G.extras.back(); };
@@ -329,6 +412,7 @@
       try { shelfTab = localStorage.getItem(TAB_KEY); } catch (e) { /* optional */ }
     }
     if (shelfTab === 'fav' || shelfTab === 'all' || shelfTab === 'recent') return shelfTab;
+    if (shelfTab === 'guide' && guideOn()) return shelfTab;
     shelfTab = null;
     return s.favorites.length ? 'fav' : 'all';
   }
@@ -345,7 +429,8 @@
   }
 
   // Jeder Reiter mit eigenem Zeichen und eigener Farbe (siehe start.css)
-  var TAB_ICON = { fav: 'starFill', all: 'grid', recent: 'history' };
+  var TAB_ICON = { fav: 'starFill', all: 'grid', recent: 'history', guide: 'clock' };
+  function guideOn() { return !!(G.epg && G.epg.has() && G.store.state.settings.epgOn); }
 
   function tabBtn(key, label, n, tab) {
     var on = tab === key;
@@ -364,16 +449,13 @@
         tabBtn('fav', 'Favoriten', s.favorites.length, tab) +
         tabBtn('all', 'Alle', allCount || null, tab) +
         tabBtn('recent', 'Verlauf', s.recent.length, tab) +
-      '</div>' +
-      // Ansicht wie im Bereich Favoriten: Kacheln oder Liste
-      '<div class="start-shelf__mode" role="group" aria-label="Ansicht">' +
-        '<button class="' + (mode === 'tiles' ? 'is-on' : '') + '" data-view="tiles" aria-label="Kacheln" title="Kacheln">' + u.icon('grid', 16) + '</button>' +
-        '<button class="' + (mode === 'list' ? 'is-on' : '') + '" data-view="list" aria-label="Liste" title="Liste">' + u.icon('playlists', 16) + '</button>' +
+        (guideOn() ? tabBtn('guide', 'Programm', null, tab) : '') +
       '</div>' +
     '</div>';
 
     var body;
     if (tab === 'all') body = allHead() + '<div class="start-shelf__grid" id="stGrid"></div><div class="start-shelf__more" id="stMore"></div>';
+    else if (tab === 'guide') body = guideBody();
     else body = listBody(tab);
 
     return head + body;
@@ -492,22 +574,57 @@
   function allHead() {
     var s = G.store.state;
     if (!s.playlists.length) return '';
-    return '<div class="start-shelf__tools">' +
+    return plLine() + '<div class="start-shelf__tools">' +
         '<div class="search start-shelf__search">' + u.icon('search', 16) +
           '<input class="input" id="stSearch" type="search" inputmode="search" autocomplete="off" ' +
           'placeholder="Suchen …" value="' + u.esc(allQuery) + '"></div>' +
-        (G.epg && G.epg.has() && G.store.state.settings.epgOn
-          ? '<button class="btn start-shelf__guide" id="stGuide" title="Jetzt im TV">' + u.icon('clock', 16) + '<span>Jetzt im TV</span></button>' : '') +
-        (s.playlists.length > 1
-          ? '<select class="select start-shelf__pick" id="stPick" aria-label="Playlist">' +
-              s.playlists.map(function (p) {
-                return '<option value="' + u.esc(p.id) + '"' + (p.id === s.activeId ? ' selected' : '') + '>' + u.esc(p.name) + '</option>';
-              }).join('') +
-            '</select>'
-          : '') +
+
       '</div>' +
       '<div class="chips chips--scroll start-shelf__cats" id="stCats"></div>';
   }
+
+  /** Schmale Zeile „Playlist: Name ▾“ (nur bei mehreren Playlisten) */
+  function plLine() {
+    var s = G.store.state;
+    if (s.playlists.length < 2) return '';
+    return '<label class="start-shelf__pl"><span>Playlist:</span>' +
+      '<select id="stPick" aria-label="Playlist">' +
+        s.playlists.map(function (p) {
+          return '<option value="' + u.esc(p.id) + '"' + (p.id === s.activeId ? ' selected' : '') + '>' + u.esc(p.name) + '</option>';
+        }).join('') +
+      '</select></label>';
+  }
+
+  /** Reiter „Programm“: Jetzt / 20:15 / 22:00 und Suche im Programm */
+  function guideBody() {
+    var en = G.epg && G.epg.en();
+    var chips = [['now', en ? 'Now' : 'Jetzt'], ['20:15', '20:15'], ['22:00', '22:00']];
+    return plLine() +
+      '<div class="start-shelf__tools"><div class="search start-shelf__search">' + u.icon('search', 16) +
+        '<input class="input" id="stGuideQ" type="search" autocomplete="off" placeholder="' + tr('Sendung oder Sender suchen …') + '" value="' + u.esc(guideQuery) + '"></div></div>' +
+      '<div class="chips guide__when start-shelf__when" id="stGuideWhen">' + chips.map(function (c) {
+        return '<button class="chip' + (guideAt === c[0] ? ' is-on' : '') + '" data-at="' + c[0] + '">' + c[1] + '</button>';
+      }).join('') + '</div>' +
+      '<div class="guide__list" id="stGuideList"><p class="start-shelf__empty">' + tr('Sender werden geladen …') + '</p></div>';
+  }
+  async function loadGuide() {
+    var s = G.store.state;
+    if (!u.$('#stGuideList')) return;
+    if (!allPool || allPoolId !== s.activeId) {
+      var id = s.activeId;
+      var pool = await playlistChannels(id);
+      if (id !== G.store.state.activeId) return;
+      allPool = pool; allPoolId = id; allGroups = groupsInOrder(pool);
+    }
+    paintGuide();
+  }
+  function paintGuide() {
+    var list = u.$('#stGuideList');
+    if (list && allPool) list.innerHTML = guideRows();
+    var when = u.$('#stGuideWhen');
+    if (when) when.style.opacity = guideQuery ? '.4' : '';
+  }
+
 
   /** Kategorien wie in der Playlist: Reihenfolge des ersten Auftretens */
   function groupsInOrder(list) {
@@ -1016,23 +1133,20 @@
     // Programmführer: geladen oder neue Minute - Zeilen und Fortschritt nachführen
     var onEpg = function () {
       if (G.epg && G.epg.info().busy) return;
-      // Programm gerade fertig geladen: Knopf „Jetzt im TV“ nachreichen
-      var tools = u.$('.start-shelf__tools');
-      var want = G.epg && G.epg.has() && G.store.state.settings.epgOn;
-      var gb = u.$('#stGuide');
-      if (tools && want && !gb) {
-        var sb = tools.querySelector('.start-shelf__search');
-        if (sb) {
-          sb.insertAdjacentHTML('afterend', '<button class="btn start-shelf__guide" id="stGuide" title="' + tr('Jetzt im TV') + '">' + u.icon('clock', 16) + '<span>' + tr('Jetzt im TV') + '</span></button>');
-          u.$('#stGuide').onclick = function () { if (allPool) guideSheet(); else loadAll().then(guideSheet); };
-        }
-      } else if (gb && !want) gb.remove();
+      // Programm gerade fertig geladen: Reiter „Programm“ nachreichen
+      var tabsEl = u.$('.start-shelf__tabs');
+      var gt = u.$('[data-shelf="guide"]');
+      if (tabsEl && guideOn() && !gt) tabsEl.insertAdjacentHTML('beforeend', tabBtn('guide', tr('Programm'), null, currentTab()));
+      else if (gt && !guideOn()) gt.remove();
+      if (currentTab() === 'guide') paintGuide();
       var vol = u.$('#stVol');
       if (!(vol && document.activeElement === vol)) paintNow();
       refreshEpg();
     };
     document.addEventListener('g04tv:epg', onEpg);
     document.addEventListener('g04tv:prev', paintNow);
+    document.addEventListener('g04tv:sleep', paintNow);
+    off.push(function () { document.removeEventListener('g04tv:sleep', paintNow); });
     off.push(function () { document.removeEventListener('g04tv:prev', paintNow); });
     off.push(function () { document.removeEventListener('g04tv:epg', onEpg); });
 
@@ -1066,6 +1180,12 @@
       e.stopPropagation();
       G.store.moveFavorite(t.getAttribute('data-mv'), +t.getAttribute('data-dir'));
       paintShelf();
+    });
+
+    // Langes Drücken: Sender- bzw. Kategorie-Menü
+    u.onLongPress(host, '.ch-tile[data-play], .start-shelf__cat', function (el) {
+      if (el.classList.contains('start-shelf__cat')) { categoryMenu(el.getAttribute('data-cat')); return; }
+      channelMenu(findChannel(el.getAttribute('data-play')));
     });
 
     u.on(host, 'click', '[data-play]', function (e, t) {
@@ -1157,23 +1277,41 @@
         applyAll();
         scrollToShelf();
       });
-      var guideBtn = u.$('#stGuide');
-      if (guideBtn) guideBtn.onclick = function () {
-        if (allPool) guideSheet();
-        else loadAll().then(guideSheet);
-      };
-      var pick = u.$('#stPick');
-      if (pick) pick.addEventListener('change', function () {
-        G.store.setActive(pick.value);
-        allQuery = '';
-        allGroup = '*';
-        paintShelf();
-      });
       loadAll();
     }
 
+    var pick = u.$('#stPick');
+    if (pick) pick.addEventListener('change', function () {
+      G.store.setActive(pick.value);
+      allQuery = '';
+      allGroup = '*';
+      paintShelf();
+    });
+
+    if (currentTab() === 'guide') {
+      var gq = u.$('#stGuideQ');
+      if (gq) gq.addEventListener('input', u.debounce(function () { guideQuery = gq.value.trim(); paintGuide(); }, 200));
+      var gw = u.$('#stGuideWhen');
+      if (gw) gw.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-at]');
+        if (!b) return;
+        guideAt = b.getAttribute('data-at');
+        u.$$('[data-at]', gw).forEach(function (x) { x.classList.toggle('is-on', x === b); });
+        paintGuide();
+      });
+      var gl = u.$('#stGuideList');
+      if (gl) gl.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-guide]');
+        if (!b) return;
+        var c = findChannel(b.getAttribute('data-guide'));
+        if (c) G.views.live.playChannel(c);
+      });
+      loadGuide();
+    }
+
+
     // Enter schließt die Tastatur (auf dem Tablet bleibt sie sonst stehen)
-    ['#stSearch', '#stListSearch'].forEach(function (sel) {
+    ['#stSearch', '#stListSearch', '#stGuideQ'].forEach(function (sel) {
       var f = u.$(sel);
       if (f) f.addEventListener('keydown', function (e) {
         if (e.key === 'Enter') { e.preventDefault(); f.blur(); }
