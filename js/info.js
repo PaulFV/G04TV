@@ -38,9 +38,9 @@
       '<div class="card">' +
         '<div class="card__head">' + u.icon('playlists', 18) + '<h3>Die Bereiche</h3></div>' +
         '<div class="list">' +
-          [['start', 'Start', 'Das Bild, darunter Favoriten, alle Sender mit Suche und der Verlauf'],
-           ['playlists', 'Playlisten', 'Quellen eintragen, aktualisieren, ersetzen, löschen'],
-           ['settings', 'Einstellungen', 'Wiedergabe, Vermittler, Sicherung und Löschen — und diese Info']].map(function (r) {
+          [['start', 'Start', 'Das Bild, darunter Favoriten, alle Sender, Verlauf und Programm'],
+           ['playlists', 'Playlisten', 'Quellen eintragen, aktualisieren, ersetzen, sperren, löschen'],
+           ['settings', 'Einstellungen', 'Allgemein, Programm & Sperre, Erweitert und Über — mit dieser Info']].map(function (r) {
             return '<div class="list__row"><span class="list__ic">' +
               u.icon(r[0] === 'favorites' ? 'star' : r[0], 17) + '</span>' +
               '<span class="list__main"><b>' + r[1] + '</b><span>' + r[2] + '</span></span></div>';

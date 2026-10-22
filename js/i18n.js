@@ -789,6 +789,10 @@
     , 'Programm': 'Guide'
     , '„⋯ Mehr“ unter dem Bild': '“⋯ More” below the picture'
     , 'Timer, Bild-in-Bild, Mehrfachansicht, AirPlay, andere App': 'Timer, picture in picture, multiview, AirPlay, other app'
+    // Info: Bereiche neu
+    , 'Das Bild, darunter Favoriten, alle Sender, Verlauf und Programm': 'The picture, below it favourites, all channels, history and guide'
+    , 'Quellen eintragen, aktualisieren, ersetzen, sperren, löschen': 'Add, refresh, replace, lock and delete sources'
+    , 'Allgemein, Programm & Sperre, Erweitert und Über — mit dieser Info': 'General, guide & lock, advanced and about — including this info'
   };
 
 

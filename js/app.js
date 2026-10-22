@@ -1,5 +1,5 @@
 /* ============================================================
-   G04TV v1.0.108 — Anwendung, Navigation, Start
+   G04TV — Anwendung, Navigation, Start
    ============================================================ */
 (function (G) {
   'use strict';
@@ -301,6 +301,8 @@
 
     G.dock.init();
     initLangSwitch();
+    // Versionsangabe überall aus G.VERSION (nicht von Hand im HTML pflegen)
+    u.$$('.brand__ver').forEach(function (e) { e.textContent = 'v' + G.VERSION; });
     initTheme();
     initAppFull();
     trackTopbar();
