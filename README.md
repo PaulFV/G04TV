@@ -1,4 +1,4 @@
-# G04TV v1.0.116
+# G04TV v1.0.117
 
 Abspieler für **eigene IPTV-Playlisten** — als installierbare Web-App für **iPhone, iPad, Android und
 Desktop**. Ohne Backend, ohne Konto, ohne Tracking. Playlisten, Favoriten, Programm und Zugangsdaten
@@ -12,7 +12,7 @@ bleiben auf dem Gerät.
 
 | Bereich | Beschreibung |
 |:--|:--|
-| **Start** | Oben das Bild, darunter die Reiter **Favoriten**, **Alle**, **Verlauf** und **Programm** — schlichte Kacheln (gelber Punkt = Favorit, rotes Quadrat = gesperrt), alles Weitere per langem Drücken |
+| **Start** | Oben das Bild, darunter die Reiter **Favoriten**, **Alle**, **Verlauf** und **Programm** — schlichte Kacheln (kleiner Stern = Favorit, kleines Schloss = gesperrt), alles Weitere per langem Drücken |
 | **Playlisten** | Quellen eintragen (Adresse, Datei, Einfügen, Xtream), aktualisieren, ersetzen, umbenennen, sperren, löschen |
 | **Einstellungen** | Vier Gruppen: Allgemein, Programm & Sperre, Erweitert, Über — jede Zeile zeigt ihren Stand |
 
