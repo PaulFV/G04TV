@@ -226,3 +226,4 @@
 [data-theme="light"] .cat-sheet__row,[data-theme="light"] .guide__row{border-color:rgba(16,44,66,.08)}
 [data-theme="light"] .guide__row:hover{background:rgba(16,44,66,.04)}
 [data-theme="light"] .guide__logo{background:#F1F5F9;border-color:rgba(16,44,66,.1)} [data-theme="light"] .guide__logo img{background:#fff}
+[data-theme="light"] .mv-pick__row{border-color:rgba(16,44,66,.08)}
