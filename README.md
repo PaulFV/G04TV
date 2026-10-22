@@ -1,4 +1,4 @@
-# G04TV v1.0.115
+# G04TV v1.0.116
 
 Abspieler für **eigene IPTV-Playlisten** — als installierbare Web-App für **iPhone, iPad, Android und
 Desktop**. Ohne Backend, ohne Konto, ohne Tracking. Playlisten, Favoriten, Programm und Zugangsdaten
@@ -12,9 +12,9 @@ bleiben auf dem Gerät.
 
 | Bereich | Beschreibung |
 |:--|:--|
-| **Start** | Oben das Bild, darunter die Reiter **Favoriten**, **Alle** und **Verlauf** — als Kacheln oder Liste, mit Suche, Kategorien und Programm |
+| **Start** | Oben das Bild, darunter die Reiter **Favoriten**, **Alle**, **Verlauf** und **Programm** — schlichte Kacheln (gelber Punkt = Favorit, rotes Quadrat = gesperrt), alles Weitere per langem Drücken |
 | **Playlisten** | Quellen eintragen (Adresse, Datei, Einfügen, Xtream), aktualisieren, ersetzen, umbenennen, sperren, löschen |
-| **Einstellungen** | Sprache und Darstellung, Wiedergabe, Sperre, Programmführer, Vermittler, Daten, Installation, Feedback, Info |
+| **Einstellungen** | Vier Gruppen: Allgemein, Programm & Sperre, Erweitert, Über — jede Zeile zeigt ihren Stand |
 
 Auf dem **Tablet quer** teilt sich die Startseite: links das Bild, rechts die Senderliste, jede Seite
 für sich scrollbar. Auf dem **Handy** klebt das Bild oben; die untere Leiste lässt sich ausblenden.
@@ -42,7 +42,7 @@ für sich scrollbar. Auf dem **Handy** klebt das Bild oben; die untere Leiste l�
 
 * Auf jeder Kachel steht, **was gerade läuft**, mit Fortschrittsbalken; unter dem Bild dazu
   Uhrzeit und **was danach kommt**. Antippen zeigt das Programm der nächsten Stunden.
-* **Jetzt im TV:** alle Sender mit ihrer laufenden Sendung — oder um **20:15** und **22:00** — und
+* **Reiter Programm:** alle Sender mit ihrer laufenden Sendung — oder um **20:15** und **22:00** — und
   eine **Suche im ganzen Programm** (z. B. „Tatort“). Antippen schaltet um.
 * Quellen kommen von selbst: `url-tvg` / `x-tvg-url` aus der Playlist und bei Xtream-Zugängen
   `xmltv.php`. Eigene XMLTV-Adressen (`.xml` oder `.xml.gz`) lassen sich in den Einstellungen
@@ -55,7 +55,7 @@ für sich scrollbar. Auf dem **Handy** klebt das Bild oben; die untere Leiste l�
 ### Sperre (Jugendschutz)
 
 * Ein **4-stelliger Code** (in den Einstellungen festlegen) sperrt **ganze Playlisten, Kategorien
-  oder einzelne Sender** — über das rote Schloss auf Kachel, Kategorie oder Playlist-Karte.
+  oder einzelne Sender** — per langem Drücken auf Sender oder Kategorie, Playlisten über das Schloss auf ihrer Karte.
 * Gesperrte Sender bleiben mit Namen sichtbar, laufen aber erst nach dem Code. Danach ist alles
   **15 Minuten** frei; eine neue Sperre gilt sofort.
 * Nach 5 falschen Eingaben eine Wartezeit, die sich jedes Mal verdoppelt. Im Auto werden gesperrte
@@ -83,11 +83,12 @@ für sich scrollbar. Auf dem **Handy** klebt das Bild oben; die untere Leiste l�
 | Geste / Taste | Wirkung |
 |:--|:--|
 | Kachel antippen | Sender abspielen |
-| Stern / Schloss auf der Kachel | Favorit merken / Sender sperren |
+| Lang drücken auf Sender | Favorit, Sperre, Programm, Mehrfachansicht |
+| Lang drücken auf Kategorie | Nur diese zeigen, ausblenden, sperren |
 | Im Bild wischen | Links: nächster Sender, rechts: vorheriger (im Vollbild auch hoch/runter) |
 | Doppeltippen ins Bild | Vollbild ein und aus |
 | Sendung unter dem Namen antippen | Programm der nächsten Stunden |
-| Mond | Einschlaf-Timer |
+| „⋯ Mehr“ unter dem Bild | Programm, Einschlaf-Timer, Bild-in-Bild, Mehrfachansicht, AirPlay, andere App |
 | `F` · `Esc` · `M` | Vollbild · Vollbild verlassen · Ton aus/an |
 | `Bild ↓` / `Bild ↑` · `B` | Nächster / vorheriger Sender · zurück zum letzten Sender |
 | `/` · `1 – 3` | Suche · Bereich wechseln |
