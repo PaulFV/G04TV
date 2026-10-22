@@ -755,6 +755,17 @@
     , 'Zum vorherigen Sender': 'To the previous channel'
     , 'Sender-Knopf neben „Live“': 'Channel button next to “Live”'
     , 'Ins Programm aller Sender schauen, auch 20:15 und 22:00': 'See what\'s on all channels, also at 20:15 and 22:00'
+    // Mehrfachansicht
+    , 'Mehrfachansicht': 'Multiview'
+    , 'Bild antippen = Ton': 'Tap picture = sound'
+    , 'Sender wählen': 'Choose channel'
+    , 'Sender wechseln': 'Change channel'
+    , 'Groß ansehen': 'Watch large'
+    , 'Entfernen': 'Remove'
+    , '2 Sender': '2 channels'
+    , '4 Sender': '4 channels'
+    , 'Mehrfachansicht-Knopf': 'Multiview button'
+    , 'Bis zu vier Sender gleichzeitig (iPad, Rechner); Bild antippen gibt ihm den Ton': 'Up to four channels at once (iPad, computer); tap a picture to give it the sound'
   };
 
 

@@ -242,6 +242,7 @@
         u.icon(muted ? 'muted' : 'volume', 18) + '</button>' +
       '<span id="stVolSlot"></span>' +
       (G.extras ? G.extras.pipButton() : '') +
+      (G.multiview ? '<button class="start-now__icon start-now__icon--sm start-now__multi" id="stMulti" aria-label="Mehrfachansicht" title="Mehrfachansicht">' + u.icon('multi', 18) + '</button>' : '') +
       '<button class="start-now__icon start-now__icon--sm" id="stFull" aria-label="Vollbild" title="Vollbild">' + u.icon('full', 18) + '</button>';
   }
 
@@ -259,6 +260,9 @@
     if (fullTop) fullTop.onclick = function () { G.player.fullscreen(true); };
     var air = u.$('#stAir');
     if (air) air.onclick = function () { var b = u.$('#stageAirplay'); if (b) b.click(); };
+
+    var multiB = u.$('#stMulti');
+    if (multiB) multiB.onclick = function () { G.multiview.open(); };
 
     var backB = u.$('#stBack');
     if (backB) backB.onclick = function (e) { e.stopPropagation(); G.extras.back(); };

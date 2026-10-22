@@ -800,6 +800,7 @@
     softFullscreen: softFullscreen,
     isFull: isFull,
     kindOf: kindOf,
+    ensureLib: ensure, hlsUsable: hlsUsable, tsUsable: tsUsable,
     hlsVariant: hlsVariant,
     mixedContent: mixedContent,
     get channel() { return current; },

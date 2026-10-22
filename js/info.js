@@ -87,6 +87,7 @@
            ['Mond antippen', 'Einschlaf-Timer stellen'],
            ['Sender-Knopf neben „Live“', 'Zum vorherigen Sender'],
            ['Jetzt im TV', 'Ins Programm aller Sender schauen, auch 20:15 und 22:00'],
+           ['Mehrfachansicht-Knopf', 'Bis zu vier Sender gleichzeitig (iPad, Rechner); Bild antippen gibt ihm den Ton'],
            ['Bild-in-Bild-Knopf', 'Video läuft im kleinen Fenster weiter, auch in anderen Apps'],
            ['Sendung unter dem Namen antippen', 'Programm der nächsten Stunden'],
            ['Bereich wechseln', 'Das Bild läuft unten rechts weiter']].map(function (k) {
