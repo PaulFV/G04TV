@@ -1,4 +1,4 @@
-# G04TV v1.0.117
+# G04TV v1.0.118
 
 Abspieler für **eigene IPTV-Playlisten** — als installierbare Web-App für **iPhone, iPad, Android und
 Desktop**. Ohne Backend, ohne Konto, ohne Tracking. Playlisten, Favoriten, Programm und Zugangsdaten
