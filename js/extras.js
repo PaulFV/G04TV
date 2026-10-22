@@ -324,6 +324,24 @@
   /* ------------------------------------------------------------
      Einhängen
      ------------------------------------------------------------ */
+  // Senderwechsel im kleinen Fenster: manche Browser (iPhone) schließen es beim
+  // Wechsel der Quelle - dann nach dem Start des neuen Senders wieder öffnen.
+  var pipWanted = false;
+  G.player.on(function (status) {
+    var v = vid();
+    if (!v) return;
+    if (status === 'loading' && isPip()) pipWanted = true;
+    if (status === 'playing' && pipWanted) {
+      pipWanted = false;
+      if (!isPip()) {
+        try {
+          if (typeof v.webkitSupportsPresentationMode === 'function' && v.webkitSupportsPresentationMode('picture-in-picture')) v.webkitSetPresentationMode('picture-in-picture');
+          else if (v.requestPictureInPicture) v.requestPictureInPicture().catch(function () { });
+        } catch (e) { /* ohne Berührung nicht erlaubt */ }
+      }
+    }
+    if (status === 'idle' || status === 'error') pipWanted = false;
+  });
   G.player.on(function (status, message, channel) {
     if (channel && (status === 'loading' || status === 'playing') && !same(channel, curCh)) {
       if (curCh) prevCh = curCh;

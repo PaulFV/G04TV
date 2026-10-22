@@ -33,6 +33,19 @@
     /* --- Knoepfe im Bild --- */
     u.$('#stageFull').addEventListener('click', function () { G.player.fullscreen(); });
     u.$('#stageMute').addEventListener('click', function () { G.player.toggleMuted(); paintMute(); });
+
+    // Lautstärke im Vollbild. Auf iPhone/iPad regeln nur die Tasten am Gerät -
+    // dort bleiben die Regler weg (sie hätten keine Wirkung).
+    if (!G.player.volumeSettable()) document.documentElement.classList.add('vol-fixed');
+    var vol = u.$('#stageVol');
+    if (vol) {
+      vol.value = G.store.state.settings.volume;
+      vol.addEventListener('input', function () {
+        G.player.setVolume(u.num(vol.value, 80));
+        paintMute();
+        document.dispatchEvent(new CustomEvent('g04tv:volume'));
+      });
+    }
     u.$('#stageRetry').addEventListener('click', function () {
       var c = G.player.channel;
       if (c) G.player.play(c);
@@ -244,6 +257,10 @@
   }
 
   function paintMute() {
+    // Regler im Vollbild und unter dem Bild auf denselben Stand bringen
+    [u.$('#stageVol'), u.$('#stVol')].forEach(function (r) {
+      if (r && document.activeElement !== r) r.value = G.store.state.settings.volume;
+    });
     var b = u.$('#stageMute');
     if (!b) return;
     var muted = G.store.state.settings.muted || G.store.state.settings.volume <= 0;
