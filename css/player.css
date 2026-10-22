@@ -339,3 +339,15 @@
   background:radial-gradient(circle at 50% 45%,rgba(49,216,255,.12),rgba(4,8,14,.94) 70%);pointer-events:none;
 }
 .stage__bar #stagePip.is-on{color:var(--acc)}
+
+/* ---------- Lautstärke im Vollbild ---------- */
+.stage__vol{display:none;align-items:center;height:44px;padding:0 12px;border-radius:13px;
+  background:rgba(6,8,12,.72);border:1px solid rgba(255,255,255,.14)}
+.stage__vol input[type=range]{width:min(160px,28vw);height:22px;margin:0;accent-color:var(--acc);cursor:pointer;touch-action:none}
+.stage.is-full .stage__vol,.stage.is-fs .stage__vol{display:flex}
+/* iPhone/iPad: Lautstärke nur über die Tasten am Gerät */
+.vol-fixed .stage__vol,.vol-fixed .start-now__vol{display:none !important}
+.vol-fixed .settings-range:has(#setVol){display:none}
+/* Vollbild ohne Browser-Schnittstelle: die Ansicht darf kein transform tragen,
+   sonst bezieht sich position:fixed auf sie statt auf den Bildschirm (iPad quer) */
+.view:has(.stage.is-full),.start-live:has(.stage.is-full){transform:none !important;filter:none !important;-webkit-backdrop-filter:none !important;backdrop-filter:none !important}
