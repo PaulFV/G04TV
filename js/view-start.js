@@ -430,7 +430,10 @@
       '<div id="stListBody">' + listItems(tab) + '</div>' +
       (tab === 'recent'
         ? '<div class="start-shelf__foot"><button class="btn btn--sm btn--ghost" id="stClearRecent">' + u.icon('trash', 14) + ' Verlauf leeren</button></div>'
-        : '<div class="start-shelf__foot"><button class="btn btn--sm btn--ghost" data-fav-export type="button">' + u.icon('download', 14) + ' Als M3U</button></div>');
+        : '<div class="start-shelf__foot">' +
+            '<button class="btn btn--sm btn--ghost" data-fav-share type="button">' + u.icon('share', 14) + ' Teilen</button>' +
+            '<button class="btn btn--sm btn--ghost" data-fav-export type="button">' + u.icon('download', 14) + ' Als M3U</button>' +
+          '</div>');
   }
 
   /** Suche und - bei mehreren Playlisten - Auswahl der Playlist */
@@ -954,6 +957,16 @@
     if (currentTab() === 'fav') {
       resolveFavPlaylists().then(function (changed) { if (changed && currentTab() === 'fav') paintShelf(); });
     }
+
+    // Favoriten weitergeben - bei gewählter Playlist nur deren Favoriten
+    u.$$('[data-fav-share]').forEach(function (b) {
+      b.onclick = function () {
+        var pl = activeFavPl();
+        var list = G.store.state.favorites.filter(function (c) { return pl === '*' || c.pl === pl; });
+        var p = pl === '*' ? null : G.store.playlist(pl);
+        G.share.open({ title: p ? tr('Favoriten') + ' ' + p.name : tr('Favoriten'), favorites: list });
+      };
+    });
 
     var listSearch = u.$('#stListSearch');
     if (listSearch) listSearch.addEventListener('input', u.debounce(function () {

@@ -1,12 +1,12 @@
 /* ============================================================
-   G04TV v1.0.108 — Hilfsfunktionen
+   G04TV v1.0.109 — Hilfsfunktionen
 
    Klassisches Script (kein Modul), damit die App auch per
    Doppelklick ueber file:// laeuft.
    ============================================================ */
 var G04TV = window.G04TV || {};
 window.G04TV = G04TV;
-G04TV.VERSION = '1.0.108';
+G04TV.VERSION = '1.0.109';
 G04TV.NAME = 'G04TV';
 
 (function (G) {
@@ -213,6 +213,7 @@ G04TV.NAME = 'G04TV';
     download: '<path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>',
     upload: '<path d="M12 19V8m0 0l-4 4m4-4l4 4M5 4h14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>',
     link: '<path d="M10.5 13.5a3.6 3.6 0 005.1 0l3-3a3.6 3.6 0 10-5.1-5.1l-1.4 1.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M13.5 10.5a3.6 3.6 0 00-5.1 0l-3 3a3.6 3.6 0 105.1 5.1l1.4-1.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+    share: '<circle cx="18" cy="5.5" r="2.6" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="6" cy="12" r="2.6" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="18.5" r="2.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8.3 10.8l7.4-3.9M8.3 13.2l7.4 3.9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
     file: '<path d="M13.5 3.5H7A1.5 1.5 0 005.5 5v14A1.5 1.5 0 007 20.5h10a1.5 1.5 0 001.5-1.5V8.5l-5-5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M13.5 3.5v5h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>',
     lock: '<rect x="5" y="10.5" width="14" height="10" rx="2.4" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M8.3 10.5V7.8a3.7 3.7 0 017.4 0v2.7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>',
     unlock: '<rect x="5" y="10.5" width="14" height="10" rx="2.4" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M8.3 10.5V7.8a3.7 3.7 0 017.1-1.4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>',

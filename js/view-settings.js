@@ -467,6 +467,9 @@
     var picked = await u.pickFile('.json,application/json');
     if (!picked) return;
 
+    // Eine Datei aus „Teilen“ wird erst geprüft und nachgefragt
+    if (G.share && await G.share.importText(picked.text)) return;
+
     try {
       G.store.importAll(picked.text);
       G.app.rerender();

@@ -143,6 +143,7 @@
     u.$('#onboarding').hidden = true;
     u.$('#app').hidden = false;
     G.app.go('start');
+    if (G.share) G.share.processPending();
   }
 
   G.onboarding = { start: start, finish: finish };

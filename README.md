@@ -1,4 +1,4 @@
-# G04TV v1.0.108
+# G04TV v1.0.109
 
 Abspieler für **eigene IPTV-Playlisten** — als eigenständige Web-App für **iPhone, Android und
 Desktop**. Ohne Backend, ohne Konto, ohne Tracking. Playlisten, Favoriten und Zugangsdaten bleiben
@@ -53,6 +53,7 @@ genügt es, die beiden Dateien dort abzulegen:
 ```
 vendor/hls.min.js
 vendor/mpegts.js
+vendor/qrcode.js        (nur für den QR-Code beim Teilen)
 ```
 
 ---

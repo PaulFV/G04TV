@@ -342,3 +342,11 @@
 /* Playlist-Karte */
 .pill--lock{border-color:rgba(255,77,79,.45);background:rgba(255,77,79,.12);color:#FF6B6D}
 .pl-card__lock.is-on{color:#FF4D4F;border-color:rgba(255,77,79,.55);background:rgba(255,77,79,.1)}
+
+/* ---------- Teilen-Blatt ---------- */
+.share__sum{font-weight:650;color:var(--tx-1)}
+.share__link{font-size:12px}
+.share__qr{display:grid;place-items:center}
+.share__qrbox{width:min(260px,100%);padding:12px;border-radius:14px;background:#fff}
+.share__qrbox svg{display:block;width:100%;height:auto}
+.start-shelf__foot{gap:8px;flex-wrap:wrap}

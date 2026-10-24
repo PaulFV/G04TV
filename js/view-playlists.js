@@ -71,6 +71,9 @@
         (G.lock && G.lock.hasCode()
           ? '<button class="btn btn--sm pl-card__lock' + (locked ? ' is-on' : '') + '" data-act="lock" title="' + (locked ? 'Sperre aufheben' : 'Playlist sperren') + '" aria-label="' + (locked ? 'Sperre aufheben' : 'Playlist sperren') + '">' + u.icon(locked ? 'lock' : 'unlock', 14) + '</button>'
           : '') +
+        (p.kind === 'url' || p.kind === 'xtream'
+          ? '<button class="btn btn--sm" data-act="share" title="Teilen" aria-label="Teilen">' + u.icon('share', 14) + '</button>'
+          : '') +
         '<button class="btn btn--sm" data-act="rename">' + u.icon('edit', 14) + '</button>' +
         '<button class="btn btn--sm btn--danger" data-act="delete">' + u.icon('trash', 14) + '</button>' +
       '</div>' +
@@ -353,6 +356,11 @@
       if (on === null) return;
       u.toast(on ? 'Playlist gesperrt' : 'Sperre aufgehoben', p.name, 'ok', 2400);
       G.app.rerender();
+      return;
+    }
+
+    if (act === 'share') {
+      G.share.open({ title: p.name, playlists: [{ id: p.id, name: p.name, source: p.source, kind: p.kind }] });
       return;
     }
 

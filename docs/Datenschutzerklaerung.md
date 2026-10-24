@@ -40,6 +40,11 @@ G04TV baut nur die Verbindungen auf, die für die Wiedergabe nötig sind:
 * **Senderlogos.** Die Bildadressen stehen in der Playlist und werden von dort geladen.
 * **hls.js / mpegts.js.** Nur wenn ein Format sie braucht und sie nicht im Ordner `vendor/`
   hinterlegt sind, werden sie von `cdnjs.cloudflare.com` bzw. `cdn.jsdelivr.net` geladen.
+* **QR-Code (qrcode-generator).** Nur wenn du das Teilen-Blatt öffnest und die Bibliothek nicht im
+  Ordner `vendor/` liegt, wird sie von `cdn.jsdelivr.net` geladen (mit Prüfsumme).
+* **Teilen.** Link, QR-Code und Datei entstehen auf deinem Gerät. Der Inhalt steht im Link hinter dem
+  `#`, das nie an einen Server geschickt wird. Wer ihn bekommt, erhält alles, was darin steht, auch
+  Zugangsdaten, die in Adressen stecken.
 * **Vermittler (Proxy).** Nur wenn du unter *Einstellungen › Playlisten aus dem Netz* selbst einen
   einträgst und einschaltest. Er sieht dann die vollständige Adresse der Playlist einschließlich
   etwaiger Zugangsdaten. Voreingestellt ist keiner.

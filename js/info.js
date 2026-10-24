@@ -115,7 +115,8 @@
         '<div class="list">' +
           [['Dein Anbieter', 'Playlist und Streams werden direkt von deiner Quelle geholt — sie sieht deine IP-Adresse, wie bei jedem Abruf'],
            ['Senderlogos', 'Die Bilder stehen in der Playlist und werden von dort geladen'],
-           ['hls.js / mpegts.js', 'Nur wenn sie gebraucht und nicht lokal hinterlegt sind: von cdnjs bzw. jsDelivr'],
+           ['hls.js / mpegts.js / QR-Code', 'Nur wenn sie gebraucht und nicht lokal hinterlegt sind: von cdnjs bzw. jsDelivr'],
+           ['Teilen', 'Link, QR-Code und Datei entstehen auf deinem Gerät. Der Inhalt steht im Link hinter dem #, das nie an einen Server geht — wer ihn bekommt, erhält aber alles darin, auch Zugangsdaten'],
            ['Vermittler', 'Nur wenn du selbst einen einträgst und einschaltest — dann sieht er die ' +
             'vollständige Adresse samt Zugangsdaten, und bei „auch Streams“ läuft das ganze Bild über ihn'],
            ['Feedback-Formular', 'Nur wenn du selbst auf „Senden“ tippst — Nachricht, freiwillige E-Mail und ' +

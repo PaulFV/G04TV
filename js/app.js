@@ -1,5 +1,5 @@
 /* ============================================================
-   G04TV v1.0.108 — Anwendung, Navigation, Start
+   G04TV v1.0.109 — Anwendung, Navigation, Start
    ============================================================ */
 (function (G) {
   'use strict';
@@ -289,6 +289,7 @@
      ------------------------------------------------------------ */
   function boot() {
     G.store.load();
+    G.share.take();
     var s = G.store.state;
 
     if (G.i18n) G.i18n.useState(s.settings);
@@ -321,6 +322,11 @@
     document.addEventListener('keydown', keys);
 
     window.addEventListener('hashchange', function () {
+      if (location.hash.indexOf('#share/') === 0) {
+        G.share.take();
+        if (G.store.state.onboarded) G.share.processPending();
+        return;
+      }
       var k = location.hash.replace('#', '');
       if (k && G.views[k] && k !== current) go(k);
     });
@@ -340,6 +346,9 @@
 
     // Verwaiste Senderlisten aufraeumen (geloeschte Playlisten)
     G.store.tidy();
+
+    // Kam die App über einen Teilen-Link: jetzt fragen, ob importiert werden soll
+    G.share.processPending();
 
     if (!G.store.storageOk) {
       u.toast('Kein lokaler Speicher',

@@ -281,6 +281,25 @@
     return true;
   }
 
+  /** Mehrere Favoriten auf einmal eintragen (Import). Gibt zurück, wie viele neu waren. */
+  function addFavorites(list) {
+    var added = 0;
+    list.forEach(function (c) {
+      if (!c || !c.url || isFavorite(c.url)) return;
+      state.favorites.push({
+        name: c.name || G.m3u.nameFromSource(c.url),
+        url: c.url,
+        group: c.group || '',
+        logo: c.logo || '',
+        pl: '',
+        addedAt: new Date().toISOString()
+      });
+      added++;
+    });
+    if (added) commit('favorites');
+    return added;
+  }
+
   /** Verschiebt einen Favoriten in der eigenen Reihenfolge. */
   function moveFavorite(url, delta) {
     var i = state.favorites.findIndex(function (f) { return G.m3u.sameSource(f.url, url); });
@@ -411,7 +430,7 @@
     }
     if (Array.isArray(d.favorites)) {
       d.favorites.forEach(function (f) {
-        if (f && f.url && !isFavorite(f.url)) state.favorites.push(f);
+        if (f && /^https?:\/\//i.test(String(f.url || '')) && !isFavorite(f.url)) state.favorites.push(f);
       });
     }
     if (d.settings) {
@@ -473,6 +492,7 @@
     isFavorite: isFavorite,
     toggleFavorite: toggleFavorite,
     moveFavorite: moveFavorite,
+    addFavorites: addFavorites,
 
     pushRecent: pushRecent,
     clearRecent: clearRecent,
