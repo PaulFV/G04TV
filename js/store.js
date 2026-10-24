@@ -78,6 +78,10 @@
         bufferMin: 1,            // Vorrat, den der Abspieler höchstens vorhält (1-12 Minuten)
         showTabbar: true,        // untere Leiste auf dem Handy
         confirmExternal: true,   // vor dem Oeffnen in einer anderen App fragen
+        keepAwake: true,         // Bildschirm anlassen, solange ein Sender läuft
+        epgOn: true,             // Programmführer anzeigen
+        epgUrls: '',             // eigene Programm-Adressen (XMLTV), eine pro Zeile
+        hiddenGroups: {},        // ausgeblendete Kategorien: { playlistId: [Name, …] }
         proxyOn: false,
         proxy: '',               // eigener Vermittler, z. B. https://…/?url={url}
         proxyStreams: false,     // auch die Streams über den Vermittler holen
@@ -275,6 +279,7 @@
       group: channel.group || '',
       logo: channel.logo || '',
       pl: channel.pl || '',
+      tvgId: channel.tvgId || '',
       addedAt: new Date().toISOString()
     });
     commit('favorites');
@@ -321,6 +326,7 @@
       group: channel.group || '',
       logo: channel.logo || '',
       pl: channel.pl || '',
+      tvgId: channel.tvgId || '',
       at: new Date().toISOString()
     };
 
@@ -342,6 +348,28 @@
   function setSetting(key, value) {
     if (!(key in state.settings)) return;
     state.settings[key] = value;
+    commit('settings');
+  }
+
+  /* ---------- Ausgeblendete Kategorien (je Playlist) ---------- */
+  function hiddenGroups(plId) {
+    var m = state.settings.hiddenGroups;
+    return (m && plId && Array.isArray(m[plId])) ? m[plId] : [];
+  }
+  function groupHidden(plId, group) {
+    return hiddenGroups(plId).indexOf(group || '') >= 0;
+  }
+  function setGroupHidden(plId, group, hide) {
+    if (!plId) return;
+    var m = state.settings.hiddenGroups = Object.assign({}, state.settings.hiddenGroups || {});
+    var list = (m[plId] || []).filter(function (g) { return g !== (group || ''); });
+    if (hide) list.push(group || '');
+    if (list.length) m[plId] = list; else delete m[plId];
+    commit('settings');
+  }
+  function showAllGroups(plId) {
+    var m = state.settings.hiddenGroups = Object.assign({}, state.settings.hiddenGroups || {});
+    delete m[plId];
     commit('settings');
   }
 
@@ -466,7 +494,7 @@
     var known = state.playlists.map(function (p) { return p.id; });
     var stored = await G.db.keys();
     await Promise.all(stored
-      .filter(function (id) { return known.indexOf(id) < 0; })
+      .filter(function (id) { return known.indexOf(id) < 0 && String(id).indexOf('__') !== 0; })
       .map(function (id) { return G.db.del(id); }));
   }
 
@@ -498,6 +526,7 @@
     clearRecent: clearRecent,
 
     setSetting: setSetting,
+    hiddenGroups: hiddenGroups, groupHidden: groupHidden, setGroupHidden: setGroupHidden, showAllGroups: showAllGroups,
     proxy: proxy,
     viaProxy: viaProxy,
     streamViaProxy: streamViaProxy,

@@ -1,12 +1,12 @@
 /* ============================================================
-   G04TV v1.0.109 — Hilfsfunktionen
+   G04TV — Hilfsfunktionen
 
    Klassisches Script (kein Modul), damit die App auch per
    Doppelklick ueber file:// laeuft.
    ============================================================ */
 var G04TV = window.G04TV || {};
 window.G04TV = G04TV;
-G04TV.VERSION = '1.0.109';
+G04TV.VERSION = '1.0.119';
 G04TV.NAME = 'G04TV';
 
 (function (G) {
@@ -222,6 +222,14 @@ G04TV.NAME = 'G04TV';
     muted: '<path d="M5 9.5h3L12 6v12l-4-3.5H5v-5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M16 9.6l4.4 4.8M20.4 9.6L16 14.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
     menu: '<path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
     shield: '<path d="M12 3l7 3v6c0 4.2-2.8 7.7-7 9-4.2-1.3-7-4.8-7-9V6l7-3z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+    pip: '<rect x="3" y="5" width="18" height="14" rx="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="11.5" y="11.5" width="7" height="5" rx="1.2" fill="currentColor"/>',
+    eye: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/>',
+    eyeOff: '<path d="M4 4l16 16M9.9 5.8A9.6 9.6 0 0112 5.5c6 0 9.5 6.5 9.5 6.5a16 16 0 01-3 3.7M6.6 7.4C3.9 9.2 2.5 12 2.5 12S6 18.5 12 18.5c1.6 0 3-.4 4.2-1M9.9 10a3 3 0 004.1 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+    back: '<path d="M9 5L4 10l5 5M4.5 10h10a5 5 0 010 10H11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+    multi: '<rect x="3" y="4" width="8" height="7" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="4" width="8" height="7" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="13" width="8" height="7" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="13" width="8" height="7" rx="1.6" fill="currentColor"/>',
+    dots: '<circle cx="5" cy="12" r="1.9" fill="currentColor"/><circle cx="12" cy="12" r="1.9" fill="currentColor"/><circle cx="19" cy="12" r="1.9" fill="currentColor"/>',
+    airplay: '<path d="M6.5 17H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v9a2 2 0 01-2 2h-1.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 14.5l5 6H7l5-6z" fill="currentColor"/>',
+    moon: '<path d="M19.5 14.6A8 8 0 019.4 4.5a8 8 0 1010.1 10.1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>',
     clock: '<circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 7v5.3l3.3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
     folder: '<path d="M3.5 7.5A1.5 1.5 0 015 6h4l2 2.4h8a1.5 1.5 0 011.5 1.5V18A1.5 1.5 0 0119 19.5H5A1.5 1.5 0 013.5 18v-10.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>',
     chevron: '<path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
@@ -272,6 +280,84 @@ G04TV.NAME = 'G04TV';
     document.body.style.overflow = '';
   }
 
+  /**
+   * Kleines Auswahlmenü (unten auf dem Handy, sonst mittig) - für „⋯ Mehr“
+   * und langes Drücken. items: [{icon, label, sub, danger, act}]
+   */
+  var menuEl = null;
+  function closeMenu() {
+    if (!menuEl) return;
+    var m = menuEl; menuEl = null;
+    m.classList.add('is-out');
+    document.removeEventListener('keydown', menuKey, true);
+    setTimeout(function () { m.remove(); }, 160);
+  }
+  function menuKey(e) { if (e.key === 'Escape') { e.stopPropagation(); closeMenu(); } }
+  function menu(opts) {
+    closeMenu();
+    var items = (opts.items || []).filter(Boolean);
+    var el = document.createElement('div');
+    el.className = 'amenu';
+    el.innerHTML = '<div class="amenu__dim"></div><div class="amenu__box" role="menu">' +
+      (opts.title ? '<div class="amenu__title" data-no-translate>' + esc(opts.title) + '</div>' : '') +
+      items.map(function (it, i) {
+        return '<button class="amenu__item' + (it.danger ? ' is-danger' : '') + (it.on ? ' is-on' : '') + '" role="menuitem" data-i="' + i + '">' +
+          (it.icon ? icon(it.icon, 20) : '') + '<span class="amenu__label">' + esc(it.label) + '</span>' +
+          (it.sub ? '<span class="amenu__sub" data-no-translate>' + esc(it.sub) + '</span>' : '') + '</button>';
+      }).join('') + '</div>';
+    document.body.appendChild(el);
+    menuEl = el;
+    el.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-i]');
+      if (!b) { if (e.target.closest('.amenu__dim')) closeMenu(); return; }
+      var it = items[+b.getAttribute('data-i')];
+      closeMenu();
+      if (it && it.act) it.act();
+    });
+    document.addEventListener('keydown', menuKey, true);
+    var first = el.querySelector('.amenu__item');
+    if (first) try { first.focus({ preventScroll: true }); } catch (e) { }
+  }
+
+  /**
+   * Langes Drücken (oder Rechtsklick) auf Elemente unter host, die zu sel passen.
+   * fn(element) - der folgende Klick wird geschluckt.
+   */
+  function onLongPress(host, sel, fn) {
+    var timer = null, sx = 0, sy = 0, fired = false, target = null;
+    host.addEventListener('pointerdown', function (e) {
+      if (e.button && e.button !== 0) return;
+      var t = e.target.closest(sel);
+      if (!t || !host.contains(t)) return;
+      fired = false; target = t; sx = e.clientX; sy = e.clientY;
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        fired = true;
+        if (navigator.vibrate) try { navigator.vibrate(12); } catch (x) { }
+        fn(target);
+      }, 520);
+    });
+    var cancel = function () { clearTimeout(timer); };
+    host.addEventListener('pointermove', function (e) {
+      if (Math.abs(e.clientX - sx) > 10 || Math.abs(e.clientY - sy) > 10) cancel();
+    });
+    host.addEventListener('pointerup', cancel);
+    host.addEventListener('pointercancel', cancel);
+    host.addEventListener('pointerleave', cancel);
+    // Nach dem langen Drücken keinen Klick auslösen
+    host.addEventListener('click', function (e) {
+      if (fired) { fired = false; e.preventDefault(); e.stopPropagation(); }
+    }, true);
+    host.addEventListener('contextmenu', function (e) {
+      var t = e.target.closest(sel);
+      if (!t || !host.contains(t)) return;
+      e.preventDefault();
+      clearTimeout(timer);
+      if (!fired) fn(t);
+      fired = false;
+    });
+  }
+
   /** Einfache Rueckfrage im Blatt */
   function confirmSheet(opts) {
     return new Promise(function (resolve) {
@@ -315,6 +401,7 @@ G04TV.NAME = 'G04TV';
     uid: uid, debounce: debounce, groupBy: groupBy,
     download: download, pickFile: pickFile, copy: copy,
     icon: icon, ICONS: ICONS, logoHtml: logoHtml,
-    toast: toast, openSheet: openSheet, closeSheet: closeSheet, confirmSheet: confirmSheet
+    toast: toast, openSheet: openSheet, closeSheet: closeSheet, confirmSheet: confirmSheet,
+    menu: menu, closeMenu: closeMenu, onLongPress: onLongPress
   };
 })(G04TV);

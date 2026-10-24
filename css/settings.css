@@ -226,3 +226,46 @@
   .settings-info__body{margin-bottom:6px}
   .settings-info__ver{display:none}
 }
+
+/* ---------- Programmführer ---------- */
+.sec-epg{--sec:#F472B6;--sec-rgb:244,114,182}
+.settings-epg__state{display:flex;gap:10px;align-items:center;margin:12px 0 8px;padding:10px 12px;border-radius:12px;font-size:13.5px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--tx-1)}
+.settings-epg__state b{color:var(--tx-0)}
+.settings-epg__state.is-ok{border-color:rgba(52,211,153,.35);background:rgba(52,211,153,.08)}
+.settings-epg__state.is-ok svg{color:#34D399}
+.settings-epg__state svg{flex:none}
+.settings-epg__spin{width:16px;height:16px;border-radius:50%;border:2px solid rgba(var(--sec-rgb),.3);border-top-color:var(--sec);animation:epgSpin .8s linear infinite;flex:none}
+@keyframes epgSpin{to{transform:rotate(360deg)}}
+.settings-epg__list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.settings-epg__src{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;padding:6px 2px}
+.settings-epg__src div{display:flex;flex-direction:column;gap:1px;min-width:0}
+.settings-epg__src b{font-weight:600;color:var(--tx-0);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.settings-epg__src span{color:var(--tx-2);line-height:1.35}
+.settings-epg__dot{flex:none;width:8px;height:8px;border-radius:50%;margin-top:5px;background:var(--tx-2)}
+.settings-epg__src.is-ok .settings-epg__dot{background:#34D399}
+.settings-epg__src.is-err .settings-epg__dot{background:#FF6B6B}
+.settings-epg__src.is-err span{color:#FF8B8B}
+.settings-epg__field{margin:6px 0 12px}
+.settings-epg__field .textarea{min-height:56px;height:64px;font-size:13px}
+
+/* ---------- Einstellungen in vier Gruppen ---------- */
+.settings-group{border-radius:20px;padding:4px 0;background:rgba(8,16,26,.72);border:1px solid var(--glass-br);overflow:hidden}
+.settings-group__h{margin:12px 18px 4px;font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--tx-2)}
+.settings-group > .settings-section{margin:0;border:0;border-radius:0;background:none;box-shadow:none;padding:4px 16px;border-top:1px solid rgba(255,255,255,.06)}
+.settings-group > .settings-group__h + .settings-section{border-top:0}
+.settings-group > .settings-section > summary{display:flex;align-items:center;gap:12px;min-height:52px;margin:0}
+.settings-group > .settings-section[open] > summary{margin-bottom:10px}
+.settings-group > .settings-section > summary > svg{width:21px;height:21px;filter:none}
+.settings-group > .settings-section > summary h3{font-size:16px;font-weight:600;letter-spacing:0;flex:none}
+.settings-sum{margin-left:auto;padding-left:8px;font-size:13px;color:var(--tx-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;text-align:right}
+.settings-group > .settings-section > summary .settings-info__ver{margin-left:auto;font-size:13px;color:var(--tx-2)}
+.settings-group > .settings-section > summary::after{flex:none;margin-left:10px !important}
+.settings-group > .settings-section[open]{padding-bottom:14px}
+[data-theme="light"] .settings-group{background:#fff;border-color:rgba(16,44,66,.1);box-shadow:0 6px 20px rgba(16,44,66,.06)}
+[data-theme="light"] .settings-group > .settings-section{background:none;border-color:rgba(16,44,66,.08);box-shadow:none}
+.settings-group > .settings-section > summary h3{flex:1 1 auto;min-width:0}
+.settings-group > .settings-section > summary .settings-sum{flex:0 1 auto;max-width:55%;margin-left:0}
+.settings-group > .settings-section > summary h3{flex:1 0 auto;white-space:nowrap;font-size:16px !important}
+.settings-group > .settings-section > summary .settings-sum{min-width:0;max-width:none;font-size:12.5px}
+@media (max-width:620px){ .settings-group > .settings-section{padding:2px 12px} .settings-group__h{margin:10px 14px 2px} }

@@ -173,6 +173,7 @@
       }
 
       cache[id] = res.channels;
+      p.epgAuto = res.tvgUrl || '';
       await G.store.setChannels(id, res.channels);
       return { ok: true, count: res.channels.length, error: '' };
     } catch (e) {
@@ -257,6 +258,7 @@
     });
 
     cache[p.id] = res.channels;
+    p.epgAuto = res.tvgUrl || '';
     await G.store.setChannels(p.id, res.channels);
     return { playlist: p, count: res.channels.length };
   }
@@ -268,6 +270,7 @@
     if (!res.channels.length) throw new Error('Die Senderliste ist leer.');
 
     cache[id] = res.channels;
+    var rp = G.store.playlist(id); if (rp) rp.epgAuto = res.tvgUrl || '';
     await G.store.setChannels(id, res.channels);
     return res.channels.length;
   }

@@ -707,6 +707,21 @@
     G.store.commit('settings');
   }
 
+  /**
+   * Lässt sich die Lautstärke per Programm setzen? Auf iPhone und iPad nicht:
+   * dort regeln nur die Tasten am Gerät, video.volume bleibt immer 1.
+   */
+  var volOk = null;
+  function volumeSettable() {
+    if (volOk !== null) return volOk;
+    try {
+      var t = document.createElement('video');
+      t.volume = 0.5;
+      volOk = Math.abs(t.volume - 0.5) < 0.01;
+    } catch (e) { volOk = false; }
+    return volOk;
+  }
+
   function toggleMuted() {
     G.store.state.settings.muted = !G.store.state.settings.muted;
     applyVolume();
@@ -779,11 +794,13 @@
     stats: function () { var s = snapshot(); s.text = describe(s); return s; },
     setVolume: setVolume,
     toggleMuted: toggleMuted,
+    volumeSettable: volumeSettable,
     applyVolume: applyVolume,
     fullscreen: fullscreen,
     softFullscreen: softFullscreen,
     isFull: isFull,
     kindOf: kindOf,
+    ensureLib: ensure, hlsUsable: hlsUsable, tsUsable: tsUsable,
     hlsVariant: hlsVariant,
     mixedContent: mixedContent,
     get channel() { return current; },

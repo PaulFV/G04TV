@@ -563,3 +563,118 @@ body[data-view="start"] .topbar{background:var(--bg-0)}
   .start-shelf__cats::-webkit-scrollbar-thumb{background:var(--glass-hi);border-radius:99px}
   .start-shelf__cats .chip{cursor:pointer}
 }
+
+/* ---------- Einschlaf-Timer ---------- */
+.start-now__sleep{position:relative}
+.start-now__sleep.is-on{color:#A98BFF;border-color:rgba(169,139,255,.5);background:rgba(169,139,255,.12)}
+.start-now__sleep i{
+  position:absolute;right:-5px;top:-5px;min-width:19px;height:19px;padding:0 4px;border-radius:99px;
+  font-style:normal;font-size:10.5px;font-weight:800;line-height:19px;text-align:center;
+  background:#A98BFF;color:#0B0F18;
+}
+.sleep-sheet__intro{margin:0 0 14px;color:var(--tx-1);font-size:14px;line-height:1.45}
+.sleep-sheet__grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.sleep-sheet__opt{flex-direction:column;gap:0;height:auto;min-height:64px;padding:8px 4px}
+.sleep-sheet__opt b{font-size:20px}
+.sleep-sheet__opt span{font-size:11.5px;color:var(--tx-2)}
+.sleep-sheet__off{width:100%;margin-top:12px}
+@media (max-width:400px){ .sleep-sheet__grid{grid-template-columns:repeat(3,1fr)} }
+
+/* ---------- Programmführer ---------- */
+.epg-bar{display:block;height:3px;border-radius:2px;background:rgba(255,255,255,.12);overflow:hidden}
+.epg-bar i{display:block;height:100%;background:var(--acc);border-radius:2px}
+.ch-tile__grp.is-epg{color:var(--tx-1)}
+.ch-tile__bar{position:absolute;left:10px;right:10px;bottom:5px;height:2.5px;border-radius:2px;background:rgba(255,255,255,.1);overflow:hidden;pointer-events:none}
+.ch-tile__bar i{display:block;height:100%;background:var(--acc);opacity:.85}
+.start-shelf.is-list .ch-tile__bar{left:74px;right:auto;width:calc(100% - 74px - 90px);bottom:4px}
+.start-now__epg{display:flex;flex-direction:column;gap:3px;cursor:pointer;min-width:0;max-width:100%}
+.start-now__epgt{color:var(--tx-0);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.start-now__epgm{font-size:11.5px;color:var(--tx-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.start-now__epg .epg-bar{width:100%;max-width:240px;margin-top:1px}
+
+/* Blatt: Programm eines Senders */
+.epg-sheet{display:flex;flex-direction:column}
+.epg-sheet__row{display:grid;grid-template-columns:62px minmax(0,1fr) auto;gap:10px;padding:10px 4px;border-bottom:1px solid rgba(255,255,255,.06)}
+.epg-sheet__row:last-child{border-bottom:0}
+.epg-sheet__time{font-variant-numeric:tabular-nums;color:var(--tx-2);font-size:13.5px;padding-top:1px}
+.epg-sheet__main{display:flex;flex-direction:column;gap:4px;min-width:0}
+.epg-sheet__main b{font-size:14.5px;color:var(--tx-0)}
+.epg-sheet__sub{font-size:12.5px;color:var(--tx-1)}
+.epg-sheet__main p{margin:2px 0 0;font-size:12.5px;line-height:1.45;color:var(--tx-2)}
+.epg-sheet__end{font-size:12px;color:var(--acc);white-space:nowrap;padding-top:2px}
+.epg-sheet__row.is-live{background:linear-gradient(90deg,rgba(49,216,255,.08),transparent);border-radius:12px}
+.epg-sheet__row.is-live .epg-sheet__time{color:var(--acc);font-weight:700}
+.epg-sheet__main .epg-bar{max-width:260px}
+
+/* ---------- Zurück zum vorherigen Sender ---------- */
+.start-now__back{
+  display:inline-flex;align-items:center;gap:4px;margin-left:8px;max-width:140px;height:22px;padding:0 8px 0 6px;
+  border-radius:99px;border:1px solid var(--acc-line);background:var(--acc-dim);color:var(--acc);
+  font:inherit;font-size:11.5px;font-weight:650;cursor:pointer;letter-spacing:0;
+}
+.start-now__back span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.start-now__back svg{flex:none}
+
+/* ---------- Kategorien ausblenden ---------- */
+.chip.chip--edit{gap:6px;color:var(--tx-2);border-style:dashed}
+.chip.chip--edit.has-hidden{color:var(--acc);border-color:var(--acc-line)}
+.chip.chip--edit svg{flex:none}
+.cat-sheet__intro{margin:0 0 10px;font-size:13.5px;line-height:1.45;color:var(--tx-1)}
+.cat-sheet__actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.cat-sheet__list{display:flex;flex-direction:column}
+.cat-sheet__row{padding:10px 2px;border-bottom:1px solid rgba(255,255,255,.06)}
+.cat-sheet__row:last-child{border-bottom:0}
+.cat-sheet__foot{margin:10px 0 0;font-size:12px;color:var(--tx-2);text-align:center}
+
+/* ---------- Jetzt im TV ---------- */
+.start-shelf__guide{flex:none;gap:6px;white-space:nowrap}
+@media (max-width:620px){ .start-shelf__guide span{display:none} .start-shelf__guide{padding:0 12px} }
+.guide{display:flex;flex-direction:column;gap:10px}
+.guide__when{gap:6px}
+.guide__list{display:flex;flex-direction:column}
+.guide__row{
+  display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;
+  padding:9px 6px;border:0;border-bottom:1px solid rgba(255,255,255,.06);background:none;color:inherit;
+  font:inherit;text-align:left;cursor:pointer;border-radius:10px;
+}
+.guide__row:hover{background:rgba(255,255,255,.04)}
+.guide__logo{width:44px;height:32px;border-radius:8px}
+.guide__main{display:flex;flex-direction:column;gap:2px;min-width:0}
+.guide__ch{font-size:11.5px;color:var(--tx-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.guide__main b{font-size:14px;color:var(--tx-0);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.guide__main .epg-bar{max-width:220px;margin:2px 0}
+.guide__next{font-size:11.5px;color:var(--tx-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.guide__time{font-size:12px;color:var(--tx-2);white-space:nowrap;font-variant-numeric:tabular-nums}
+.guide__row.is-live .guide__time{color:var(--acc)}
+.guide__empty{margin:20px 0;text-align:center;color:var(--tx-2);font-size:14px}
+.guide__logo{position:relative;display:grid;place-items:center;overflow:hidden;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08)}
+.guide__logo b{font-size:12px;font-weight:800;color:var(--tx-2)}
+.guide__logo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:4px;background:#0b141f}
+.start-now__state{flex-wrap:nowrap;white-space:nowrap;min-width:0}
+.start-now__time{white-space:nowrap}
+@media (max-width:620px){ .start-now__back{max-width:110px;margin-left:6px} }
+
+/* ---------- Vereinfachte Kacheln: kleiner Stern (Favorit) und kleines Schloss (gesperrt) ---------- */
+.ch-tile.is-fav::after,.ch-tile.is-locked::before{content:"";position:absolute;width:15px;height:15px;background-size:contain;background-repeat:no-repeat;pointer-events:none;z-index:2;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
+.ch-tile.is-fav::after{top:7px;right:7px;background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%23FFC93C%22%20stroke%3D%22rgba%280%2C0%2C0%2C.35%29%22%20stroke-width%3D%221%22%20d%3D%22M12%202.8l2.8%205.8%206.3.9-4.6%204.4%201.1%206.3L12%2017.2l-5.6%203%201.1-6.3L2.9%209.5l6.3-.9z%22/%3E%3C/svg%3E")}
+.ch-tile.is-locked::before{top:7px;left:7px;background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Crect%20x%3D%224.5%22%20y%3D%2210.5%22%20width%3D%2215%22%20height%3D%2210.5%22%20rx%3D%222.4%22%20fill%3D%22%23FF4D4F%22/%3E%3Cpath%20d%3D%22M8%2010.5V8a4%204%200%20018%200v2.5%22%20fill%3D%22none%22%20stroke%3D%22%23FF4D4F%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22/%3E%3C/svg%3E")}
+.start-shelf.is-list .ch-tile.is-fav::after{top:50%;right:12px;transform:translateY(-50%)}
+.start-shelf.is-list .ch-tile.is-locked::before{top:5px;left:5px;width:13px;height:13px}
+[data-theme="light"] .ch-tile.is-fav::after{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%23E0A100%22%20stroke%3D%22rgba%280%2C0%2C0%2C.35%29%22%20stroke-width%3D%221%22%20d%3D%22M12%202.8l2.8%205.8%206.3.9-4.6%204.4%201.1%206.3L12%2017.2l-5.6%203%201.1-6.3L2.9%209.5l6.3-.9z%22/%3E%3C/svg%3E");filter:none}
+[data-theme="light"] .ch-tile.is-locked::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Crect%20x%3D%224.5%22%20y%3D%2210.5%22%20width%3D%2215%22%20height%3D%2210.5%22%20rx%3D%222.4%22%20fill%3D%22%23D92D20%22/%3E%3Cpath%20d%3D%22M8%2010.5V8a4%204%200%20018%200v2.5%22%20fill%3D%22none%22%20stroke%3D%22%23D92D20%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22/%3E%3C/svg%3E");filter:none}
+.ch-tile{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.start-shelf.is-list .ch-tile{grid-template-columns:52px minmax(0,1fr) 20px}
+@media (max-width:620px){ .start-shelf.is-list .ch-tile{grid-template-columns:46px minmax(0,1fr) 16px} }
+.start-shelf__cat{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+
+/* Playlist als schmale Zeile */
+.start-shelf__pl{display:flex;align-items:center;gap:6px;margin:2px 2px 10px;font-size:13px;color:var(--tx-2)}
+.start-shelf__pl select{appearance:none;-webkit-appearance:none;border:0;background:none;color:var(--acc);font:inherit;font-weight:700;padding:2px 18px 2px 0;cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);
+  background-position:calc(100% - 9px) 55%,calc(100% - 4px) 55%;background-size:5px 5px;background-repeat:no-repeat;max-width:70vw;text-overflow:ellipsis}
+.start-shelf__when{margin:8px 0 6px}
+
+/* Einschlaf-Timer in der Zustandszeile */
+.start-now__sleepchip{display:inline-flex;align-items:center;gap:4px;margin-left:8px;height:22px;padding:0 8px;border-radius:99px;
+  border:1px solid rgba(169,139,255,.5);background:rgba(169,139,255,.12);color:#A98BFF;font:inherit;font-size:11.5px;font-weight:650;cursor:pointer}
+[data-theme="light"] .start-now__sleepchip{color:#6B4CE0;background:#F0ECFF;border-color:rgba(107,76,224,.4)}

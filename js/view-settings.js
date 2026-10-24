@@ -166,17 +166,114 @@
     '</details>';
   }
 
+  /* ------------------------------------------------------------
+     Programmführer (EPG)
+     ------------------------------------------------------------ */
+  function epgSection() {
+    if (!G.epg) return '';
+    var s = G.store.state.settings;
+    return '<details class="card settings-section settings-fold sec-epg" id="fold-epg"' + (folds.epg ? ' open' : '') + '>' +
+      '<summary class="settings-section__head">' + u.icon('clock', 22) + '<h3>Programmführer (EPG)</h3></summary>' +
+      '<div class="settings-panel">' + sw('epgOn', 'Programm anzeigen', 'Auf den Kacheln und unter dem Bild: was gerade läuft und was danach kommt.') + '</div>' +
+      '<div id="epgLive">' + epgLiveHtml() + '</div>' +
+      '<div class="field settings-epg__field"><label for="setEpgUrls">Eigene Programm-Adressen</label>' +
+        '<textarea class="textarea" id="setEpgUrls" rows="2" spellcheck="false" autocomplete="off" placeholder="https://…/epg.xml.gz">' + u.esc(s.epgUrls || '') + '</textarea>' +
+        '<span class="settings-proxy__hint">XMLTV-Datei (.xml oder .xml.gz), eine Adresse pro Zeile. Adressen aus der Playlist (url-tvg) und von Xtream-Zugängen kommen von selbst dazu.</span>' +
+      '</div>' +
+      '<div class="settings-actions"><button class="btn" id="epgRefresh">' + u.icon('refresh', 16) + ' Programm jetzt laden</button></div>' +
+    '</details>';
+  }
+
+  function epgLiveHtml() {
+    var i = G.epg.info();
+    var state;
+    if (i.busy) state = '<div class="settings-epg__state is-busy"><span class="settings-epg__spin"></span><span data-no-translate>' + u.esc(i.status) + '</span></div>';
+    else if (!i.sources.length) state = '<div class="settings-epg__state is-none">' + u.icon('info', 18) + '<span>Keine Programm-Adresse gefunden. Viele Anbieter nennen sie in der Playlist — sonst unten eintragen.</span></div>';
+    else if (!i.at) state = '<div class="settings-epg__state is-none">' + u.icon('clock', 18) + '<span>Noch kein Programm geladen.</span></div>';
+    else state = '<div class="settings-epg__state' + (i.channels ? ' is-ok' : ' is-none') + '">' + u.icon(i.channels ? 'check' : 'warn', 18) +
+      '<span><b>' + u.fmtInt(i.channels) + '</b> ' + (i.channels === 1 ? 'Sender' : 'Sender') + ' mit Programm · Stand ' + G.epg.hm(i.at) + '</span></div>';
+    var res = i.results || [];
+    var list = i.sources.map(function (src) {
+      var r = res.filter(function (x) { return x.url === src.url; })[0];
+      var shown = G.xtream ? G.xtream.masked(src.url) : src.url;
+      return '<div class="settings-epg__src' + (r ? (r.ok ? ' is-ok' : ' is-err') : '') + '">' +
+        '<span class="settings-epg__dot"></span>' +
+        '<div><b data-no-translate>' + u.esc(u.shorten ? u.shorten(shown, 60) : shown) + '</b>' +
+        '<span>' + u.esc(src.from || '') + (r ? ' · ' + (r.ok ? u.fmtInt(r.channels) + ' ' + tr('Sender') + ', ' + u.fmtInt(r.items) + ' ' + tr('Sendungen') : u.esc(r.error)) : '') + '</span></div>' +
+      '</div>';
+    }).join('');
+    return state + (list ? '<div class="settings-epg__list">' + list + '</div>' : '');
+  }
+
+  // Programm lädt oder ist fertig: nur den Zustand nachziehen (Eingaben bleiben)
+  document.addEventListener('g04tv:epg', function () {
+    var box = u.$('#epgLive');
+    if (box) box.innerHTML = epgLiveHtml();
+  });
+
   // Welche ausklappbaren Abschnitte offen sind - bleibt, wenn die Einstellungen neu gezeichnet werden
-  var folds = { lang: false, play: false, lock: false, net: false, data: false, app: false, fb: false };
+  var folds = { lang: false, play: false, lock: false, epg: false, net: false, data: false, app: false, fb: false };
+
+  function viewMode() {
+    try { return localStorage.getItem('g04tv.startView') === 'list' ? 'list' : 'tiles'; } catch (e) { return 'tiles'; }
+  }
+
+  /**
+   * Vier Gruppen statt neun Abschnitten: Allgemein, Programm & Sperre,
+   * Erweitert, Über. Jede Zeile zeigt rechts den aktuellen Stand.
+   */
+  function regroup(html) {
+    var t = document.createElement('template');
+    t.innerHTML = html;
+    var root = t.content;
+    var view = root.querySelector('.settings-view');
+    if (!view) return html;
+    var s = G.store.state.settings;
+    var en = G.i18n && G.i18n.language === 'en';
+    var L = G.lock, info = G.epg ? G.epg.info() : null;
+    var sums = {
+      'fold-lang': (en ? 'English' : 'Deutsch') + ' · ' + (s.theme === 'light' ? tr('Hell') : tr('Dunkel')) + ' · ' + (viewMode() === 'list' ? tr('Liste') : tr('Kacheln')),
+      'fold-play': (s.autoplay ? tr('Sofort abspielen') : (en ? 'Select first' : 'Erst auswählen')) + ' · ' + bufferValue(s) + ' Min',
+      'fold-lock': L && L.hasCode() ? (L.isOpen() ? tr('Entsperrt') : tr('Code aktiv')) : (en ? 'Off' : 'Aus'),
+      'fold-epg': !s.epgOn ? (en ? 'Off' : 'Aus') : info && info.busy ? '…' : info && info.channels ? info.channels + ' ' + (en ? 'channels' : 'Sender') : (en ? 'No programme' : 'Kein Programm'),
+      'fold-net': s.proxyOn && G.store.proxy() ? (en ? 'Relay on' : 'Vermittler an') : (en ? 'Direct' : 'Direkt'),
+      'fold-data': G.store.state.playlists.length + ' ' + (G.store.state.playlists.length === 1 ? 'Playlist' : (en ? 'playlists' : 'Playlisten'))
+    };
+    Object.keys(sums).forEach(function (id) {
+      var d = root.getElementById(id);
+      var sm = d && d.querySelector('summary');
+      if (sm) sm.insertAdjacentHTML('beforeend', '<span class="settings-sum" data-no-translate>' + u.esc(sums[id]) + '</span>');
+    });
+    var groups = [
+      ['Allgemein', ['fold-lang', 'fold-play']],
+      ['Programm & Sperre', ['fold-lock', 'fold-epg']],
+      ['Erweitert', ['fold-net', 'fold-data']],
+      ['Über', ['fold-app', 'infoBox', 'fbBox']]
+    ];
+    var tail = view.querySelector(':scope > p.tiny');
+    groups.forEach(function (g) {
+      var sec = document.createElement('section');
+      sec.className = 'settings-group';
+      sec.innerHTML = '<h3 class="settings-group__h">' + g[0].replace('&', '&amp;') + '</h3>';
+      g[1].forEach(function (id) { var d = root.getElementById(id); if (d) sec.appendChild(d); });
+      view.insertBefore(sec, tail);
+    });
+    var box = document.createElement('div');
+    box.appendChild(root.cloneNode(true));
+    return box.innerHTML;
+  }
 
   function renderModern() {
+    return regroup(renderSections());
+  }
+
+  function renderSections() {
     var s = G.store.state.settings;
     var lang = G.i18n ? G.i18n.language : 'de';
 
     return '<div class="view settings-view">' +
       '<div class="settings-intro">' +
-        '<div><h2>Deine Einstellungen</h2><p>Wiedergabe, Darstellung und lokale Daten verwalten.</p></div>' +
-        '<span class="settings-device">' + u.icon('shield', 18) + ' Nur auf diesem Gerät</span>' +
+        '<div><h2>Einstellungen</h2><p>Alles Wichtige auf einen Blick — gespeichert nur auf diesem Gerät.</p></div>' +
       '</div>' +
 
       '<details class="card settings-section settings-fold sec-lang" id="fold-lang"' + (folds.lang ? ' open' : '') + '>' +
@@ -198,6 +295,14 @@
                 '<option value="light"' + (s.theme === 'light' ? ' selected' : '') + '>' + tr('Hell') + '</option>' +
               '</select></div>' +
           '</div>' +
+          '<div class="settings-panel settings-panel__language">' +
+            u.icon('playlists', 22) +
+            '<div class="field"><label for="setView">Senderliste</label>' +
+              '<select class="select" id="setView">' +
+                '<option value="tiles"' + (viewMode() !== 'list' ? ' selected' : '') + '>' + tr('Kacheln') + '</option>' +
+                '<option value="list"' + (viewMode() === 'list' ? ' selected' : '') + '>' + tr('Liste') + '</option>' +
+              '</select></div>' +
+          '</div>' +
           '<div class="settings-panel">' + sw('showTabbar', 'Untere Leiste anzeigen', 'Aus: mehr Platz für die Sender. Die Bereiche erreichst du dann über das Menü oben links.') + '</div>' +
           '<div class="settings-panel">' + sw('reduceMotion', 'Bewegung reduzieren', 'Animationen und Hintergrundschein abschalten.') + '</div>' +
         '</div>' +
@@ -208,7 +313,8 @@
         '<div class="settings-grid settings-grid--2">' +
           '<div class="settings-panel">' + sw('autoplay', 'Sofort abspielen', 'Sender beim Antippen direkt starten.') + '</div>' +
           '<div class="settings-panel">' + sw('resume', 'Letzten Sender beim Start laden', 'Zuletzt gesehenen Sender vorbereiten.') + '</div>' +
-          '<div class="settings-panel settings-panel--wide">' + sw('confirmExternal', 'Vor „Extern öffnen“ fragen', 'Übergabe an einen anderen Player bestätigen.') + '</div>' +
+          '<div class="settings-panel">' + sw('keepAwake', 'Bildschirm anlassen', 'Solange ein Sender läuft, wird das Display nicht dunkel.') + '</div>' +
+          '<div class="settings-panel">' + sw('confirmExternal', 'Vor „Extern öffnen“ fragen', 'Übergabe an einen anderen Player bestätigen.') + '</div>' +
           '<div class="settings-panel settings-range">' +
             '<div class="settings-range__head"><span>Lautstärke</span><span id="setVolV">' + s.volume + ' %</span></div>' +
             '<input type="range" id="setVol" min="0" max="100" value="' + s.volume + '">' +
@@ -226,6 +332,7 @@
       '</details>' +
 
       lockSection() +
+      epgSection() +
 
       '<details class="card settings-section settings-fold sec-net" id="fold-net"' + (folds.net ? ' open' : '') + '>' +
         '<summary class="settings-section__head">' + u.icon('link', 22) + '<h3>Playlisten aus dem Netz</h3></summary>' +
@@ -299,7 +406,7 @@
      ------------------------------------------------------------ */
   function mount(host) {
     if (G.info) G.info.mount();
-    ['lang', 'play', 'lock', 'net', 'data', 'app', 'fb'].forEach(function (id) {
+    ['lang', 'play', 'lock', 'epg', 'net', 'data', 'app', 'fb'].forEach(function (id) {
       var box = u.$(id === 'fb' ? '#fbBox' : '#fold-' + id);
       if (box) box.addEventListener('toggle', function () { folds[id] = box.open; });
     });
@@ -309,6 +416,11 @@
     if (language) language.onchange = function () { if (G.i18n) G.i18n.setLanguage(language.value); };
     var theme = u.$('#setTheme');
     if (theme) theme.onchange = function () { G.app.setTheme(theme.value); };
+    var viewSel = u.$('#setView');
+    if (viewSel) viewSel.onchange = function () {
+      try { localStorage.setItem('g04tv.startView', viewSel.value); } catch (e) { /* optional */ }
+      G.app.rerender();
+    };
 
     /* Schalter */
     u.on(host, 'change', '[data-set]', function (e, t) {
@@ -317,6 +429,7 @@
 
       if (key === 'reduceMotion') document.body.classList.toggle('no-motion', t.checked);
       if (key === 'showTabbar') document.body.classList.toggle('no-tabbar', !t.checked);
+      if (key === 'epgOn' && G.epg) { if (t.checked) G.epg.refresh(false); document.dispatchEvent(new CustomEvent('g04tv:epg')); }
       if (key === 'resume' && t.checked) {
         u.toast('Gemerkt', 'Beim nächsten Start wird der letzte Sender vorbereitet.', 'ok', 2600);
       }
@@ -348,6 +461,22 @@
     if (proxy) proxy.onchange = function () {
       G.store.setSetting('proxy', proxy.value.trim());
       u.toast('Gespeichert', 'Der Vermittler wird beim nächsten Abruf verwendet.', 'ok', 2600);
+    };
+
+    /* Programmführer */
+    var epgUrls = u.$('#setEpgUrls');
+    if (epgUrls) epgUrls.onchange = function () {
+      G.store.setSetting('epgUrls', epgUrls.value.trim());
+    };
+    var epgRefresh = u.$('#epgRefresh');
+    if (epgRefresh) epgRefresh.onclick = async function () {
+      if (epgUrls) G.store.setSetting('epgUrls', epgUrls.value.trim());
+      if (!G.epg.sources().length) { u.toast('Keine Programm-Adresse', 'Trage eine XMLTV-Adresse ein.', 'warn', 3500); return; }
+      if (!G.store.state.settings.epgOn) { u.toast('Programm ist ausgeschaltet', 'Schalter „Programm anzeigen“ einschalten.', 'warn', 3500); return; }
+      var ok = await G.epg.refresh(true);
+      var n = G.epg.info().channels;
+      u.toast(ok ? 'Programm geladen' : 'Kein Programm gefunden',
+        ok ? n + ' ' + tr('Sender mit Programm') : 'Adresse prüfen — oder die Sender passen nicht zur Playlist.', ok ? 'ok' : 'warn', 4000);
     };
 
     /* Sperre */

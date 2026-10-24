@@ -44,7 +44,7 @@
     <div class="brand brand--lg">
       <span class="brand__mark" aria-hidden="true"></span>
       <span class="brand__text">G0<b>4</b>TV</span>
-      <span class="brand__ver">v1.0.109</span>
+      <span class="brand__ver">v1.0.119</span>
     </div>
     <div id="onboardingSteps"></div>
   </div>
@@ -85,10 +85,6 @@
         <button class="icon-btn view-close" id="viewClose" type="button" title="Schließen" aria-label="Schließen">
           <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
         </button>
-        <div class="lang-switch" id="langSwitch" role="group" aria-label="Sprache / Language" data-no-translate>
-          <button type="button" data-lang="de" title="Deutsch">DE</button>
-          <button type="button" data-lang="en" title="English">EN</button>
-        </div>
         <button class="live-chip" id="liveChip" title="Was gerade läuft"><i class="live-chip__dot"></i><span>Nichts läuft</span></button>
         <!-- Nur im Browser: die ganze App ohne Adressleiste (siehe app.js) -->
         <button class="icon-btn" id="appFull" type="button" title="App im Vollbild" aria-label="App im Vollbild" hidden></button>
@@ -137,7 +133,9 @@
 
     <div class="stage__bar">
       <button class="icon-btn" id="stageAirplay" aria-label="AirPlay" title="AirPlay" hidden></button>
+      <button class="icon-btn" id="stagePip" aria-label="Bild-in-Bild" title="Bild-in-Bild" hidden></button>
       <button class="icon-btn" id="stageMute" aria-label="Ton"></button>
+      <span class="stage__vol"><input type="range" id="stageVol" min="0" max="100" step="1" aria-label="Lautstärke"></span>
       <button class="icon-btn" id="stageFull" aria-label="Vollbild"></button>
     </div>
   </div>
@@ -180,6 +178,9 @@
 <script src="js/share.js"></script>
 <script src="js/dock.js"></script>
 <script src="js/carplay.js"></script>
+<script src="js/extras.js"></script>
+<script src="js/epg.js"></script>
+<script src="js/multiview.js"></script>
 <script src="js/view-start.js"></script>
 <script src="js/view-live.js"></script>
 <script src="js/view-playlists.js"></script>

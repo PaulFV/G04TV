@@ -1,5 +1,5 @@
 /* ============================================================
-   G04TV v1.0.109 — Anwendung, Navigation, Start
+   G04TV — Anwendung, Navigation, Start
    ============================================================ */
 (function (G) {
   'use strict';
@@ -278,6 +278,8 @@
 
     if (e.key === '/') { e.preventDefault(); go('live', { search: true }); return; }
     if (e.key === 'f' || e.key === 'F') { G.player.fullscreen(); return; }
+    if ((e.key === 'b' || e.key === 'B') && G.extras && G.extras.previous()) { G.extras.back(); return; }
+    if ((e.key === 'PageDown' || e.key === 'PageUp') && G.extras && G.player.channel) { e.preventDefault(); G.extras.zap(e.key === 'PageDown' ? 1 : -1); return; }
     if (e.key === 'm' || e.key === 'M') { G.player.toggleMuted(); G.dock.paintMute(); rerender(); return; }
 
     var n = parseInt(e.key, 10);
@@ -300,6 +302,8 @@
 
     G.dock.init();
     initLangSwitch();
+    // Versionsangabe überall aus G.VERSION (nicht von Hand im HTML pflegen)
+    u.$$('.brand__ver').forEach(function (e) { e.textContent = 'v' + G.VERSION; });
     initTheme();
     initAppFull();
     trackTopbar();

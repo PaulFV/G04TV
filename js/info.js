@@ -16,6 +16,8 @@
     ['F', 'Vollbild ein und aus'],
     ['Esc', 'Vollbild verlassen'],
     ['M', 'Ton aus und an'],
+    ['Bild ↓ / Bild ↑', 'Nächster / vorheriger Sender'],
+    ['B', 'Zum vorherigen Sender'],
     ['↑ ↓', 'In der Senderliste blättern'],
     ['/', 'In das Suchfeld springen'],
     ['1 – 3', 'Bereich wechseln']
@@ -36,9 +38,9 @@
       '<div class="card">' +
         '<div class="card__head">' + u.icon('playlists', 18) + '<h3>Die Bereiche</h3></div>' +
         '<div class="list">' +
-          [['start', 'Start', 'Das Bild, darunter Favoriten, alle Sender mit Suche und der Verlauf'],
-           ['playlists', 'Playlisten', 'Quellen eintragen, aktualisieren, ersetzen, löschen'],
-           ['settings', 'Einstellungen', 'Wiedergabe, Vermittler, Sicherung und Löschen — und diese Info']].map(function (r) {
+          [['start', 'Start', 'Das Bild, darunter Favoriten, alle Sender, Verlauf und Programm'],
+           ['playlists', 'Playlisten', 'Quellen eintragen, aktualisieren, ersetzen, sperren, löschen'],
+           ['settings', 'Einstellungen', 'Allgemein, Programm & Sperre, Erweitert und Über — mit dieser Info']].map(function (r) {
             return '<div class="list__row"><span class="list__ic">' +
               u.icon(r[0] === 'favorites' ? 'star' : r[0], 17) + '</span>' +
               '<span class="list__main"><b>' + r[1] + '</b><span>' + r[2] + '</span></span></div>';
@@ -79,8 +81,13 @@
         '<div class="card__head">' + u.icon('live', 18) + '<h3>Mit dem Finger</h3></div>' +
         '<div class="list">' +
           [['Antippen', 'Sender abspielen'],
-           ['Stern antippen', 'Sender merken oder vergessen'],
+           ['Lang drücken', 'Favorit, Sperre, Programm, Mehrfachansicht'],
            ['Doppeltippen ins Bild', 'Vollbild ein und aus'],
+           ['Im Bild wischen', 'Links: nächster Sender, rechts: vorheriger. Im Vollbild auch hoch und runter'],
+           ['„⋯ Mehr“ unter dem Bild', 'Timer, Bild-in-Bild, Mehrfachansicht, AirPlay, andere App'],
+           ['Sender-Knopf neben „Live“', 'Zum vorherigen Sender'],
+           ['Programm', 'Ins Programm aller Sender schauen, auch 20:15 und 22:00'],
+           ['Sendung unter dem Namen antippen', 'Programm der nächsten Stunden'],
            ['Bereich wechseln', 'Das Bild läuft unten rechts weiter']].map(function (k) {
             return '<div class="list__row"><span class="list__main"><b>' + k[0] + '</b><span>' + k[1] + '</span></span></div>';
           }).join('') +

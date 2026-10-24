@@ -3,7 +3,7 @@
    Wird zuletzt geladen. Drei Dinge:
    1. Hochkant (621–980 px): Bild und Infos nebeneinander statt ein
       Bild über die ganze Breite, schmalere Leiste, mittiges Blatt.
-   2. Quer (981–1366 px): Das Menü klappt ein wie auf dem Handy und
+   2. Quer (ab 981 px; über 1366 px nur bei Berührung): Das Menü klappt ein wie auf dem Handy und
       gibt dem Inhalt die ganze Breite; die Startseite teilt sich in
       Bild links und Senderliste rechts, jede Seite für sich scrollbar.
    3. Berührung: größere Tippflächen.
@@ -35,7 +35,10 @@
 }
 
 /* ---------- 2. Quer ---------- */
-@media (min-width:981px) and (max-width:1366px) and (orientation:landscape){
+/* Auch größere Tablets (iPad Pro 13" quer = 1376 px) und Safari mit verkleinertem
+   Seitenzoom: bei Berührung gilt die Tablet-Ansicht ohne obere Grenze. */
+@media (min-width:981px) and (max-width:1366px) and (orientation:landscape),
+       (min-width:1367px) and (orientation:landscape) and (pointer:coarse){
   /* Menü als Schublade, genau wie auf dem Handy */
   :root{--sidebar-w:0px}
   .only-mobile{display:flex}
@@ -124,7 +127,7 @@
 }
 
 /* ---------- Senderkacheln auf Tablet kleiner ---------- */
-@media (min-width:621px) and (max-width:1366px){
+@media (min-width:621px) and (max-width:1366px), (min-width:1367px) and (pointer:coarse){
   .start-shelf:not(.is-list) .start-shelf__grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}
   .start-shelf:not(.is-list) .ch-tile{padding:7px;gap:5px;border-radius:12px}
   .start-shelf:not(.is-list) .ch-tile:hover{transform:none}
@@ -140,7 +143,8 @@
 }
 
 /* ---------- Bedienknöpfe unter dem Bild: größer auf dem Tablet ---------- */
-@media (min-width:621px) and (max-width:1366px) and (min-height:501px){
+@media (min-width:621px) and (max-width:1366px) and (min-height:501px),
+       (min-width:1367px) and (min-height:501px) and (pointer:coarse){
   .start-now__head{gap:10px}
   .start-now__head .start-now__icon,
   .start-now__head .start-now__icon--sm{width:52px;height:52px;border-radius:14px}
@@ -183,4 +187,13 @@
     position:sticky;left:auto;right:auto;top:var(--topbar-h,66px);height:auto;
     margin:-14px -16px 0;padding:14px 16px 8px;border-radius:var(--r-lg) var(--r-lg) 0 0;
   }
+}
+
+/* ---------- Großes Tablet hochkant (iPad Pro 13" = 1024 px breit) ----------
+   Zu breit für die Handy-Ansicht: Bild über die ganze Breite, die Infos
+   darunter statt eingequetscht daneben. */
+@media (min-width:981px) and (orientation:portrait) and (pointer:coarse){
+  .start-live{grid-template-columns:minmax(0,1fr);justify-items:stretch;gap:12px}
+  .start-live > .start-live__stage,.start-live > .start-now{width:100%;max-width:none}
+  .start-now__name{font-size:19px}
 }
