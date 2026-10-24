@@ -1236,7 +1236,11 @@
     var card = u.$('#stShelf');
     if (!card) return;
     var live = u.$('.start-live');
-    var under = live ? live.getBoundingClientRect().bottom : 0;
+    // Klebt das Bild oben, liegt die Liste darunter; sonst zählt nur die Kopfzeile
+    var pos = live ? getComputedStyle(live).position : '';
+    var bar = u.$('.topbar');
+    var under = (pos === 'sticky' || pos === 'fixed') ? live.getBoundingClientRect().bottom
+      : (bar ? bar.getBoundingClientRect().bottom : 0);
     var y = card.getBoundingClientRect().top + window.scrollY - under - 10;
     window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
   }

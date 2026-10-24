@@ -199,15 +199,17 @@
 }
 
 /* ---------- Desktop (breites Fenster, Maus): großes Bild, Bedienung darunter ----------
-   Die Karte klebt oben und die Liste läuft darunter durch - deshalb wächst das Bild
-   mit der Fensterhöhe, nicht einfach mit der Breite: etwa 360 px bleiben für die Liste.
-   Niedrige Fenster behalten mindestens die bisherige Größe. */
+   Die Karte klebt hier nicht oben, sondern scrollt mit der Seite. Dadurch darf das Bild
+   die ganze Kartenbreite nutzen; nur die Höhe ist so begrenzt, dass Bild und Zeile darunter
+   auf einen Bildschirm passen; die Liste beginnt direkt darunter. */
 @media (min-width:1367px) and (pointer:fine){
   .start-live{
-    --sw:max(calc((100vh - var(--topbar-h,72px) - 360px) * 16 / 9), 860px);
+    --sw:max(calc((100vh - var(--topbar-h,72px) - 200px) * 16 / 9), 860px);
+    position:relative;top:auto;z-index:1;
     grid-template-columns:minmax(0,1fr);justify-items:center;gap:12px;
   }
   .start-live > .start-live__stage,.start-live > .start-now{width:min(100%,var(--sw))}
   .start-now{padding:0 4px}
   .start-now__name{font-size:19px}
+  .start-shelf{scroll-margin-top:calc(var(--topbar-h,72px) + 8px)}
 }
