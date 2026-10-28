@@ -59,20 +59,43 @@
     u.$('#pdockOpen').addEventListener('click', function () { G.app.go('live'); });
     u.$('#pdockClose').addEventListener('click', function () { G.player.stop(); });
 
-    // Doppelklick ins Bild schaltet das Vollbild - wie in Connect+.
-    stage.addEventListener('dblclick', function () { G.player.fullscreen(); });
-
-    // Laufendes Bild antippen: Stopp-Knopf fuer ein paar Sekunden zeigen.
-    // Erst ein zweites Antippen haelt an - eine versehentliche Beruehrung nicht.
+    // Antippen und Doppeltippen ins Bild.
+    // Doppeltippen schaltet das Vollbild (wie in Connect+). Einmal Antippen
+    // zeigt den Stopp-Knopf - aber erst, wenn kein zweiter Tipp folgt. Früher
+    // erschien der Knopf sofort unter dem Finger, und der zweite Tipp des
+    // Doppeltippens traf ihn: der Sender hielt an, das Bild blieb stehen.
     var ctl = u.$('#stageCtl');
+    var lastTap = 0, lastX = 0, lastY = 0, tapTimer = null, dblAt = 0;
+    var running = function () { var st = G.player.status; return st === 'playing' || st === 'loading'; };
+    var toggleFull = function () {
+      dblAt = Date.now();
+      clearTimeout(tapTimer);
+      hideCtl();
+      G.player.fullscreen();
+    };
     stage.addEventListener('click', function (e) {
       if (e.target.closest('.stage__bar, .stage__err, .stage__idle, #stageCtl')) return;
-      var st = G.player.status;
-      if (st !== 'playing' && st !== 'loading') return;
-      showCtl();
+      var now = Date.now();
+      var near = Math.abs(e.clientX - lastX) < 40 && Math.abs(e.clientY - lastY) < 40;
+      if (now - lastTap < 320 && near) {           // zweiter Tipp: Doppeltippen
+        lastTap = 0;
+        if (now - dblAt > 500) toggleFull();
+        return;
+      }
+      lastTap = now; lastX = e.clientX; lastY = e.clientY;
+      clearTimeout(tapTimer);
+      if (!running()) return;
+      tapTimer = setTimeout(function () { if (running()) showCtl(); }, 330);
+    });
+    // Maus: der Browser meldet den Doppelklick selbst - nur einmal schalten
+    stage.addEventListener('dblclick', function (e) {
+      if (e.target.closest('.stage__bar, .stage__err, #stageCtl')) return;
+      if (Date.now() - dblAt > 500) toggleFull();
     });
     if (ctl) ctl.addEventListener('click', function (e) {
       e.stopPropagation();
+      // Ein Tipp direkt nach dem Erscheinen ist kein bewusstes Anhalten
+      if (Date.now() - ctlShownAt < 400) return;
       hideCtl();
       G.player.stop();
     });
@@ -101,6 +124,45 @@
 
     document.addEventListener('fullscreenchange', paintFull);
     document.addEventListener('webkitfullscreenchange', paintFull);
+
+    // Nach dem Wechsel ins oder aus dem Vollbild: läuft das Bild weiter?
+    // iPhone/iPad halten das Video beim Wechsel manchmal an oder das Bild
+    // friert ein, obwohl der Ton weiterläuft. Dann sanft wieder anstoßen
+    // (abspielen, bei Live-Strömen an das Ende des Puffers springen).
+    var nudge = function () {
+      if (!video) return;
+      var st = G.player.status;
+      if (st !== 'playing' && st !== 'loading') return;
+      setTimeout(function () {
+        if (video.paused) { var pp = video.play(); if (pp && pp.catch) pp.catch(function () { }); }
+        var t0 = video.currentTime;
+        setTimeout(function () {
+          if (G.player.status !== 'playing' || video.paused) return;
+          if (Math.abs(video.currentTime - t0) > 0.2) return;          // läuft
+          try {
+            var b = video.buffered;
+            if (b && b.length) {
+              var end = b.end(b.length - 1);
+              if (end - video.currentTime > 0.5) video.currentTime = Math.max(0, end - 0.3);
+            }
+          } catch (e) { /* Puffer nicht lesbar */ }
+          var p2 = video.play(); if (p2 && p2.catch) p2.catch(function () { });
+        }, 2000);
+      }, 350);
+    };
+    document.addEventListener('fullscreenchange', nudge);
+    document.addEventListener('webkitfullscreenchange', nudge);
+    if (video) {
+      video.addEventListener('webkitbeginfullscreen', nudge);
+      video.addEventListener('webkitendfullscreen', nudge);
+      video.addEventListener('webkitpresentationmodechanged', nudge);
+    }
+    // Weiches Vollbild (Handy drehen, Notlösung): Klasse is-full
+    var fullWas = false;
+    new MutationObserver(function () {
+      var f = stage.classList.contains('is-full');
+      if (f !== fullWas) { fullWas = f; nudge(); }
+    }).observe(stage, { attributes: true, attributeFilter: ['class'] });
 
     // Handy gedreht (quer, niedrig): läuft ein Sender, geht das Bild gleich in den
     // Vollbildmodus; zurück ins Hochformat beendet ihn wieder - aber nur, wenn
@@ -134,7 +196,9 @@
   }
 
   var ctlTimer = null;
+  var ctlShownAt = 0;
   function showCtl() {
+    if (!stage.classList.contains('is-ctl')) ctlShownAt = Date.now();
     stage.classList.add('is-ctl');
     clearTimeout(ctlTimer);
     ctlTimer = setTimeout(hideCtl, 3000);
