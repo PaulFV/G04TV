@@ -678,3 +678,5 @@ body[data-view="start"] .topbar{background:var(--bg-0)}
 .start-now__sleepchip{display:inline-flex;align-items:center;gap:4px;margin-left:8px;height:22px;padding:0 8px;border-radius:99px;
   border:1px solid rgba(169,139,255,.5);background:rgba(169,139,255,.12);color:#A98BFF;font:inherit;font-size:11.5px;font-weight:650;cursor:pointer}
 [data-theme="light"] .start-now__sleepchip{color:#6B4CE0;background:#F0ECFF;border-color:rgba(107,76,224,.4)}
+.start-now__state.is-paused{color:var(--tx-1)}
+.start-now__state.is-paused i{background:var(--tx-2)}
