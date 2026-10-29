@@ -60,17 +60,18 @@
     u.$('#pdockClose').addEventListener('click', function () { G.player.stop(); });
 
     // Antippen und Doppeltippen ins Bild.
-    // Doppeltippen schaltet das Vollbild (wie in Connect+). Einmal Antippen
-    // zeigt den Stopp-Knopf - aber erst, wenn kein zweiter Tipp folgt. Früher
-    // erschien der Knopf sofort unter dem Finger, und der zweite Tipp des
-    // Doppeltippens traf ihn: der Sender hielt an, das Bild blieb stehen.
+    // Einmal Antippen: Pause bzw. weiter - in der Mitte erscheint kurz das
+    // Zeichen (❚❚ beim Anhalten, ▶ beim Weiterspielen); angehalten bleibt ▶
+    // stehen. Doppeltippen schaltet das Vollbild (wie in Connect+). Der
+    // einzelne Tipp wartet 0,33 s, ob ein zweiter folgt - sonst würde das
+    // Doppeltippen erst anhalten und dann wieder starten.
     var ctl = u.$('#stageCtl');
+    ctlIcon('pause');
     var lastTap = 0, lastX = 0, lastY = 0, tapTimer = null, dblAt = 0;
     var running = function () { var st = G.player.status; return st === 'playing' || st === 'loading'; };
     var toggleFull = function () {
       dblAt = Date.now();
       clearTimeout(tapTimer);
-      hideCtl();
       G.player.fullscreen();
     };
     stage.addEventListener('click', function (e) {
@@ -79,26 +80,34 @@
       var near = Math.abs(e.clientX - lastX) < 40 && Math.abs(e.clientY - lastY) < 40;
       if (now - lastTap < 320 && near) {           // zweiter Tipp: Doppeltippen
         lastTap = 0;
+        clearTimeout(tapTimer);
         if (now - dblAt > 500) toggleFull();
         return;
       }
       lastTap = now; lastX = e.clientX; lastY = e.clientY;
       clearTimeout(tapTimer);
       if (!running()) return;
-      tapTimer = setTimeout(function () { if (running()) showCtl(); }, 330);
+      tapTimer = setTimeout(function () { if (running()) togglePause(); }, 330);
     });
     // Maus: der Browser meldet den Doppelklick selbst - nur einmal schalten
     stage.addEventListener('dblclick', function (e) {
       if (e.target.closest('.stage__bar, .stage__err, #stageCtl')) return;
+      clearTimeout(tapTimer);
       if (Date.now() - dblAt > 500) toggleFull();
     });
+    // Das Zeichen in der Mitte ist selbst ein Knopf: ▶ spielt weiter, ❚❚ hält an
     if (ctl) ctl.addEventListener('click', function (e) {
       e.stopPropagation();
-      // Ein Tipp direkt nach dem Erscheinen ist kein bewusstes Anhalten
-      if (Date.now() - ctlShownAt < 400) return;
-      hideCtl();
-      G.player.stop();
+      if (!running()) return;
+      togglePause();
     });
+    // Angehalten oder weiter - egal ob durch Tippen, Sperrbildschirm oder CarPlay
+    video.addEventListener('pause', function () {
+      if (!running() || video.ended || !video.currentSrc) return;
+      paintPaused(true);
+    });
+    video.addEventListener('playing', function () { paintPaused(false); });
+    G.player.on(function (status) { if (status !== 'playing') { userPaused = false; paintPaused(false, true); } });
 
     // Vollbild: Knöpfe 5 s zeigen (beim Eintritt und bei jeder Berührung), dann ausblenden
     var barTimer = null;
@@ -130,10 +139,11 @@
     // friert ein, obwohl der Ton weiterläuft. Dann sanft wieder anstoßen
     // (abspielen, bei Live-Strömen an das Ende des Puffers springen).
     var nudge = function () {
-      if (!video) return;
+      if (!video || userPaused) return;
       var st = G.player.status;
       if (st !== 'playing' && st !== 'loading') return;
       setTimeout(function () {
+        if (userPaused) return;                                         // bewusst angehalten
         if (video.paused) { var pp = video.play(); if (pp && pp.catch) pp.catch(function () { }); }
         var t0 = video.currentTime;
         setTimeout(function () {
@@ -196,6 +206,67 @@
   }
 
   var ctlTimer = null;
+  /* ---------- Pause / weiter ---------- */
+  var userPaused = false, pausedAt = 0, flashTimer = null;
+  var PLAY = '<svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M8 5.5l11 6.5-11 6.5v-13z"/></svg>';
+  var PAUSE = '<svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><rect x="6.5" y="5.5" width="4" height="13" rx="1.3"/><rect x="13.5" y="5.5" width="4" height="13" rx="1.3"/></svg>';
+
+  function ctlIcon(kind) {
+    var c = u.$('#stageCtl');
+    if (!c) return;
+    c.innerHTML = kind === 'play' ? PLAY : PAUSE;
+    var t = kind === 'play' ? 'Abspielen' : 'Pause';
+    c.title = t; c.setAttribute('aria-label', t);
+  }
+
+  function togglePause() {
+    if (!video) return;
+    if (video.paused) resume(); else pause();
+  }
+  function pause() {
+    userPaused = true;
+    pausedAt = Date.now();
+    try { video.pause(); } catch (e) { }
+    paintPaused(true);
+  }
+  function resume() {
+    userPaused = false;
+    var c = G.player.channel;
+    // Lange angehalten: bei Live-Sendern ist der Puffer dann veraltet -
+    // neu verbinden, damit es an der aktuellen Stelle weitergeht.
+    if (c && pausedAt && Date.now() - pausedAt > 60000) {
+      pausedAt = 0;
+      flash('play');
+      G.player.play(c);
+      return;
+    }
+    pausedAt = 0;
+    var p = video.play();
+    if (p && p.catch) p.catch(function () { });
+    flash('play');
+  }
+  /** Kurz das Zeichen der eben ausgeführten Aktion zeigen */
+  function flash(kind) {
+    clearTimeout(flashTimer);
+    ctlIcon(kind);
+    stage.classList.add('is-ctl');
+    flashTimer = setTimeout(function () {
+      flashTimer = null;
+      if (video && video.paused && G.player.channel) { ctlIcon('play'); return; }   // angehalten: ▶ bleibt
+      stage.classList.remove('is-ctl');
+      ctlIcon('pause');
+    }, 750);
+  }
+  function paintPaused(on, quiet) {
+    if (!stage) return;
+    var was = stage.classList.contains('is-paused');
+    stage.classList.toggle('is-paused', !!on);
+    if (on && !was && !quiet) flash('pause');
+    if (!on && was && !quiet && !flashTimer) { stage.classList.remove('is-ctl'); ctlIcon('pause'); }
+    if (!on && quiet) { clearTimeout(flashTimer); flashTimer = null; stage.classList.remove('is-ctl'); ctlIcon('pause'); }
+    if (was !== !!on) document.dispatchEvent(new CustomEvent('g04tv:paused', { detail: { paused: !!on } }));
+  }
+
   var ctlShownAt = 0;
   function showCtl() {
     if (!stage.classList.contains('is-ctl')) ctlShownAt = Date.now();
@@ -379,6 +450,8 @@
     paintMute: paintMute,
     paintFull: paintFull,
     external: external,
+    togglePause: function () { togglePause(); },
+    isPaused: function () { return !!(video && video.paused && G.player.channel && (G.player.status === 'playing' || G.player.status === 'loading')); },
     get el() { return dock; }
   };
 })(G04TV);

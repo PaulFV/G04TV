@@ -82,6 +82,7 @@
         '<div class="list">' +
           [['Antippen', 'Sender abspielen'],
            ['Lang drücken', 'Favorit, Sperre, Programm, Mehrfachansicht'],
+           ['Bild antippen', 'Pause / weiter'],
            ['Doppeltippen ins Bild', 'Vollbild ein und aus'],
            ['Im Bild wischen', 'Links: nächster Sender, rechts: vorheriger. Im Vollbild auch hoch und runter'],
            ['„⋯ Mehr“ unter dem Bild', 'Timer, Bild-in-Bild, Mehrfachansicht, AirPlay, andere App'],
