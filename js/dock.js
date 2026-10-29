@@ -245,25 +245,28 @@
     if (p && p.catch) p.catch(function () { });
     flash('play');
   }
-  /** Kurz das Zeichen der eben ausgeführten Aktion zeigen */
+  /**
+   * Wie in G04Music: angehalten steht ❚❚ groß in der Mitte; beim Weiterspielen
+   * blitzt ▶ kurz auf (wächst und blendet aus).
+   */
   function flash(kind) {
+    if (kind !== 'play') return;
     clearTimeout(flashTimer);
-    ctlIcon(kind);
-    stage.classList.add('is-ctl');
+    ctlIcon('play');
+    stage.classList.remove('flash-play');
+    void stage.offsetWidth;
+    stage.classList.add('flash-play');
     flashTimer = setTimeout(function () {
       flashTimer = null;
-      if (video && video.paused && G.player.channel) { ctlIcon('play'); return; }   // angehalten: ▶ bleibt
-      stage.classList.remove('is-ctl');
+      stage.classList.remove('flash-play');
       ctlIcon('pause');
-    }, 750);
+    }, 650);
   }
   function paintPaused(on, quiet) {
     if (!stage) return;
     var was = stage.classList.contains('is-paused');
+    if (on) { clearTimeout(flashTimer); flashTimer = null; stage.classList.remove('flash-play'); ctlIcon('pause'); }
     stage.classList.toggle('is-paused', !!on);
-    if (on && !was && !quiet) flash('pause');
-    if (!on && was && !quiet && !flashTimer) { stage.classList.remove('is-ctl'); ctlIcon('pause'); }
-    if (!on && quiet) { clearTimeout(flashTimer); flashTimer = null; stage.classList.remove('is-ctl'); ctlIcon('pause'); }
     if (was !== !!on) document.dispatchEvent(new CustomEvent('g04tv:paused', { detail: { paused: !!on } }));
   }
 
