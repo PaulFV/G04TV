@@ -74,6 +74,14 @@
       clearTimeout(tapTimer);
       G.player.fullscreen();
     };
+    // Im Vollbild sind die Knöpfe nach 5 s ausgeblendet. Der erste Tipp holt sie
+    // nur zurück - er hält nicht an. Sonst traf, wer „Vollbild verlassen“
+    // drücken wollte, das Bild und der Sender stand still.
+    var hintBefore = true;
+    var fullNow = function () { return stage.classList.contains('is-full') || stage.classList.contains('is-fs'); };
+    stage.addEventListener('pointerdown', function () {
+      hintBefore = !fullNow() || stage.classList.contains('is-hint');
+    }, { capture: true, passive: true });
     stage.addEventListener('click', function (e) {
       if (e.target.closest('.stage__bar, .stage__err, .stage__idle, #stageCtl')) return;
       var now = Date.now();
@@ -87,6 +95,7 @@
       lastTap = now; lastX = e.clientX; lastY = e.clientY;
       clearTimeout(tapTimer);
       if (!running()) return;
+      if (!hintBefore) return;                     // nur Knöpfe zeigen
       tapTimer = setTimeout(function () { if (running()) togglePause(); }, 330);
     });
     // Maus: der Browser meldet den Doppelklick selbst - nur einmal schalten
@@ -112,7 +121,7 @@
     // Vollbild: Knöpfe 5 s zeigen (beim Eintritt und bei jeder Berührung), dann ausblenden
     var barTimer = null;
     var wasFull = false;
-    var fullNow = function () { return stage.classList.contains('is-full') || stage.classList.contains('is-fs'); };
+    fullNow = function () { return stage.classList.contains('is-full') || stage.classList.contains('is-fs'); };
     var showBar = function () {
       stage.classList.add('is-hint');
       clearTimeout(barTimer);

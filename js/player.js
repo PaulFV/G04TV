@@ -778,6 +778,10 @@
 
   /** Ohne Vollbild-Schnittstelle: das Videofeld selbst, sonst die Notloesung. */
   function fallbackFull() {
+    // iPhone: das eigene Vollbild von Apple friert bei MediaSource-Wiedergabe
+    // (hls.js, mpegts.js über ManagedMediaSource) gern ein - der Ton läuft
+    // weiter, das Bild steht. Dann lieber das eigene Vollbild der App.
+    if (hls || ts) { if (stage) stage.classList.add('is-full'); return; }
     if (video && video.webkitEnterFullscreen) { try { video.webkitEnterFullscreen(); return; } catch (e) { } }
     if (stage) stage.classList.add('is-full');
   }
