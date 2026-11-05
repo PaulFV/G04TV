@@ -826,6 +826,12 @@
     , 'Das Bild, darunter Favoriten, alle Sender, Verlauf und Programm': 'The picture, below it favourites, all channels, history and guide'
     , 'Quellen eintragen, aktualisieren, ersetzen, sperren, löschen': 'Add, refresh, replace, lock and delete sources'
     , 'Allgemein, Programm & Sperre, Erweitert und Über — mit dieser Info': 'General, guide & lock, advanced and about — including this info'
+    // Pause
+    , 'Pausiert': 'Paused'
+    , 'Abspielen': 'Play'
+    , 'Pause': 'Pause'
+    , 'Bild antippen': 'Tap the picture'
+    , 'Pause / weiter': 'Pause / resume'
   };
 
 

@@ -190,7 +190,8 @@
     var clock = left ? '<button class="start-now__sleepchip" id="stSleepChip" title="Einschlaf-Timer">' + u.icon('moon', 12) + '<span>' + left + ' Min.</span></button>' : '';
     var back = G.extras && G.extras.previous();
     var backBtn = back ? '<button class="start-now__back" id="stBack" title="' + tr('Zurück zu') + ' ' + u.esc(back.name) + '">' + u.icon('back', 12) + '<span data-no-translate>' + u.esc(back.name) + '</span></button>' : '';
-    if (status === 'playing') state = '<span class="start-now__state is-live"><i></i>Live' + clock + backBtn + '</span>';
+    if (status === 'playing' && G.dock.isPaused && G.dock.isPaused()) state = '<span class="start-now__state is-paused"><i></i>Pausiert' + clock + backBtn + '</span>';
+    else if (status === 'playing') state = '<span class="start-now__state is-live"><i></i>Live' + clock + backBtn + '</span>';
     else if (status === 'loading') state = '<span class="start-now__state is-busy"><i></i>Wird geladen …' + clock + backBtn + '</span>';
     else if (status === 'error') state = '<span class="start-now__state is-err"><i></i>Fehler' + backBtn + '</span>';
     else state = '<span class="start-now__state"><i></i>Zuletzt gesehen' +
@@ -413,8 +414,11 @@
     }
     if (shelfTab === 'fav' || shelfTab === 'all' || shelfTab === 'recent') return shelfTab;
     if (shelfTab === 'guide' && guideOn()) return shelfTab;
-    shelfTab = null;
-    return s.favorites.length ? 'fav' : 'all';
+    // Noch nichts gewählt: Favoriten, wenn es welche gibt, sonst Alle. Für diese Sitzung
+    // bleibt es dabei (gespeichert wird nichts) - sonst kippte der Reiter beim ersten
+    // Favoriten von Alle auf Favoriten, und die Seite sprang nach oben.
+    shelfTab = s.favorites.length ? 'fav' : 'all';
+    return shelfTab;
   }
 
   var VIEW_KEY = 'g04tv.startView';
@@ -1149,6 +1153,8 @@
     document.addEventListener('g04tv:epg', onEpg);
     document.addEventListener('g04tv:prev', paintNow);
     document.addEventListener('g04tv:sleep', paintNow);
+    document.addEventListener('g04tv:paused', paintNow);
+    off.push(function () { document.removeEventListener('g04tv:paused', paintNow); });
     off.push(function () { document.removeEventListener('g04tv:sleep', paintNow); });
     off.push(function () { document.removeEventListener('g04tv:prev', paintNow); });
     off.push(function () { document.removeEventListener('g04tv:epg', onEpg); });

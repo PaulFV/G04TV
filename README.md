@@ -1,4 +1,4 @@
-# G04TV v1.0.122
+# G04TV v1.0.127
 
 Abspieler für **eigene IPTV-Playlisten** — als installierbare Web-App für **iPhone, iPad, Android und
 Desktop**. Ohne Backend, ohne Konto, ohne Tracking. Playlisten, Favoriten, Programm und Zugangsdaten
@@ -86,7 +86,9 @@ für sich scrollbar. Auf dem **Handy** klebt das Bild oben; die untere Leiste l�
 | Lang drücken auf Sender | Favorit, Sperre, Programm, Mehrfachansicht |
 | Lang drücken auf Kategorie | Nur diese zeigen, ausblenden, sperren |
 | Im Bild wischen | Links: nächster Sender, rechts: vorheriger (im Vollbild auch hoch/runter) |
+| Bild antippen | Pause (❚❚ bleibt stehen) / weiter (▶ blitzt auf) — nach über einer Minute Pause neu verbunden, damit es live weitergeht |
 | Doppeltippen ins Bild | Vollbild ein und aus |
+| Im Vollbild tippen | Erster Tipp zeigt die Knöpfe (nach 5 s ausgeblendet), erst dann Pause / weiter |
 | Sendung unter dem Namen antippen | Programm der nächsten Stunden |
 | „⋯ Mehr“ unter dem Bild | Programm, Einschlaf-Timer, Bild-in-Bild, Mehrfachansicht, AirPlay, andere App |
 | `F` · `Esc` · `M` | Vollbild · Vollbild verlassen · Ton aus/an |

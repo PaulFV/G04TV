@@ -59,28 +59,69 @@
     u.$('#pdockOpen').addEventListener('click', function () { G.app.go('live'); });
     u.$('#pdockClose').addEventListener('click', function () { G.player.stop(); });
 
-    // Doppelklick ins Bild schaltet das Vollbild - wie in Connect+.
-    stage.addEventListener('dblclick', function () { G.player.fullscreen(); });
-
-    // Laufendes Bild antippen: Stopp-Knopf fuer ein paar Sekunden zeigen.
-    // Erst ein zweites Antippen haelt an - eine versehentliche Beruehrung nicht.
+    // Antippen und Doppeltippen ins Bild.
+    // Einmal Antippen: Pause bzw. weiter - in der Mitte erscheint kurz das
+    // Zeichen (❚❚ beim Anhalten, ▶ beim Weiterspielen); angehalten bleibt ▶
+    // stehen. Doppeltippen schaltet das Vollbild (wie in Connect+). Der
+    // einzelne Tipp wartet 0,33 s, ob ein zweiter folgt - sonst würde das
+    // Doppeltippen erst anhalten und dann wieder starten.
     var ctl = u.$('#stageCtl');
+    ctlIcon('pause');
+    var lastTap = 0, lastX = 0, lastY = 0, tapTimer = null, dblAt = 0;
+    var running = function () { var st = G.player.status; return st === 'playing' || st === 'loading'; };
+    var toggleFull = function () {
+      dblAt = Date.now();
+      clearTimeout(tapTimer);
+      G.player.fullscreen();
+    };
+    // Im Vollbild sind die Knöpfe nach 5 s ausgeblendet. Der erste Tipp holt sie
+    // nur zurück - er hält nicht an. Sonst traf, wer „Vollbild verlassen“
+    // drücken wollte, das Bild und der Sender stand still.
+    var hintBefore = true;
+    var fullNow = function () { return stage.classList.contains('is-full') || stage.classList.contains('is-fs'); };
+    stage.addEventListener('pointerdown', function () {
+      hintBefore = !fullNow() || stage.classList.contains('is-hint');
+    }, { capture: true, passive: true });
     stage.addEventListener('click', function (e) {
       if (e.target.closest('.stage__bar, .stage__err, .stage__idle, #stageCtl')) return;
-      var st = G.player.status;
-      if (st !== 'playing' && st !== 'loading') return;
-      showCtl();
+      var now = Date.now();
+      var near = Math.abs(e.clientX - lastX) < 40 && Math.abs(e.clientY - lastY) < 40;
+      if (now - lastTap < 320 && near) {           // zweiter Tipp: Doppeltippen
+        lastTap = 0;
+        clearTimeout(tapTimer);
+        if (now - dblAt > 500) toggleFull();
+        return;
+      }
+      lastTap = now; lastX = e.clientX; lastY = e.clientY;
+      clearTimeout(tapTimer);
+      if (!running()) return;
+      if (!hintBefore) return;                     // nur Knöpfe zeigen
+      tapTimer = setTimeout(function () { if (running()) togglePause(); }, 330);
     });
+    // Maus: der Browser meldet den Doppelklick selbst - nur einmal schalten
+    stage.addEventListener('dblclick', function (e) {
+      if (e.target.closest('.stage__bar, .stage__err, #stageCtl')) return;
+      clearTimeout(tapTimer);
+      if (Date.now() - dblAt > 500) toggleFull();
+    });
+    // Das Zeichen in der Mitte ist selbst ein Knopf: ▶ spielt weiter, ❚❚ hält an
     if (ctl) ctl.addEventListener('click', function (e) {
       e.stopPropagation();
-      hideCtl();
-      G.player.stop();
+      if (!running()) return;
+      togglePause();
     });
+    // Angehalten oder weiter - egal ob durch Tippen, Sperrbildschirm oder CarPlay
+    video.addEventListener('pause', function () {
+      if (!running() || video.ended || !video.currentSrc) return;
+      paintPaused(true);
+    });
+    video.addEventListener('playing', function () { paintPaused(false); });
+    G.player.on(function (status) { if (status !== 'playing') { userPaused = false; paintPaused(false, true); } });
 
     // Vollbild: Knöpfe 5 s zeigen (beim Eintritt und bei jeder Berührung), dann ausblenden
     var barTimer = null;
     var wasFull = false;
-    var fullNow = function () { return stage.classList.contains('is-full') || stage.classList.contains('is-fs'); };
+    fullNow = function () { return stage.classList.contains('is-full') || stage.classList.contains('is-fs'); };
     var showBar = function () {
       stage.classList.add('is-hint');
       clearTimeout(barTimer);
@@ -101,6 +142,46 @@
 
     document.addEventListener('fullscreenchange', paintFull);
     document.addEventListener('webkitfullscreenchange', paintFull);
+
+    // Nach dem Wechsel ins oder aus dem Vollbild: läuft das Bild weiter?
+    // iPhone/iPad halten das Video beim Wechsel manchmal an oder das Bild
+    // friert ein, obwohl der Ton weiterläuft. Dann sanft wieder anstoßen
+    // (abspielen, bei Live-Strömen an das Ende des Puffers springen).
+    var nudge = function () {
+      if (!video || userPaused) return;
+      var st = G.player.status;
+      if (st !== 'playing' && st !== 'loading') return;
+      setTimeout(function () {
+        if (userPaused) return;                                         // bewusst angehalten
+        if (video.paused) { var pp = video.play(); if (pp && pp.catch) pp.catch(function () { }); }
+        var t0 = video.currentTime;
+        setTimeout(function () {
+          if (G.player.status !== 'playing' || video.paused) return;
+          if (Math.abs(video.currentTime - t0) > 0.2) return;          // läuft
+          try {
+            var b = video.buffered;
+            if (b && b.length) {
+              var end = b.end(b.length - 1);
+              if (end - video.currentTime > 0.5) video.currentTime = Math.max(0, end - 0.3);
+            }
+          } catch (e) { /* Puffer nicht lesbar */ }
+          var p2 = video.play(); if (p2 && p2.catch) p2.catch(function () { });
+        }, 2000);
+      }, 350);
+    };
+    document.addEventListener('fullscreenchange', nudge);
+    document.addEventListener('webkitfullscreenchange', nudge);
+    if (video) {
+      video.addEventListener('webkitbeginfullscreen', nudge);
+      video.addEventListener('webkitendfullscreen', nudge);
+      video.addEventListener('webkitpresentationmodechanged', nudge);
+    }
+    // Weiches Vollbild (Handy drehen, Notlösung): Klasse is-full
+    var fullWas = false;
+    new MutationObserver(function () {
+      var f = stage.classList.contains('is-full');
+      if (f !== fullWas) { fullWas = f; nudge(); }
+    }).observe(stage, { attributes: true, attributeFilter: ['class'] });
 
     // Handy gedreht (quer, niedrig): läuft ein Sender, geht das Bild gleich in den
     // Vollbildmodus; zurück ins Hochformat beendet ihn wieder - aber nur, wenn
@@ -134,7 +215,73 @@
   }
 
   var ctlTimer = null;
+  /* ---------- Pause / weiter ---------- */
+  var userPaused = false, pausedAt = 0, flashTimer = null;
+  var PLAY = '<svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M8 5.5l11 6.5-11 6.5v-13z"/></svg>';
+  var PAUSE = '<svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><rect x="6.5" y="5.5" width="4" height="13" rx="1.3"/><rect x="13.5" y="5.5" width="4" height="13" rx="1.3"/></svg>';
+
+  function ctlIcon(kind) {
+    var c = u.$('#stageCtl');
+    if (!c) return;
+    c.innerHTML = kind === 'play' ? PLAY : PAUSE;
+    var t = kind === 'play' ? 'Abspielen' : 'Pause';
+    c.title = t; c.setAttribute('aria-label', t);
+  }
+
+  function togglePause() {
+    if (!video) return;
+    if (video.paused) resume(); else pause();
+  }
+  function pause() {
+    userPaused = true;
+    pausedAt = Date.now();
+    try { video.pause(); } catch (e) { }
+    paintPaused(true);
+  }
+  function resume() {
+    userPaused = false;
+    var c = G.player.channel;
+    // Lange angehalten: bei Live-Sendern ist der Puffer dann veraltet -
+    // neu verbinden, damit es an der aktuellen Stelle weitergeht.
+    if (c && pausedAt && Date.now() - pausedAt > 60000) {
+      pausedAt = 0;
+      flash('play');
+      G.player.play(c);
+      return;
+    }
+    pausedAt = 0;
+    var p = video.play();
+    if (p && p.catch) p.catch(function () { });
+    flash('play');
+  }
+  /**
+   * Wie in G04Music: angehalten steht ❚❚ groß in der Mitte; beim Weiterspielen
+   * blitzt ▶ kurz auf (wächst und blendet aus).
+   */
+  function flash(kind) {
+    if (kind !== 'play') return;
+    clearTimeout(flashTimer);
+    ctlIcon('play');
+    stage.classList.remove('flash-play');
+    void stage.offsetWidth;
+    stage.classList.add('flash-play');
+    flashTimer = setTimeout(function () {
+      flashTimer = null;
+      stage.classList.remove('flash-play');
+      ctlIcon('pause');
+    }, 650);
+  }
+  function paintPaused(on, quiet) {
+    if (!stage) return;
+    var was = stage.classList.contains('is-paused');
+    if (on) { clearTimeout(flashTimer); flashTimer = null; stage.classList.remove('flash-play'); ctlIcon('pause'); }
+    stage.classList.toggle('is-paused', !!on);
+    if (was !== !!on) document.dispatchEvent(new CustomEvent('g04tv:paused', { detail: { paused: !!on } }));
+  }
+
+  var ctlShownAt = 0;
   function showCtl() {
+    if (!stage.classList.contains('is-ctl')) ctlShownAt = Date.now();
     stage.classList.add('is-ctl');
     clearTimeout(ctlTimer);
     ctlTimer = setTimeout(hideCtl, 3000);
@@ -315,6 +462,8 @@
     paintMute: paintMute,
     paintFull: paintFull,
     external: external,
+    togglePause: function () { togglePause(); },
+    isPaused: function () { return !!(video && video.paused && G.player.channel && (G.player.status === 'playing' || G.player.status === 'loading')); },
     get el() { return dock; }
   };
 })(G04TV);
