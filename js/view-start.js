@@ -1245,16 +1245,37 @@
     window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
   }
 
-  /** Nur die Sender-Kachel neu zeichnen - das Bild oben bleibt unberuehrt. */
+  /**
+   * Nur die Sender-Kachel neu zeichnen - das Bild oben bleibt unberuehrt.
+   *
+   * Steht man weit unten in "Alle" (die Liste kommt blockweise nach), wäre die
+   * Liste danach wieder nur 60 Sender lang: die Seite würde kürzer und sprang
+   * nach oben. Deshalb wird sie hier gleich weit nachgeladen und die Stelle
+   * wiederhergestellt. Bei einem Wechsel des Reiters oder der Playlist beginnt
+   * die Liste dagegen von vorn.
+   */
   function paintShelf() {
     var card = u.$('#stShelf');
     if (!card) return;
+    var y = window.scrollY;
+    var before = card.getAttribute('data-tab');
+    var shown = allShown;
     if (observer) { observer.disconnect(); observer = null; }
     card.innerHTML = shelfInner();
     wireShelf();
+
+    if (!before || before !== currentTab()) return;
+    if (currentTab() === 'all') {
+      // Andere Playlist: wird gerade erst geholt, die Liste beginnt von vorn
+      if (!allPool || allPoolId !== G.store.state.activeId) return;
+      for (var guard = 0; allShown < shown && allShown < allList.length && guard < 500; guard++) moreAll();
+    }
+    if (Math.abs(window.scrollY - y) > 2) window.scrollTo(0, y);
   }
 
   function wireShelf() {
+    var shelf = u.$('#stShelf');
+    if (shelf) shelf.setAttribute('data-tab', currentTab());
     if (currentTab() === 'all') {
       var search = u.$('#stSearch');
       if (search) search.addEventListener('input', u.debounce(function () {
