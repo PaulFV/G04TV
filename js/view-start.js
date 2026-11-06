@@ -462,7 +462,27 @@
     else if (tab === 'guide') body = guideBody();
     else body = listBody(tab);
 
-    return head + body;
+    return head + sportStrip() + body;
+  }
+
+  /** Eine Zeile: was im Sport als Nächstes kommt und wo - Antippen öffnet die Übersicht. */
+  function sportStrip() {
+    var m = G.sport && G.sport.summary();
+    if (!m) return '';
+    var ic = m.sport === 'boxing' ? 'glove' : m.sport === 'f1' ? 'flag' : 'ball';
+    return '<button class="start-sport is-' + m.sport + (m.live ? ' is-live' : '') + '" id="stSport" type="button">' +
+      '<span class="start-sport__ic">' + u.icon(ic, 18) + '<i class="start-sport__dot"></i></span>' +
+      '<span class="start-sport__txt"><b>' + u.esc(m.label) + '</b>' +
+      '<span>' + u.esc(m.sub) + (m.more ? ' · +' + m.more + ' ' + tr('weitere') : '') + '</span></span>' +
+      u.icon('chevron', 16) + '</button>';
+  }
+
+  function paintSport() {
+    var el = u.$('#stSport'), html = sportStrip();
+    if (el) { if (html) el.outerHTML = html; else el.remove(); return; }
+    if (!html) return;
+    var top = u.$('#stShelf .start-shelf__top');
+    if (top) top.insertAdjacentHTML('afterend', html);
   }
 
   /** Die Playlisten, aus denen Favoriten stammen - mit Anzahl, in der Reihenfolge der Playlisten. */
@@ -1158,6 +1178,11 @@
     off.push(function () { document.removeEventListener('g04tv:sleep', paintNow); });
     off.push(function () { document.removeEventListener('g04tv:prev', paintNow); });
     off.push(function () { document.removeEventListener('g04tv:epg', onEpg); });
+
+    // Sport-Hinweise: Zeile über der Liste nachführen, Antippen öffnet die Übersicht
+    document.addEventListener('g04tv:sport', paintSport);
+    off.push(function () { document.removeEventListener('g04tv:sport', paintSport); });
+    u.on(host, 'click', '#stSport', function () { if (G.sport) G.sport.sheet(); });
 
     // Stern auf einer Kachel: Favorit an/aus - ohne abzuspielen
     u.on(host, 'click', '[data-fav]', function (e, t) {

@@ -1,4 +1,4 @@
-# G04TV v1.0.127
+# G04TV v1.0.128
 
 Abspieler für **eigene IPTV-Playlisten** — als installierbare Web-App für **iPhone, iPad, Android und
 Desktop**. Ohne Backend, ohne Konto, ohne Tracking. Playlisten, Favoriten, Programm und Zugangsdaten
@@ -74,6 +74,10 @@ für sich scrollbar. Auf dem **Handy** klebt das Bild oben; die untere Leiste l�
   Gerät, eingefügter Text, Xtream-Zugang (Server, Benutzer, Kennwort → `get.php?...&type=m3u_plus`).
 * **Deutsch und Englisch,** **hell und dunkel** — ohne Neuladen, ein laufender Sender spielt weiter.
 * **Offline lauffähig:** ein Service Worker legt die Programmdateien ab. Die Streams selbst kommen
+* **Sport-Hinweise:** sagt vorab, wenn Champions League, Europa League, DFB-Pokal, Länderspiele (und auf
+  Wunsch Bundesliga- und LaLiga-Topspiele), Boxen oder Formel 1 im Programm deines Anbieters kommen — und auf
+  welchem Sender der eigenen Playlisten. Zeiten und Wettbewerbe stehen in den Einstellungen. Mitteilungen kommen,
+  solange G04TV geöffnet ist; die Zeile über der Senderliste zeigt es immer.
   natürlich weiter aus dem Netz.
 
 ---

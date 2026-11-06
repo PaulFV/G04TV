@@ -429,7 +429,27 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(boot, 300); });
   else setTimeout(boot, 300);
 
+  /**
+   * Alle Sendungen, die zwischen from und to laufen und für die test(p) wahr ist.
+   * p = [start, stop, titel, beschreibung, untertitel]; zurück kommen Sendungen mit der Kennung.
+   */
+  function find(test, from, to) {
+    var out = [];
+    if (!data || !data.progs) return out;
+    Object.keys(data.progs).forEach(function (id) {
+      data.progs[id].forEach(function (p) {
+        if (p[1] <= from || p[0] >= to) return;
+        if (!test(p)) return;
+        var it = item(p);
+        it.id = id;
+        out.push(it);
+      });
+    });
+    return out;
+  }
+
   G.epg = {
+    find: find, idFor: idOf,
     refresh: refresh, nowNext: nowNext, upcoming: upcoming, progress: progress, hm: hm,
     info: info, sources: sources, sheet: sheet, norm: norm,
     en: en,

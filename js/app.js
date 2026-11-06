@@ -292,6 +292,7 @@
   function boot() {
     G.store.load();
     G.share.take();
+    if (G.sport) G.sport.take();
     var s = G.store.state;
 
     if (G.i18n) G.i18n.useState(s.settings);
@@ -353,6 +354,7 @@
 
     // Kam die App über einen Teilen-Link: jetzt fragen, ob importiert werden soll
     G.share.processPending();
+    if (G.sport) G.sport.processPending();
 
     if (!G.store.storageOk) {
       u.toast('Kein lokaler Speicher',

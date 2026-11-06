@@ -269,3 +269,54 @@
 .settings-group > .settings-section > summary h3{flex:1 0 auto;white-space:nowrap;font-size:16px !important}
 .settings-group > .settings-section > summary .settings-sum{min-width:0;max-width:none;font-size:12.5px}
 @media (max-width:620px){ .settings-group > .settings-section{padding:2px 12px} .settings-group__h{margin:10px 14px 2px} }
+
+/* ---------- Sport-Hinweise: je Sportart eine farbige Karte ---------- */
+.sec-sport{--sec:#A3E635;--sec-rgb:163,230,53;position:relative;overflow:hidden}
+.sec-sport::before{
+  content:"";position:absolute;left:0;right:0;top:0;height:3px;opacity:0;transition:opacity .4s;
+  background:linear-gradient(90deg,#4ADE80,#FBBF24,#FB7185,#4ADE80);background-size:300% 100%;
+}
+.sec-sport:has(input[data-set="sportOn"]:checked)::before{opacity:1;animation:sportSweep 6s linear infinite}
+.sec-sport > summary > svg{transform-origin:50% 12%}
+.sec-sport:has(input[data-set="sportOn"]:checked) > summary > svg{animation:sportRing 5s ease-in-out infinite}
+.settings-sport__sub{margin:18px 2px 8px;font-size:13px;font-weight:700;letter-spacing:.02em;color:var(--tx-1)}
+.settings-sport__own{margin:12px 0 0}
+.settings-sport__btns{margin-top:10px}
+
+.sport-card{
+  --sec:#4ADE80;--sec-rgb:74,222,128;
+  margin:12px 0 0;border-radius:16px;overflow:hidden;
+  border:1px solid rgba(var(--sec-rgb),.38);
+  background:linear-gradient(135deg,rgba(var(--sec-rgb),.16),rgba(var(--sec-rgb),.03) 62%);
+  transition:border-color .3s,box-shadow .3s,transform .3s;
+}
+.sport-card:hover{transform:translateY(-2px);border-color:rgba(var(--sec-rgb),.65);box-shadow:0 10px 28px rgba(var(--sec-rgb),.18)}
+.sport-card.is-f1{--sec:#FBBF24;--sec-rgb:251,191,36}
+.sport-card.is-boxing{--sec:#FB7185;--sec-rgb:251,113,133}
+.sport-card__head{display:flex;align-items:center;gap:8px;padding:6px 10px 6px 12px}
+.sport-card__head .switch{flex:1;min-width:0;padding:10px 4px;height:auto}
+.sport-card__ic{
+  flex:none;width:48px;height:48px;border-radius:15px;display:grid;place-items:center;color:var(--sec);
+  background:rgba(var(--sec-rgb),.16);border:1px solid rgba(var(--sec-rgb),.5);
+  transition:box-shadow .3s,background .3s;
+}
+.sport-card:has(.sport-card__head input:checked) .sport-card__ic{
+  background:rgba(var(--sec-rgb),.24);box-shadow:0 0 20px rgba(var(--sec-rgb),.4);animation:sportBob 3.4s ease-in-out infinite;
+}
+.sport-card:has(.sport-card__head input:not(:checked)) .sport-card__ic{filter:grayscale(.85);opacity:.7}
+.sport-card__body{display:grid;grid-template-rows:1fr;transition:grid-template-rows .42s cubic-bezier(.4,0,.2,1),opacity .3s}
+.sport-card__in{min-height:0;overflow:hidden}
+.sport-card__pad{padding:0 12px 14px}
+.sport-card:has(.sport-card__head input:not(:checked)) .sport-card__body{grid-template-rows:0fr;opacity:0}
+.sec-sport[open] .sport-card{animation:sportRise .5s cubic-bezier(.2,.8,.3,1) both}
+.sec-sport[open] .sport-card:nth-of-type(2){animation-delay:.08s}
+.sec-sport[open] .sport-card:nth-of-type(3){animation-delay:.16s}
+
+@keyframes sportSweep{from{background-position:0 0}to{background-position:300% 0}}
+@keyframes sportRing{0%,84%,100%{transform:rotate(0)}87%{transform:rotate(16deg)}91%{transform:rotate(-13deg)}95%{transform:rotate(8deg)}}
+@keyframes sportBob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3px) rotate(-5deg)}}
+@keyframes sportRise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .sec-sport *,.sec-sport::before,.sport-card{animation:none !important;transition:none !important}
+}
+body.no-motion .sec-sport *,body.no-motion .sec-sport::before,body.no-motion .sport-card{animation:none !important;transition:none !important}

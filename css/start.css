@@ -680,3 +680,43 @@ body[data-view="start"] .topbar{background:var(--bg-0)}
 [data-theme="light"] .start-now__sleepchip{color:#6B4CE0;background:#F0ECFF;border-color:rgba(107,76,224,.4)}
 .start-now__state.is-paused{color:var(--tx-1)}
 .start-now__state.is-paused i{background:var(--tx-2)}
+
+/* ---------- Sport-Hinweise: Zeile über der Liste und Übersicht ---------- */
+.start-sport{
+  --sec:#4ADE80;--sec-rgb:74,222,128;
+  display:flex;align-items:center;gap:10px;width:100%;margin-top:10px;padding:9px 12px;
+  border-radius:12px;border:1px solid rgba(var(--sec-rgb),.45);color:var(--tx-0);text-align:left;font:inherit;cursor:pointer;
+  background:linear-gradient(100deg,rgba(var(--sec-rgb),.2),rgba(var(--sec-rgb),.05) 45%,rgba(var(--sec-rgb),.2));
+  background-size:220% 100%;animation:sportSweep2 7s linear infinite;
+  transition:transform .2s,box-shadow .2s;
+}
+.start-sport.is-f1{--sec:#FBBF24;--sec-rgb:251,191,36}
+.start-sport.is-boxing{--sec:#FB7185;--sec-rgb:251,113,133}
+.start-sport:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--sec-rgb),.22)}
+.start-sport__ic{position:relative;flex:none;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  color:var(--sec);background:rgba(var(--sec-rgb),.18);border:1px solid rgba(var(--sec-rgb),.5)}
+.start-sport__dot{display:none;position:absolute;right:-3px;top:-3px;width:9px;height:9px;border-radius:50%;background:var(--sec)}
+.start-sport.is-live .start-sport__dot{display:block;animation:sportPulse 1.6s ease-out infinite}
+.start-sport > svg{flex:none;color:var(--tx-2)}
+.start-sport__txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.start-sport__txt b{font-size:13.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.start-sport__txt span{font-size:12px;color:var(--tx-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+[data-theme="light"] .start-sport{--sec:#15803D;--sec-rgb:21,128,61}
+[data-theme="light"] .start-sport.is-f1{--sec:#B45309;--sec-rgb:180,83,9}
+[data-theme="light"] .start-sport.is-boxing{--sec:#BE123C;--sec-rgb:190,18,60}
+@keyframes sportSweep2{from{background-position:0 0}to{background-position:220% 0}}
+@keyframes sportPulse{0%{box-shadow:0 0 0 0 rgba(var(--sec-rgb),.65)}70%{box-shadow:0 0 0 8px rgba(var(--sec-rgb),0)}100%{box-shadow:0 0 0 0 rgba(var(--sec-rgb),0)}}
+@media (prefers-reduced-motion:reduce){.start-sport,.start-sport__dot{animation:none !important}}
+body.no-motion .start-sport,body.no-motion .start-sport__dot{animation:none !important}
+
+.sport-day{margin:14px 0 6px;font-size:13px;font-weight:700;color:var(--tx-1)}
+.sport-day:first-child{margin-top:0}
+.sport-ev{--sec:#4ADE80;--sec-rgb:74,222,128;padding:10px 0 10px 12px;margin:0 0 6px;border-left:3px solid var(--sec);border-radius:0 10px 10px 0;
+  background:linear-gradient(90deg,rgba(var(--sec-rgb),.1),transparent 70%)}
+.sport-ev.is-f1{--sec:#FBBF24;--sec-rgb:251,191,36}
+.sport-ev.is-boxing{--sec:#FB7185;--sec-rgb:251,113,133}
+.sport-ev__head{display:flex;justify-content:space-between;gap:10px;font-size:14px}
+.sport-ev__head b{color:var(--sec)}
+.sport-ev__head span{color:var(--tx-2);font-variant-numeric:tabular-nums;padding-right:8px}
+.sport-ev p{margin:2px 0 8px;font-size:13px;color:var(--tx-2)}
+.sport-ev__ch{display:flex;gap:6px;flex-wrap:wrap}

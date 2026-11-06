@@ -6,7 +6,7 @@
    ausschließlich die eigenen Programmdateien — keine Playlisten,
    keine Streams, keine Anfragen an fremde Server.
    ============================================================ */
-var CACHE = 'g04tv-v1.0.127';
+var CACHE = 'g04tv-v1.0.128';
 
 var ASSETS = [
   './',
@@ -32,6 +32,7 @@ var ASSETS = [
   './js/library.js',
   './js/lock.js',
   './js/share.js',
+  './js/sport.js',
   './js/dock.js',
   './js/carplay.js',
   './js/extras.js',
@@ -118,4 +119,19 @@ self.addEventListener('fetch', function (e) {
       return caches.match(req).then(function (hit) { return hit || Response.error(); });
     })
   );
+});
+
+// Mitteilung angetippt (Sport-Hinweise): App in den Vordergrund und die Sendung öffnen
+self.addEventListener('notificationclick', function (e) {
+  e.notification.close();
+  var key = (e.notification.data && e.notification.data.key) || '';
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (list) {
+    for (var i = 0; i < list.length; i++) {
+      if ('focus' in list[i]) {
+        if (key) list[i].postMessage({ type: 'g04tv-sport', key: key });
+        return list[i].focus();
+      }
+    }
+    return self.clients.openWindow('./index.html' + (key ? '#sport=' + encodeURIComponent(key) : ''));
+  }));
 });

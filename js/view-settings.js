@@ -184,6 +184,98 @@
     '</details>';
   }
 
+  /* ------------------------------------------------------------
+     Sport-Hinweise
+     ------------------------------------------------------------ */
+  /** Eine Sportart als farbige Karte: oben der Schalter, darunter die Feineinstellungen. */
+  function sportCard(kind, icon, title, sub, key, inner) {
+    return '<div class="sport-card is-' + kind + '">' +
+      '<div class="sport-card__head"><span class="sport-card__ic">' + u.icon(icon, 26) + '</span>' + sw(key, title, sub) + '</div>' +
+      '<div class="sport-card__body"><div class="sport-card__in"><div class="sport-card__pad">' + inner + '</div></div></div>' +
+    '</div>';
+  }
+  function sportGrid(items) {
+    return '<div class="settings-grid settings-grid--2">' + items.map(function (i) {
+      return '<div class="settings-panel">' + sw(i[0], i[1], i[2] || '') + '</div>';
+    }).join('') + '</div>';
+  }
+
+  function sportSection() {
+    if (!G.sport) return '';
+    var s = G.store.state.settings;
+    var sel = function (v, text) {
+      return '<option value="' + v + '"' + (+s.sportLead === v ? ' selected' : '') + '>' + tr(text) + '</option>';
+    };
+    var football = sportGrid([
+      ['sportUcl', 'Champions League'], ['sportUel', 'Europa League'], ['sportUecl', 'Conference League'],
+      ['sportDfb', 'DFB-Pokal'], ['sportNat', 'Länderspiele', 'Nations League und Qualifikation'],
+      ['sportTour', 'EM und WM', 'Die großen Turniere'],
+      ['sportBl', 'Bundesliga', 'Nur Topspiele'], ['sportLl', 'LaLiga', 'Nur Topspiele'],
+      ['sportPl', 'Premier League', 'Nur Topspiele'], ['sportSa', 'Serie A', 'Nur Topspiele']
+    ]) +
+      '<div class="field settings-sport__own"><label for="setSportOwn">Eigene Stichworte für die Ligen</label>' +
+        '<input class="input" id="setSportOwn" spellcheck="false" autocomplete="off" maxlength="300" placeholder="Bayern, Real Madrid" value="' + u.esc(s.sportOwn || '') + '">' +
+        '<span class="settings-proxy__hint">Ein Topspiel ist es, wenn zwei große Vereine gegeneinander spielen oder „Topspiel“, „Derby“ oder „Klassiker“ dabeisteht. Spiele mit diesen Wörtern zählen immer. Mit Komma trennen.</span>' +
+      '</div>';
+    var f1 = sportGrid([
+      ['sportF1Q', 'Qualifying'], ['sportF1S', 'Sprint'], ['sportF1R', 'Rennen', 'Der Grand Prix am Sonntag']
+    ]);
+    var box = sportGrid([
+      ['sportBoxTitle', 'WM- und Titelkämpfe', 'WBC, WBA, IBF, WBO'], ['sportBoxAll', 'Alle Boxabende', 'Auch ohne Titel']
+    ]);
+
+    return '<details class="card settings-section settings-fold sec-sport" id="fold-sport"' + (folds.sport ? ' open' : '') + '>' +
+      '<summary class="settings-section__head">' + u.icon('bell', 22) + '<h3>Sport-Hinweise</h3></summary>' +
+      '<div class="settings-panel">' + sw('sportOn', 'Sport-Hinweise', 'Meldet vorab, wenn Fußball, Boxen oder Formel 1 im Programm deines Anbieters kommen — und auf welchem Sender.') + '</div>' +
+      '<div id="sportState">' + sportStateHtml() + '</div>' +
+      sportCard('football', 'ball', 'Fußball', 'Welche Spiele gemeldet werden', 'sportFootball', football) +
+      sportCard('f1', 'flag', 'Formel 1', 'Qualifying, Sprint und Rennen', 'sportF1', f1) +
+      sportCard('boxing', 'glove', 'Boxen', 'Kämpfe und Boxabende', 'sportBoxing', box) +
+      '<h4 class="settings-sport__sub">Wann</h4>' +
+      '<div class="settings-panel">' + sw('sportMorningOn', 'Überblick am Morgen', 'Eine Mitteilung mit allem, was heute kommt.') + '</div>' +
+      '<div class="settings-grid settings-grid--2">' +
+        '<div class="settings-panel settings-panel__language">' + u.icon('clock', 22) +
+          '<div class="field"><label for="setSportMorning">Uhrzeit des Überblicks</label>' +
+          '<input class="input" type="time" id="setSportMorning" value="' + u.esc(s.sportMorning || '08:00') + '"></div></div>' +
+        '<div class="settings-panel settings-panel__language">' + u.icon('bell', 22) +
+          '<div class="field"><label for="setSportLead">Erinnerung vor Beginn</label>' +
+          '<select class="select" id="setSportLead">' + sel(0, 'Aus') + sel(15, '15 Minuten') + sel(30, '30 Minuten') + sel(60, '1 Stunde') + sel(120, '2 Stunden') + '</select></div></div>' +
+      '</div>' +
+      '<p class="settings-section__foot">Gesucht wird im Programm deines Anbieters (siehe „Programm“), nur auf diesem Gerät. Mitteilungen kommen, solange G04TV geöffnet ist: ohne eigenen Server kann sich eine Web-App nicht von selbst wecken. Die Zeile über der Senderliste zeigt immer, was gefunden wurde.</p>' +
+    '</details>';
+  }
+
+  function sportStateHtml() {
+    var s = G.store.state.settings;
+    if (!G.sport || !s.sportOn) return '';
+    var i = G.sport.info();
+    var row = function (kind, icon, text) {
+      return '<div class="settings-epg__state is-' + kind + '">' + u.icon(icon, 18) + '<span>' + tr(text) + '</span></div>';
+    };
+    var out = '';
+    if (i.permission === 'granted') out += row('ok', 'check', 'Mitteilungen sind erlaubt.');
+    else if (i.permission === 'denied') out += row('none', 'warn', 'Mitteilungen sind im Browser blockiert. Die Zeile über der Senderliste zeigt trotzdem alles.');
+    else if (i.permission === 'unsupported') out += row('none', 'info', 'Dieser Browser kennt keine Mitteilungen. Die Zeile über der Senderliste zeigt trotzdem alles.');
+    else out += row('none', 'info', 'Mitteilungen sind noch nicht erlaubt.');
+
+    if (!i.epg) out += row('none', 'warn', i.epgOn
+      ? 'Noch kein Programm geladen. Ohne Programm findet G04TV nichts (siehe „Programm“).'
+      : 'Der Programmführer ist aus („Programm anzeigen“). Ohne Programm findet G04TV nichts.');
+    else if (i.found) out += row('ok', 'check', u.fmtInt(i.found) + ' ' + (i.found === 1 ? 'Sendung' : 'Sendungen') + ' in den nächsten 30 Stunden.');
+    else out += row('none', 'clock', 'Zurzeit nichts Passendes in den nächsten 30 Stunden.');
+
+    return out + '<div class="settings-actions settings-sport__btns">' +
+      (i.permission === 'default' ? '<button class="btn btn--primary" id="sportAllow" type="button">' + u.icon('bell', 16) + ' Mitteilungen erlauben</button>' : '') +
+      '<button class="btn" id="sportTest" type="button">' + u.icon('play', 16) + ' Test-Mitteilung</button>' +
+      '<button class="btn" id="sportScan" type="button">' + u.icon('refresh', 16) + ' Jetzt suchen</button>' +
+    '</div>';
+  }
+
+  document.addEventListener('g04tv:sport', function () {
+    var box = u.$('#sportState');
+    if (box) box.innerHTML = sportStateHtml();
+  });
+
   function epgLiveHtml() {
     var i = G.epg.info();
     var state;
@@ -212,7 +304,7 @@
   });
 
   // Welche ausklappbaren Abschnitte offen sind - bleibt, wenn die Einstellungen neu gezeichnet werden
-  var folds = { lang: false, play: false, lock: false, epg: false, net: false, data: false, app: false, fb: false };
+  var folds = { lang: false, play: false, lock: false, epg: false, sport: false, net: false, data: false, app: false, fb: false };
 
   function viewMode() {
     try { return localStorage.getItem('g04tv.startView') === 'list' ? 'list' : 'tiles'; } catch (e) { return 'tiles'; }
@@ -236,6 +328,7 @@
       'fold-play': (s.autoplay ? tr('Sofort abspielen') : (en ? 'Select first' : 'Erst auswählen')) + ' · ' + bufferValue(s) + ' Min',
       'fold-lock': L && L.hasCode() ? (L.isOpen() ? tr('Entsperrt') : tr('Code aktiv')) : (en ? 'Off' : 'Aus'),
       'fold-epg': !s.epgOn ? (en ? 'Off' : 'Aus') : info && info.busy ? '…' : info && info.channels ? info.channels + ' ' + (en ? 'channels' : 'Sender') : (en ? 'No programme' : 'Kein Programm'),
+      'fold-sport': !s.sportOn ? (en ? 'Off' : 'Aus') : (G.sport && G.sport.info().found ? G.sport.info().found + ' ' + (en ? 'matches' : 'Treffer') : (en ? 'On' : 'An')),
       'fold-net': s.proxyOn && G.store.proxy() ? (en ? 'Relay on' : 'Vermittler an') : (en ? 'Direct' : 'Direkt'),
       'fold-data': G.store.state.playlists.length + ' ' + (G.store.state.playlists.length === 1 ? 'Playlist' : (en ? 'playlists' : 'Playlisten'))
     };
@@ -246,7 +339,7 @@
     });
     var groups = [
       ['Allgemein', ['fold-lang', 'fold-play']],
-      ['Programm & Sperre', ['fold-lock', 'fold-epg']],
+      ['Programm & Sperre', ['fold-lock', 'fold-epg', 'fold-sport']],
       ['Erweitert', ['fold-net', 'fold-data']],
       ['Über', ['fold-app', 'infoBox', 'fbBox']]
     ];
@@ -333,6 +426,7 @@
 
       lockSection() +
       epgSection() +
+      sportSection() +
 
       '<details class="card settings-section settings-fold sec-net" id="fold-net"' + (folds.net ? ' open' : '') + '>' +
         '<summary class="settings-section__head">' + u.icon('link', 22) + '<h3>Playlisten aus dem Netz</h3></summary>' +
@@ -406,7 +500,7 @@
      ------------------------------------------------------------ */
   function mount(host) {
     if (G.info) G.info.mount();
-    ['lang', 'play', 'lock', 'epg', 'net', 'data', 'app', 'fb'].forEach(function (id) {
+    ['lang', 'play', 'lock', 'epg', 'sport', 'net', 'data', 'app', 'fb'].forEach(function (id) {
       var box = u.$(id === 'fb' ? '#fbBox' : '#fold-' + id);
       if (box) box.addEventListener('toggle', function () { folds[id] = box.open; });
     });
@@ -430,6 +524,7 @@
       if (key === 'reduceMotion') document.body.classList.toggle('no-motion', t.checked);
       if (key === 'showTabbar') document.body.classList.toggle('no-tabbar', !t.checked);
       if (key === 'epgOn' && G.epg) { if (t.checked) G.epg.refresh(false); document.dispatchEvent(new CustomEvent('g04tv:epg')); }
+      if (key.indexOf('sport') === 0 && G.sport) { G.sport.changed(key, t.checked); var ss = u.$('#sportState'); if (ss) ss.innerHTML = sportStateHtml(); }
       if (key === 'resume' && t.checked) {
         u.toast('Gemerkt', 'Beim nächsten Start wird der letzte Sender vorbereitet.', 'ok', 2600);
       }
@@ -462,6 +557,27 @@
       G.store.setSetting('proxy', proxy.value.trim());
       u.toast('Gespeichert', 'Der Vermittler wird beim nächsten Abruf verwendet.', 'ok', 2600);
     };
+
+    /* Sport-Hinweise */
+    var sportMorning = u.$('#setSportMorning');
+    if (sportMorning) sportMorning.onchange = function () {
+      G.store.setSetting('sportMorning', /^\d{1,2}:\d{2}$/.test(sportMorning.value) ? sportMorning.value : '08:00');
+    };
+    var sportLead = u.$('#setSportLead');
+    if (sportLead) sportLead.onchange = function () { G.store.setSetting('sportLead', +sportLead.value || 0); };
+    var sportOwn = u.$('#setSportOwn');
+    if (sportOwn) sportOwn.onchange = function () { G.store.setSetting('sportOwn', sportOwn.value.trim().slice(0, 300)); };
+    u.on(host, 'click', '#sportAllow', function () {
+      G.sport.ask().then(function () { G.sport.refresh(true); var b = u.$('#sportState'); if (b) b.innerHTML = sportStateHtml(); });
+    });
+    u.on(host, 'click', '#sportTest', function () { G.sport.test(); });
+    u.on(host, 'click', '#sportScan', function () {
+      G.sport.refresh(true).then(function () {
+        var n = G.sport.info().found;
+        u.toast(n ? u.fmtInt(n) + ' ' + (n === 1 ? tr('Sendung gefunden') : tr('Sendungen gefunden')) : tr('Nichts Passendes gefunden'),
+          n ? tr('Die Zeile über der Senderliste zeigt sie.') : tr('Im Programm der nächsten 30 Stunden steht nichts davon.'), n ? 'ok' : 'warn', 4000);
+      });
+    });
 
     /* Programmführer */
     var epgUrls = u.$('#setEpgUrls');

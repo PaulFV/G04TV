@@ -6,7 +6,7 @@
    ============================================================ */
 var G04TV = window.G04TV || {};
 window.G04TV = G04TV;
-G04TV.VERSION = '1.0.127';
+G04TV.VERSION = '1.0.128';
 G04TV.NAME = 'G04TV';
 
 (function (G) {
@@ -230,6 +230,10 @@ G04TV.NAME = 'G04TV';
     dots: '<circle cx="5" cy="12" r="1.9" fill="currentColor"/><circle cx="12" cy="12" r="1.9" fill="currentColor"/><circle cx="19" cy="12" r="1.9" fill="currentColor"/>',
     airplay: '<path d="M6.5 17H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v9a2 2 0 01-2 2h-1.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 14.5l5 6H7l5-6z" fill="currentColor"/>',
     moon: '<path d="M19.5 14.6A8 8 0 019.4 4.5a8 8 0 1010.1 10.1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>',
+    ball: '<circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 8.3l3.3 2.4-1.3 3.9h-4l-1.3-3.9z" fill="currentColor"/><path d="M12 8.3V3.6M15.3 10.7l4.3-1.4M14 14.6l2.7 3.7M10 14.6l-2.7 3.7M8.7 10.7L4.4 9.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    glove: '<path d="M6.8 11a4.2 4.2 0 014.2-4.2h3.1a3.4 3.4 0 013.4 3.4v3.4a5.2 5.2 0 01-5.2 5.2H9.3a2.5 2.5 0 01-2.5-2.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9.3 18.6v2.2h6.2v-2.2M6.8 12h3.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>',
+    flag: '<path d="M6 21V3.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6 4.6h12.2l-2.2 3.7 2.2 3.7H6z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8.2 5.2h2.7v2.8H8.2zM13.6 5.2h2.4l-1 1.7-.2.1zM10.9 8h2.7v3.1h-2.7zM8.2 11.2v.5h2.7V8z" fill="currentColor"/>',
+    bell: '<path d="M6.5 16.5V11a5.5 5.5 0 0111 0v5.5l1.5 2h-14l1.5-2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 20.5a2.2 2.2 0 004 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
     clock: '<circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 7v5.3l3.3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
     folder: '<path d="M3.5 7.5A1.5 1.5 0 015 6h4l2 2.4h8a1.5 1.5 0 011.5 1.5V18A1.5 1.5 0 0119 19.5H5A1.5 1.5 0 013.5 18v-10.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>',
     chevron: '<path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',

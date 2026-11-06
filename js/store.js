@@ -81,6 +81,16 @@
         keepAwake: true,         // Bildschirm anlassen, solange ein Sender läuft
         epgOn: true,             // Programmführer anzeigen
         epgUrls: '',             // eigene Programm-Adressen (XMLTV), eine pro Zeile
+        sportOn: false,          // Sport-Hinweise (Fußball, Boxen, Formel 1)
+        sportFootball: true, sportBoxing: true, sportF1: true,
+        sportUcl: true, sportUel: true, sportUecl: true, sportDfb: true, sportNat: true,
+        sportTour: true,         // EM, WM und andere Turniere
+        sportBl: false, sportLl: false, sportPl: false, sportSa: false,   // Ligen: nur Topspiele
+        sportF1Q: true, sportF1S: true, sportF1R: true,                   // Qualifying, Sprint, Rennen
+        sportBoxTitle: true, sportBoxAll: false,                          // Titelkämpfe / alle Boxabende
+        sportOwn: '',            // eigene Stichworte (Vereine), zählen als Topspiel
+        sportMorningOn: true, sportMorning: '08:00',   // Überblick am Morgen
+        sportLead: 30,           // Erinnerung vor Beginn in Minuten, 0 = aus
         hiddenGroups: {},        // ausgeblendete Kategorien: { playlistId: [Name, …] }
         proxyOn: false,
         proxy: '',               // eigener Vermittler, z. B. https://…/?url={url}

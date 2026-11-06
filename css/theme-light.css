@@ -217,6 +217,10 @@
 [data-theme="light"] .start-now__sleep i{background:#6B4CE0;color:#fff}
 
 /* Programmführer */
+[data-theme="light"] .sec-sport{--sec:#4D7C0F;--sec-rgb:77,124,15}
+[data-theme="light"] .sport-card{--sec:#15803D;--sec-rgb:21,128,61}
+[data-theme="light"] .sport-card.is-f1{--sec:#B45309;--sec-rgb:180,83,9}
+[data-theme="light"] .sport-card.is-boxing{--sec:#BE123C;--sec-rgb:190,18,60}
 [data-theme="light"] .sec-epg{--sec:#C02675;--sec-rgb:192,38,117}
 [data-theme="light"] .settings-epg__state{background:#F6F9FB;border-color:rgba(16,44,66,.1)}
 [data-theme="light"] .settings-epg__state.is-ok{background:#E9F8F0;border-color:rgba(30,154,90,.3)}
