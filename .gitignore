@@ -24,3 +24,6 @@ zugang.txt
 *.aab
 *.apk
 play-store/keystore/
+
+# Wrangler (Cloudflare) legt lokale Arbeitsdateien an
+.wrangler/

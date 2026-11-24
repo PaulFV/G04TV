@@ -201,10 +201,11 @@
 /* ---------- Desktop (breites Fenster, Maus): großes Bild, Bedienung darunter ----------
    Die Karte klebt hier nicht oben, sondern scrollt mit der Seite. Dadurch darf das Bild
    die ganze Kartenbreite nutzen; nur die Höhe ist so begrenzt, dass Bild und Zeile darunter
-   auf einen Bildschirm passen; die Liste beginnt direkt darunter. */
+   auf einen Bildschirm passen; die Liste beginnt direkt darunter. Auf großen Bildschirmen
+   begrenzt eine feste Breite das Bild (1100 px), sonst füllte es fast das ganze Fenster. */
 @media (min-width:1367px) and (pointer:fine){
   .start-live{
-    --sw:max(calc((100vh - var(--topbar-h,72px) - 200px) * 16 / 9), 860px);
+    --sw:min(max(calc((100vh - var(--topbar-h,72px) - 200px) * 16 / 9), 860px), 1100px);
     position:relative;top:auto;z-index:1;
     grid-template-columns:minmax(0,1fr);justify-items:center;gap:12px;
   }
